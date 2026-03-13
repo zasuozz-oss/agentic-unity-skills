@@ -2,13 +2,25 @@
 
 @.agents/skills-unity/INDEX.md
 
+## ⚠️ FIRST ACTION — Read the Skill Index
+
+Before doing ANY Unity-related work, you MUST read the skill index:
+
+```
+view_file(".agents/skills-unity/INDEX.md")
+```
+
+This file lists all 70 Unity skills by category. **You MUST read it to know which skills are available.** If you skip this step, you will miss relevant skills and produce lower-quality code.
+
+**This is non-negotiable. Do it NOW before writing any Unity code.**
+
 ## Mandatory Unity Skill Usage
 
 **You MUST check and use Unity skills when working in a Unity project.**
 
 ### Skill Lookup Rule
 
-Before implementing ANY Unity-related task, check the skill index above.
+After reading INDEX.md, find the matching skill for your task.
 If a matching skill exists, `view_file` on its `SKILL.md` and follow it exactly.
 
 ### Mandatory Skill Triggers
