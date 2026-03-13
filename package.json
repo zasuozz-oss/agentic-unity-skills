@@ -1,15 +1,17 @@
 {
   "name": "ag-unity",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Unity skills for Antigravity AI agent — Install 70+ Unity skills into any project",
+  "type": "module",
   "bin": {
-    "ag-unity": "./bin/cli.js"
+    "ag-unity": "bin/cli.mjs"
   },
   "files": [
     "bin/",
     "global-config/",
-    "setup-project.sh",
-    "setup-project.ps1"
+    "scripts/",
+    "unity_context.md",
+    "gemini-extension.json"
   ],
   "keywords": [
     "unity",
@@ -18,9 +20,11 @@
     "gemini",
     "skills"
   ],
+  "author": "zasuozz-oss",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zasuozz/antigravity-unity-skills"
-  }
+    "url": "https://github.com/zasuozz-oss/antigravity-unity-skills.git"
+  },
+  "homepage": "https://github.com/zasuozz-oss/antigravity-unity-skills"
 }

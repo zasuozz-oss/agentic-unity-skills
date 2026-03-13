@@ -2,18 +2,18 @@
 
 70 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
 
-> **📦 Public, read-only repository.** Install via npm or clone and run setup scripts.
+> **📦 Public, read-only repository.** Install via npm or clone and run setup.
 
 🌐 [Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Full Skill List](global-config/skills/INDEX.md)
 
 ## 📋 Requirements
 
 - [Google Antigravity](https://antigravity.google) (macOS / Windows / Linux)
-- Node.js (for npm install) or Git + Bash/PowerShell (for manual install)
+- Node.js 18+
+
+---
 
 ## ⚡ Quick Start
-
-### Option 1: npm (Recommended)
 
 ```bash
 cd /path/to/your/unity-project
@@ -22,31 +22,13 @@ npx ag-unity
 
 That's it. 70 skills installed.
 
-### Option 2: Manual (Clone + Script)
-
 <details>
-<summary>Click to expand</summary>
-
-**1. Clone this repository:**
+<summary>Alternative: Clone + Run</summary>
 
 ```bash
 git clone https://github.com/zasuozz-oss/antigravity-unity-skills.git
-```
-
-**2. Run setup in your Unity project:**
-
-macOS / Linux:
-
-```bash
 cd /path/to/your/unity-project
-bash /path/to/antigravity-unity-skills/setup-project.sh
-```
-
-Windows (PowerShell):
-
-```powershell
-cd C:\path\to\your\unity-project
-powershell -ExecutionPolicy Bypass -File C:\path\to\antigravity-unity-skills\setup-project.ps1
+node /path/to/antigravity-unity-skills/bin/cli.mjs
 ```
 
 </details>
@@ -63,6 +45,8 @@ your-project/
 
 Open Antigravity in your project. Unity skills auto-load via `GEMINI.md`.
 
+---
+
 ## 🎯 What Is This?
 
 A collection of **70 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
@@ -70,9 +54,12 @@ A collection of **70 Unity-specific skills** organized by category, designed to 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
 - ✅ **Project-level install** — skills live in your project's `.agents/skills-unity/`
-- ✅ **No global dependency** — works independently of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
+- ✅ **Cross-platform** — pure Node.js, no bash/powershell dependency
 - ✅ **Non-destructive setup** — preserves existing `GEMINI.md` content
 - ✅ **Block-based updates** — re-run setup to update without conflicts
+- ✅ **Backup on update** — existing skills backed up before overwrite
+
+---
 
 ## 📚 What's Inside
 
@@ -92,6 +79,8 @@ Key features:
 
 👉 See [INDEX.md](global-config/skills/INDEX.md) for the complete skill list with descriptions.
 
+---
+
 ## 🔄 Updating Skills
 
 ```bash
@@ -99,7 +88,9 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-Re-running the command updates skills without conflicts (block-based replacement).
+Re-running the command updates skills without conflicts (block-based replacement). Existing skills are automatically backed up.
+
+---
 
 ## 📁 Repo Structure
 
@@ -107,22 +98,28 @@ Re-running the command updates skills without conflicts (block-based replacement
 antigravity-unity-skills/
 ├── package.json             # npm package config
 ├── bin/
-│   └── cli.js               # Cross-platform CLI wrapper
-├── setup-project.sh         # Install script (macOS/Linux)
-├── setup-project.ps1        # Install script (Windows)
+│   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
 │   └── skills/              # 70 Unity skills
 │       ├── 01-architecture/
 │       ├── 02-gameplay/
 │       ├── ...
 │       └── INDEX.md
-├── GEMINI.md                # Project config template
+├── scripts/
+│   └── update-unity-skills.sh
+├── tests/
+│   └── run-tests.sh         # Automated test suite
+├── unity_context.md         # Extension context + rules
 └── gemini-extension.json    # Extension metadata
 ```
+
+---
 
 ## 🤝 Works With Superpowers
 
 This extension is **independent** of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers), but they work great together. Both use separate block markers in `GEMINI.md` — no conflicts.
+
+---
 
 ## 🔗 Links
 

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.0.0] - 2026-03-13
+
+### Changed — Modern CLI Architecture
+- **Rewrote CLI** from CJS shell-delegate (`cli.js`) to ESM with inline Node.js logic (`cli.mjs`)
+- Removed `setup-project.sh` and `setup-project.ps1` — all logic now in `cli.mjs`
+- `npx ag-unity` now works natively on all platforms (no bash/powershell dependency)
+- Added `"type": "module"` to `package.json`
+- Added automatic backup before skill overwrite
+- Updated `package.json` with `author`, `homepage`, `scripts` in `files`
+
+### Added
+- **Automated test suite** (`tests/run-tests.sh`) with 7 test cases
+- **Enhanced update script** (`scripts/update-unity-skills.sh`) with backup, diff check, interactive menu
+- Verification step with skill count and category count
+
+### Removed
+- `setup-project.sh` — logic moved to `cli.mjs`
+- `setup-project.ps1` — logic moved to `cli.mjs`
+- `bin/cli.js` — replaced by `bin/cli.mjs`
+
+---
+
 ## [1.0.0] - 2026-03-13
 
 ### Added — Initial Release
