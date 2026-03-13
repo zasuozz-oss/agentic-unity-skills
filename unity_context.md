@@ -10,47 +10,46 @@ Before doing ANY Unity-related work, you MUST read the skill index:
 view_file(".agents/skills-unity/INDEX.md")
 ```
 
-This file lists all 70 Unity skills by category. **You MUST read it to know which skills are available.** If you skip this step, you will miss relevant skills and produce lower-quality code.
+This file lists all 70 Unity skills with descriptions organized by category. **You MUST read it to know which skills are available.**
 
 **This is non-negotiable. Do it NOW before writing any Unity code.**
 
-## Mandatory Unity Skill Usage
+## Mandatory Skill Discovery
 
-**You MUST check and use Unity skills when working in a Unity project.**
+**You MUST find and use the matching skill for every Unity task.**
 
-### Skill Lookup Rule
+### How It Works
 
-After reading INDEX.md, find the matching skill for your task.
-If a matching skill exists, `view_file` on its `SKILL.md` and follow it exactly.
+1. **Read INDEX.md** — scan all 70 skills and their descriptions
+2. **Match your task** — find the skill whose description best matches what the user is asking
+3. **Read the SKILL.md** — `view_file` on it and follow its instructions exactly
+4. **If multiple skills match** — read all relevant ones, combine their guidance
 
-### Mandatory Skill Triggers
+### Examples
 
-| Task type | Look in category | Example skills |
-|-----------|-----------------|----------------|
-| Architecture / design patterns | `01-architecture/` | di-container-manager, state-machine-architect, event-bus-system |
-| Gameplay systems | `02-gameplay/` | advanced-character-controller, ai-behavior-trees, save-load-serialization |
-| Visual / audio / VFX | `04-visuals-audio/` | shader-graph-expert, vfx-graph-shuriken, cinemachine-specialist |
-| UI implementation | `05-ui-ux/` | ui-toolkit-modern, canvas-performance, responsive-ui-design |
-| Performance issues | `06-performance/` | object-pooling-system, mobile-optimization, addressables-asset-management |
-| Editor tools / pipeline | `07-tools-pipeline/` | custom-editor-scripting, unity-mcp-connector |
-| Backend / multiplayer | `08-backend-monetization/` | multiplayer-netcode, backend-integration |
-| Build / CI/CD | `09-devops-automation/` | build-pipeline-manager |
-| C# conventions / general | `unity-specific/` | my-csharp-conventions, unity-developer |
+| User asks... | You should search INDEX.md for... | Likely match |
+|---|---|---|
+| "Add dependency injection" | DI, container, dependency | `01-architecture/di-container-manager/` |
+| "Optimize for mobile" | mobile, optimization, performance | `06-performance/mobile-optimization/` |
+| "Create a save system" | save, load, serialization | `02-gameplay/save-load-serialization/` |
+| "Add enemy AI" | AI, behavior tree, pathfinding | `02-gameplay/ai-behavior-trees/` |
+| "Fix shader issue" | shader, visual, graph | `04-visuals-audio/shader-graph-expert/` |
+
+These are examples, NOT a fixed mapping. **Always search INDEX.md yourself.**
 
 ### Red Flags — STOP if you think any of these
 
 - "I know Unity well enough, no need for the skill" → **WRONG.** Skills contain project-specific conventions.
-- "This is basic Unity, I'll just code it" → **WRONG.** Check the skill for patterns and standards.
-- "I'll figure out the architecture myself" → **WRONG.** Check `01-architecture/` skills first.
-- "Performance isn't a concern now" → **WRONG.** Check `06-performance/` before implementation.
+- "This is basic Unity, I'll just code it" → **WRONG.** Check INDEX.md for matches first.
+- "No skill matches exactly" → **LOOK HARDER.** Check related categories. If truly no match, proceed without.
 - "I'll use my own C# style" → **WRONG.** Check `my-csharp-conventions` for project standards.
 
 ### How to Use Unity Skills
 
+After finding a match in INDEX.md, read the skill:
+
 ```
-view_file(".agents/skills-unity/01-architecture/di-container-manager/SKILL.md")
-view_file(".agents/skills-unity/06-performance/object-pooling-system/SKILL.md")
-view_file(".agents/skills-unity/unity-specific/my-csharp-conventions/SKILL.md")
+view_file(".agents/skills-unity/<category>/<skill-name>/SKILL.md")
 ```
 
-**If you are writing Unity code and have NOT checked for a matching skill, you are violating this rule.**
+**If you are writing Unity code and have NOT searched INDEX.md for a matching skill, you are violating this rule.**
