@@ -1,6 +1,6 @@
 ---
 name: audio-soundscape-architect
-description: "Unity audio system specialist for immersive soundscapes, music, and audio management."
+description: "Audio management and soundscape design. Use this when the user needs audio managers, sound pooling, ambient audio, or music crossfading systems."
 version: 1.0.0
 tags: ["audio", "sound", "music", "AudioMixer", "FMOD", "Wwise"]
 argument-hint: "sound_type='sfx' OR mixer_group='Music' ducking='true'"

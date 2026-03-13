@@ -1,6 +1,6 @@
 ---
 name: loot-rng-management
-description: "Loot table system with weighted drop rates, rarity tiers, and procedural generation."
+description: "Loot tables and RNG systems. Use this when the user needs random item drops, weighted probability, gacha systems, or procedural reward distribution."
 version: 1.0.0
 tags: ["gameplay", "loot", "RNG", "drops", "rewards"]
 argument-hint: "loot_table='Chest_Common' guaranteed='false'"

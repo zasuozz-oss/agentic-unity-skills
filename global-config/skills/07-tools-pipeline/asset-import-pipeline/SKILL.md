@@ -1,6 +1,6 @@
 ---
 name: asset-import-pipeline
-description: "Automated AssetPostprocessor logic to sanitize and optimize assets (Textures, Models, Audio) upon import."
+description: "Asset import automation and configuration. Use this when the user needs texture import settings, model import rules, asset postprocessors, or batch import configuration."
 version: 1.0.0
 tags: ["tech-art", "import-settings", "optimization", "automation", "pipeline"]
 argument-hint: "action='ForceCompression' type='Texture'"

@@ -1,6 +1,6 @@
 ---
 name: cinemachine-specialist
-description: "Unity Cinemachine specialist for dynamic cameras, cutscenes, and cinematic gameplay."
+description: "Cinemachine camera system specialist. Use this when the user needs camera follow, camera shake, cutscenes, camera blending, or dynamic camera behavior."
 version: 1.0.0
 tags: ["visuals", "camera", "Cinemachine", "cutscenes", "Timeline"]
 argument-hint: "camera_type='FreeLook' OR blend='EaseInOut' follow='Player'"

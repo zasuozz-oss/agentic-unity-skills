@@ -1,6 +1,6 @@
 ---
 name: kaizen
-description: Guide for continuous improvement, error proofing, and standardization. Use this skill when the user wants to improve code quality, refactor, or discuss process improvements.
+description: "Continuous improvement and code quality process. Use this when the user wants to improve existing code, refactor for quality, or apply kaizen methodology."
 ---
 
 # Kaizen: Continuous Improvement

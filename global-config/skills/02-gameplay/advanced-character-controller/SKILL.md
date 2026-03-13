@@ -1,6 +1,6 @@
 ---
 name: advanced-character-controller
-description: "Complete 3D character controller with ground detection, jumping, slopes, and state-based movement."
+description: "Character movement and physics controller. Use this when the user needs player movement, jumping, dashing, wall-sliding, or custom physics-based character control."
 version: 1.0.0
 tags: ["gameplay", "character", "controller", "movement", "platformer"]
 argument-hint: "speed='5' jump_height='2' gravity='-20'"

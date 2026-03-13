@@ -1,6 +1,6 @@
 ---
 name: analytics-heatmaps
-description: "Implementation of comprehensive analytics tracking and heatmap data collection for player behavior analysis."
+description: "Analytics tracking and heatmap data collection. Use this when the user needs player behavior tracking, event analytics, heatmap visualization, or telemetry systems."
 version: 1.0.0
 tags: ["analytics", "tracking", "heatmaps", "metrics", "telemetry"]
 argument-hint: "event='LevelComplete' params='time,score' OR heatmap='death_pos'"

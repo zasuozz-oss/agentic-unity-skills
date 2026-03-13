@@ -1,6 +1,6 @@
 ---
 name: ai-behavior-trees
-description: "Implements modular Behavior Trees for AI decision making with composite, decorator, and action nodes."
+description: "Modular Behavior Trees for AI decision making. Use this when the user implements enemy AI, NPC behaviors, boss patterns, or complex AI decision systems."
 version: 1.0.0
 tags: ["gameplay", "AI", "behavior-tree", "NPCs", "enemies"]
 argument-hint: "root='Selector' children='PatrolSequence,ChaseSequence'"

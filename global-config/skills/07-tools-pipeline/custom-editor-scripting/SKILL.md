@@ -1,6 +1,6 @@
 ---
 name: custom-editor-scripting
-description: "Expert creation of Unity Editor tools, Inspector extensions, and Property Drawers to accelerate workflows."
+description: "Custom Unity Editor tools and windows. Use this when the user needs custom inspectors, editor windows, property drawers, or editor automation tools."
 version: 1.0.0
 tags: ["editor", "tools", "inspector", "efficiency", "pipeline"]
 argument-hint: "tool='LevelEditor' OR inspector='EnemyStats' type='PropertyDrawer'"

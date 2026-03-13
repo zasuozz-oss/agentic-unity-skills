@@ -1,6 +1,6 @@
 ---
 name: unity-build-commander
-description: "Executes a headless Unity build for the target platform (Windows/Android/iOS), parses the Editor.log for compilation errors, and reports the build status. Use this when the user asks to "build the game" or "check for compile errors"."
+description: "Headless Unity build executor. Use this when the user asks to build the game, check for compile errors, or run a build from command line."
 version: 1.0.0
 tags: []
 argument-hint: target='StandaloneWindows64' build_path='Builds/Win64'

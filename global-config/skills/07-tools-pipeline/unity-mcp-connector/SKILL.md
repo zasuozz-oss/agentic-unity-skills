@@ -1,6 +1,6 @@
 ---
 name: unity-mcp-connector
-description: "Orchestration bridge between AI Agents and the running Unity Editor instance via MCP (Model Context Protocol)."
+description: "Unity MCP integration specialist. Use this when the user connects Unity to external tools via Model Context Protocol or needs MCP server setup."
 version: 1.0.0
 tags: ["mcp", "integration", "editor-api", "automation", "bridge"]
 argument-hint: "action='ping' OR target='selection' scope='scene'"

@@ -1,6 +1,6 @@
 ---
 name: lod-occlusion-culling
-description: "LOD Groups and Occlusion Culling for rendering optimization in 3D environments."
+description: "LOD and occlusion culling optimization. Use this when the user needs to reduce draw calls, set up LOD groups, configure occlusion culling, or optimize large scenes."
 version: 1.0.0
 tags: ["performance", "rendering", "LOD", "occlusion", "culling"]
 argument-hint: "lod_levels='3' OR occlusion='bake' culling='frustum'"

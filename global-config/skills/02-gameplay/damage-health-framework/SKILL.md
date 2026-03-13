@@ -1,6 +1,6 @@
 ---
 name: damage-health-framework
-description: "Complete damage and health system with IDamageable interface, damage types, resistances, and event-driven architecture."
+description: "Damage and health system framework. Use this when the user needs HP management, damage types, armor, shields, death handling, or hit/hurt systems."
 version: 1.0.0
 tags: ["gameplay", "combat", "health", "damage", "IDamageable"]
 argument-hint: "action='create_health' OR damage_type='Fire' resistance='0.5'"

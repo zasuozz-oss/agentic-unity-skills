@@ -1,6 +1,6 @@
 ---
 name: ability-skill-system
-description: "Data-driven ability system with ScriptableObject definitions, cooldowns, resource costs, targeting, and cast times."
+description: "Ability and skill system framework. Use this when the user builds RPG abilities, cooldown systems, skill trees, or character special moves."
 version: 1.0.0
 tags: ["gameplay", "abilities", "skills", "cooldowns", "RPG", "action"]
 argument-hint: "ability_name='Fireball' cooldown='5' cost='Mana:30'"

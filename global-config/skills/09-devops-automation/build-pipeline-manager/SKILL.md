@@ -1,6 +1,6 @@
 ---
 name: build-pipeline-manager
-description: "Command Line Interface (CLI) wrapper for automating Unity Builds (Android, iOS, Windows). Essential for CI/CD (Jenkins, GitHub Actions)."
+description: "CLI wrapper for automating Unity Builds. Use this when the user needs CI/CD build scripts, automated builds for Android/iOS/Windows, or Jenkins/GitHub Actions setup."
 version: 1.0.0
 tags: ["devops", "ci-cd", "build-automation", "cli", "jenkins"]
 argument-hint: "platform='Android' version='1.0.2' output='Builds/APK'"

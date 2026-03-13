@@ -1,6 +1,6 @@
 ---
 name: event-bus-system
-description: "Implements a global decoupled Event Bus for cross-system communication. Zero-allocation struct events prevent GC spikes."
+description: "Global decoupled Event Bus for cross-system communication. Use this when the user needs systems to communicate without direct references, pub/sub patterns, or zero-allocation struct events."
 version: 1.0.0
 tags: ["architecture", "events", "decoupling", "observer", "messaging"]
 argument-hint: "event_name='PlayerDamaged' namespace='Game.Events'"

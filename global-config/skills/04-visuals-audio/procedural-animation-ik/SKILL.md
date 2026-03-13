@@ -1,6 +1,6 @@
 ---
 name: procedural-animation-ik
-description: "Procedural animation and IK specialist for dynamic, responsive character motion."
+description: "Procedural animation and Inverse Kinematics. Use this when the user needs foot IK, look-at IK, procedural walk cycles, or dynamic bone animations."
 version: 1.0.0
 tags: ["animation", "IK", "procedural", "rigging", "motion"]
 argument-hint: "ik_type='foot' OR target='hand' weight='1.0'"

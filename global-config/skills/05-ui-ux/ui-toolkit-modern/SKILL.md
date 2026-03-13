@@ -1,6 +1,6 @@
 ---
 name: ui-toolkit-modern
-description: "Unity UI Toolkit specialist for professional, scalable, responsive runtime UI with UXML and USS."
+description: "Modern Unity UI Toolkit specialist. Use this when the user builds professional, scalable runtime UI with UXML, USS, data binding, or responsive layouts."
 version: 1.0.0
 tags: ["UI", "UI-Toolkit", "UXML", "USS", "responsive", "modern"]
 argument-hint: "component='Button' OR view='MainMenu' binding='playerHealth'"

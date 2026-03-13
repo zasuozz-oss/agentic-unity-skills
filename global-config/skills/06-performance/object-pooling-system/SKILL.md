@@ -1,6 +1,6 @@
 ---
 name: object-pooling-system
-description: "High-performance object pooling for GameObjects to eliminate GC spikes and allocation overhead."
+description: "Object pooling implementation. Use this when the user needs to pool bullets, enemies, particles, or any frequently instantiated/destroyed objects to reduce GC."
 version: 1.0.0
 tags: ["performance", "pooling", "memory", "GC", "optimization"]
 argument-hint: "prefab='Bullet' initial_size='20' OR pool_type='generic'"

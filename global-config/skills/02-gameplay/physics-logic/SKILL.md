@@ -1,6 +1,6 @@
 ---
 name: physics-logic
-description: "Unity physics systems: Rigidbody, collisions, triggers, layers, and physics queries (Raycast, OverlapSphere)."
+description: "Physics queries and interactions specialist. Use this when the user works with raycasts, triggers, collisions, rigidbody forces, or physics-based gameplay."
 version: 1.0.0
 tags: ["gameplay", "physics", "collisions", "rigidbody", "raycast"]
 argument-hint: "action='raycast' layer='Enemy' distance='10'"

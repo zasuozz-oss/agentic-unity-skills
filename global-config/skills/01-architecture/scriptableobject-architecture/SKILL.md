@@ -1,6 +1,6 @@
 ---
 name: scriptableobject-architecture
-description: "Senior Architect for Data-Driven Design using ScriptableObjects. Create SO-based event channels, runtime sets, and configuration data."
+description: "Data-Driven Design using ScriptableObjects. Use this when the user needs SO-based event channels, runtime sets, game configuration data, or shared variables between systems."
 version: 1.0.0
 tags: ["architecture", "scriptableobject", "data-driven", "events", "configuration"]
 argument-hint: "type='event' name='OnPlayerDamaged' OR type='data' name='WeaponConfig'"

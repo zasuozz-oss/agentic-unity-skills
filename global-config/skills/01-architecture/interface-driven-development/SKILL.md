@@ -1,6 +1,6 @@
 ---
 name: interface-driven-development
-description: "Senior Architect for Contract-Based Modularity. Create interfaces for decoupled, testable systems following Interface Segregation Principle."
+description: "Contract-Based Modularity using interfaces and ISP. Use this when the user asks to decouple systems, create testable code, or apply Interface Segregation Principle."
 version: 1.0.0
 tags: ["architecture", "interfaces", "SOLID", "ISP", "decoupling", "testability"]
 argument-hint: "interface_name='IDamageable' methods='TakeDamage(float),IsAlive'"

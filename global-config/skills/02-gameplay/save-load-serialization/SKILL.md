@@ -1,6 +1,6 @@
 ---
 name: save-load-serialization
-description: "Complete save/load system with ISaveable interface, JSON serialization, save slots, and encryption support."
+description: "Save/load system implementation. Use this when the user needs game saves, player progress persistence, JSON/binary serialization, or cloud save integration."
 version: 1.0.0
 tags: ["gameplay", "save", "load", "serialization", "persistence"]
 argument-hint: "action='save' slot=0 OR action='implement_saveable' class='Player'"

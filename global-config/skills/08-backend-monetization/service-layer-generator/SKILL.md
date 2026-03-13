@@ -1,6 +1,6 @@
 ---
 name: service-layer-generator
-description: "Generates Backend Service interfaces and implementations. Use to "create auth service", "mock network layer", or "add playfab service"."
+description: "Backend Service interface and implementation generator. Use this when the user needs to create auth service, mock network layer, or add service abstractions."
 version: 1.0.0
 tags: []
 argument-hint: service_name='AuthService' namespace='Game.Services'

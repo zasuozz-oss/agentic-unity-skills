@@ -1,5 +1,5 @@
 ---
-description: Unity mobile coding rules - performance, lifecycle, Inspector, DOTween, TextMeshPro
+description: "Unity mobile development best practices. Use this when the user develops for Android/iOS, needs mobile-specific patterns, or touch input handling."
 ---
 
 # Unity Mobile Coding Rules

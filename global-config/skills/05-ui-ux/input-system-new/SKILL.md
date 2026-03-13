@@ -1,6 +1,6 @@
 ---
 name: input-system-new
-description: "Unity New Input System wrapper with ScriptableObject events for multi-device input handling."
+description: "Unity New Input System specialist. Use this when the user sets up gamepad, keyboard, touch input, action maps, or multi-device input handling."
 version: 1.0.0
 tags: ["input", "gamepad", "keyboard", "touch", "New-Input-System"]
 argument-hint: "action='Jump' OR device='Gamepad' scheme='Controller'"

@@ -1,6 +1,6 @@
 ---
 name: dialogue-quest-system
-description: "Complete dialogue and quest system with branching conversations, quest stages, and event triggers."
+description: "Dialogue and quest management system. Use this when the user builds conversation systems, quest tracking, branching dialogue, or NPC interaction flow."
 version: 1.0.0
 tags: ["gameplay", "dialogue", "quests", "NPCs", "narrative"]
 argument-hint: "action='create_quest' name='Kill10Rats' stages='Accept,InProgress,Complete'"

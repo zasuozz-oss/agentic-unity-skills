@@ -1,6 +1,6 @@
 ---
 name: status-effect-system
-description: "Complete buff/debuff system with stacking, timed effects, tick damage/heal, and stat modifiers."
+description: "Status effects and buffs/debuffs system. Use this when the user needs poison, burn, stun, speed boost, or stackable/timed effect management."
 version: 1.0.0
 tags: ["gameplay", "buffs", "debuffs", "status-effects", "RPG"]
 argument-hint: "effect_name='Poison' duration='5' tick_damage='10'"

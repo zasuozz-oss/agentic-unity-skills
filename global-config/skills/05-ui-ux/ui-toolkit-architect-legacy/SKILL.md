@@ -1,6 +1,6 @@
 ---
 name: ui-toolkit-architect
-description: "Generates UI Toolkit assets (UXML, USS) and C# Controllers following MVVM. Use when creating "menus", "HUDs", or "interface panels"."
+description: "UI Toolkit asset generator (UXML, USS, C# Controllers). Use this when the user creates menus, HUDs, or interface panels using legacy UI Toolkit patterns."
 version: 1.0.0
 tags: []
 argument-hint: panel_name='MainMenu' namespace='Game.UI'

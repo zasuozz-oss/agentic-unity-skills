@@ -1,6 +1,6 @@
 ---
 name: game-development
-description: Game development orchestrator. Routes to platform-specific skills based on project needs.
+description: "General game development workflows and patterns. Use this when the user asks broad game development questions spanning multiple systems or needs game design guidance."
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 

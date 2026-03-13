@@ -1,6 +1,6 @@
 ---
 name: juice-game-feel
-description: "Game feel and juice specialist for satisfying feedback, animations, and polish."
+description: "Game feel and polish effects specialist. Use this when the user wants screen shake, hit stop, squash and stretch, particles on impact, or \"juicy\" feedback."
 version: 1.0.0
 tags: ["visuals", "game-feel", "juice", "polish", "feedback", "tweening"]
 argument-hint: "effect='punch' target='button' OR feedback='hit' intensity='strong'"

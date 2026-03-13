@@ -1,6 +1,6 @@
 ---
 name: navmesh-pathfinding
-description: "Unity NavMesh integration for AI pathfinding with agents, obstacles, and off-mesh links."
+description: "NavMesh and pathfinding specialist. Use this when the user needs AI navigation, path calculation, obstacle avoidance, or NavMesh configuration."
 version: 1.0.0
 tags: ["gameplay", "AI", "pathfinding", "NavMesh", "movement"]
 argument-hint: "agent_type='Humanoid' speed='3.5' angular_speed='120'"

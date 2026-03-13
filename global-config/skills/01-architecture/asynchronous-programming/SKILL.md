@@ -1,6 +1,6 @@
 ---
 name: asynchronous-programming
-description: "Master async/await patterns in Unity. Handle loading, network requests, and non-blocking operations correctly."
+description: "Async/await, UniTask, and Coroutine specialist for Unity. Use this when the user works with asynchronous operations, loading screens, API calls, or needs to convert coroutines to async/await."
 version: 1.0.0
 tags: ["architecture", "async", "await", "Task", "coroutines", "UniTask"]
 argument-hint: "operation='LoadScene' OR task='NetworkRequest'"

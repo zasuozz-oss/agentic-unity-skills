@@ -1,6 +1,6 @@
 ---
 name: canvas-performance
-description: "UI performance optimization for both UGUI Canvas and UI Toolkit runtime."
+description: "UI performance optimization for UGUI and UI Toolkit. Use this when the user has UI lag, canvas rebuild issues, overdraw problems, or needs batching optimization."
 version: 1.0.0
 tags: ["UI", "performance", "optimization", "Canvas", "batching"]
 argument-hint: "target='Canvas' OR optimization='batching' profiler='true'"

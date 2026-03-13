@@ -1,6 +1,6 @@
 ---
 name: dynamic-audio-mixers
-description: "Advanced Unity AudioMixer configuration for dynamic audio effects, snapshots, and ducking."
+description: "Audio mixer management system. Use this when the user needs dynamic volume control, audio snapshots, crossfading between sound profiles, or frequency filtering."
 version: 1.0.0
 tags: ["audio", "AudioMixer", "snapshots", "ducking", "effects"]
 argument-hint: "mixer_action='snapshot' OR group='Music' effect='lowpass'"

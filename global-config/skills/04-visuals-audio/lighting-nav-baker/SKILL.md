@@ -1,6 +1,6 @@
 ---
 name: lighting-nav-baker
-description: "Automation tool for baking static lighting (Lightmaps) and AI Navigation (NavMesh) in one click."
+description: "Lighting and NavMesh baking specialist. Use this when the user needs to bake lightmaps, set up light probes, configure NavMesh surfaces, or optimize baked lighting."
 version: 1.0.0
 tags: ["lighting", "ai", "bake", "automation", "editor-tools"]
 argument-hint: "action='BakeAll' quality='High'"

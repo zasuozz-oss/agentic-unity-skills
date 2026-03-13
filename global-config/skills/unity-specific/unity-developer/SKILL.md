@@ -1,6 +1,6 @@
 ---
 name: unity-developer
-description: Build Unity games with optimized C# scripts, efficient rendering,
+description: "General Unity development knowledge base. Use this when the user asks Unity fundamentals, project setup, scene management, or general Unity questions."
   and proper asset management. Masters Unity 6 LTS, URP/HDRP pipelines, and
   cross-platform deployment. Handles gameplay systems, UI implementation, and
   platform optimization. Use PROACTIVELY for Unity performance issues, game

@@ -1,6 +1,6 @@
 ---
 name: multiplayer-netcode
-description: "Setup for Unity Netcode for GameObjects (NGO). Handles connection, synchronization, RPCs, and NetworkVariables."
+description: "Unity Netcode for GameObjects (NGO) specialist. Use this when the user needs multiplayer setup, network synchronization, RPCs, or NetworkVariables."
 version: 1.0.0
 tags: ["multiplayer", "networking", "ngo", "sync", "rpc"]
 argument-hint: "role='Host' OR action='Spawn' prefab='Player'"

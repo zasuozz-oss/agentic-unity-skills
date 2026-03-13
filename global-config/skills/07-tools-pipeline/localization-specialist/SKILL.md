@@ -1,6 +1,6 @@
 ---
 name: localization-specialist
-description: "Integration of Unity Localization package for multi-language support, covering Tables, Smart Strings, and CSV workflows."
+description: "Localization system implementation. Use this when the user needs multi-language support, string tables, font fallbacks, or RTL text handling."
 version: 1.0.0
 tags: ["localization", "i18n", "translation", "language", "csv"]
 argument-hint: "key='MainMenu_Play' OR language='es-ES' table='UI_Text'"

@@ -1,6 +1,6 @@
 ---
 name: memory-profiler-expert
-description: "Unity memory and performance profiling expertise for identifying bottlenecks and optimizing allocations."
+description: "Memory profiling and optimization specialist. Use this when the user has memory leaks, high GC allocation, texture memory issues, or needs memory profiling guidance."
 version: 1.0.0
 tags: ["performance", "profiling", "memory", "GC", "debugging"]
 argument-hint: "profile='memory' OR analyze='allocations' target='mobile'"

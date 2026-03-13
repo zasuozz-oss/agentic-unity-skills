@@ -1,6 +1,6 @@
 ---
 name: advanced-game-bootstrapper
-description: "Implements the Bootstrap Scene pattern. Guarantees deterministic initialization of global systems before gameplay starts."
+description: "Game initialization and bootstrapping system architect. Use this when the user asks to set up game startup flow, scene loading order, manager initialization, or singleton alternatives."
 version: 1.0.0
 tags: ["architecture", "bootstrap", "initialization", "managers", "singleton-alternative"]
 argument-hint: "name='GameBootstrapper' namespace='Game.Core'"

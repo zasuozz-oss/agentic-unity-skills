@@ -1,6 +1,6 @@
 ---
 name: lighting-post-processing
-description: "Unity lighting and post-processing specialist for atmosphere, mood, and visual polish."
+description: "Lighting and post-processing setup. Use this when the user configures URP/HDRP post-processing, bloom, color grading, ambient occlusion, or volumetric lighting."
 version: 1.0.0
 tags: ["visuals", "lighting", "post-processing", "URP", "HDRP"]
 argument-hint: "effect='bloom' intensity='1.5' OR light_type='directional'"

@@ -1,6 +1,6 @@
 ---
 name: inventory-crafting-logic
-description: "Complete inventory system with slot-based storage, item stacking, and recipe-based crafting."
+description: "Inventory and crafting system. Use this when the user needs item management, inventory UI, crafting recipes, equipment slots, or loot systems."
 version: 1.0.0
 tags: ["gameplay", "inventory", "crafting", "items", "RPG"]
 argument-hint: "action='create_item' name='Health Potion' rarity='Common'"

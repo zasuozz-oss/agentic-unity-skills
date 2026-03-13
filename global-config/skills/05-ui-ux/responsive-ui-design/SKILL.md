@@ -1,6 +1,6 @@
 ---
 name: responsive-ui-design
-description: "Responsive and adaptive UI design for multi-device support using UI Toolkit flexbox and media queries."
+description: "Responsive UI for multi-device support. Use this when the user needs adaptive layouts, safe area handling, different screen sizes, or mobile/tablet/desktop UI."
 version: 1.0.0
 tags: ["UI", "responsive", "adaptive", "mobile", "multi-platform"]
 argument-hint: "breakpoint='mobile' OR layout='adaptive' safe_area='true'"

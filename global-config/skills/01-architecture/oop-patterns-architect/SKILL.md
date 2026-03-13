@@ -1,6 +1,6 @@
 ---
 name: oop-patterns-architect
-description: "Object-Oriented design patterns specialist for clean, maintainable Unity architectures."
+description: "OOP patterns and best practices for Unity C#. Use this when the user needs inheritance hierarchies, polymorphism, encapsulation, or class design guidance."
 version: 1.0.0
 tags: ["architecture", "OOP", "SOLID", "patterns", "clean-code"]
 argument-hint: "pattern='Repository' OR principle='SRP'"

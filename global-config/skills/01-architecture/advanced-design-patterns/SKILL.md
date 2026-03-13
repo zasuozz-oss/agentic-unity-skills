@@ -1,6 +1,6 @@
 ---
 name: advanced-design-patterns
-description: "Principal Architect for SOLID & GoF Patterns in Unity 3D. Activate for complex systems, scalable mechanics, decoupled architectures, or refactoring God Classes."
+description: "Principal Architect for SOLID & GoF Patterns in Unity 3D. Use this when the user needs complex systems, scalable mechanics, decoupled architectures, or refactoring God Classes into Strategy, Factory, Observer, or Command patterns."
 version: 1.0.0
 tags: ["architecture", "patterns", "SOLID", "GoF", "strategy", "factory", "observer", "command"]
 argument-hint: "pattern='strategy' name='EnemyBehavior' namespace='Game.AI'"

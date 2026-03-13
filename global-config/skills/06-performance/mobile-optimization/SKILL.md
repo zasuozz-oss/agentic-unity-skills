@@ -1,6 +1,6 @@
 ---
 name: mobile-optimization
-description: "Mobile-specific optimization for Android/iOS including framerate, resolution, thermal, and battery management."
+description: "Mobile platform optimization for Android/iOS. Use this when the user targets mobile, needs framerate fixes, battery optimization, thermal throttling solutions, or build size reduction."
 version: 1.0.0
 tags: ["performance", "mobile", "Android", "iOS", "battery"]
 argument-hint: "fps='60' OR quality='medium' thermal='true'"

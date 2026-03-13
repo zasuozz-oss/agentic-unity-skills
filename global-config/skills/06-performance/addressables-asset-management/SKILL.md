@@ -1,6 +1,6 @@
 ---
 name: addressables-asset-management
-description: "Unity Addressables for async asset loading, memory management, and remote content delivery."
+description: "Addressables asset loading and management. Use this when the user needs async asset loading, memory management, remote content delivery, or catalog updates."
 version: 1.0.0
 tags: ["performance", "Addressables", "assets", "async", "DLC"]
 argument-hint: "asset='BossPrefab' OR action='load' release='true'"

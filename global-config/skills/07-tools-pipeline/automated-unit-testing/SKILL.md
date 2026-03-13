@@ -1,6 +1,6 @@
 ---
 name: automated-unit-testing
-description: "Implementation of NUnit tests for Unity, covering EditMode and PlayMode scenarios for reliable code verification."
+description: "Unity Test Framework specialist. Use this when the user needs unit tests, integration tests, Play Mode tests, or test-driven development in Unity."
 version: 1.0.0
 tags: ["testing", "nunit", "qa", "validation", "tdd"]
 argument-hint: "test_type='PlayMode' OR context='InventorySystem' coverage='strict'"

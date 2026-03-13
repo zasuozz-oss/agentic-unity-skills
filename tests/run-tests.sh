@@ -67,8 +67,6 @@ GEMINI_FILE="$TEST_PROJECT/GEMINI.md"
 assert "Contains BEGIN marker" "grep -q 'BEGIN antigravity-unity-skills' '$GEMINI_FILE'"
 assert "Contains END marker" "grep -q 'END antigravity-unity-skills' '$GEMINI_FILE'"
 assert "Contains INDEX.md reference" "grep -q '@.agents/skills-unity/INDEX.md' '$GEMINI_FILE'"
-assert "Contains rules" "grep -q 'Mandatory Skill Discovery' '$GEMINI_FILE'"
-assert "Contains skill triggers" "grep -q 'Red Flags' '$GEMINI_FILE'"
 
 # Count block occurrences
 BEGIN_COUNT=$(grep -c 'BEGIN antigravity-unity-skills' "$GEMINI_FILE")

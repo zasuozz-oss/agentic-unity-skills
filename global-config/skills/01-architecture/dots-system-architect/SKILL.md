@@ -1,6 +1,6 @@
 ---
 name: dots-system-architect
-description: "Unity DOTS architecture specialist for ECS, Jobs, and Burst Compiler performance systems."
+description: "Unity DOTS architecture specialist for ECS, Jobs, and Burst Compiler. Use this when the user needs high-performance systems, entity processing, parallel jobs, or Burst-compiled code."
 version: 1.0.0
 tags: ["architecture", "DOTS", "ECS", "Jobs", "Burst", "performance"]
 argument-hint: "system_name='MovementSystem' OR component='PlayerData'"
