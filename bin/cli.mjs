@@ -12,7 +12,6 @@ const PROJECT_DIR = process.cwd();
 const SKILLS_SRC = join(ROOT, 'global-config', 'skills');
 const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills-unity');
 const CONTEXT_SRC = join(ROOT, 'unity_context.md');
-const CONTEXT_DST = join(PROJECT_DIR, '.agents', 'unity_context.md');
 const GEMINI_MD = join(PROJECT_DIR, 'GEMINI.md');
 
 const BLOCK_START = '<!-- BEGIN antigravity-unity-skills -->';
@@ -97,19 +96,18 @@ function step3_installSkills() {
   copyDir(SKILLS_SRC, SKILLS_DST);
   const count = countSkills(SKILLS_DST);
   log('✓', `${count} skills installed to .agents/skills-unity/`);
-
-  // Copy unity_context.md (rules + INDEX reference)
-  if (existsSync(CONTEXT_SRC)) {
-    cpSync(CONTEXT_SRC, CONTEXT_DST, { force: true });
-    log('✓', 'unity_context.md installed to .agents/');
-  }
   console.log('');
 }
 
 function step4_updateGeminiMd() {
   console.log('📝 Step 3: Updating project GEMINI.md...');
 
-  const blockContent = `${BLOCK_START}\n@.agents/unity_context.md\n${BLOCK_END}`;
+  // Read unity_context.md content and embed into block
+  let contextContent = '@.agents/skills-unity/INDEX.md';
+  if (existsSync(CONTEXT_SRC)) {
+    contextContent = readFileSync(CONTEXT_SRC, 'utf8').trim();
+  }
+  const blockContent = `${BLOCK_START}\n${contextContent}\n${BLOCK_END}`;
 
   if (existsSync(GEMINI_MD)) {
     let content = readFileSync(GEMINI_MD, 'utf8');

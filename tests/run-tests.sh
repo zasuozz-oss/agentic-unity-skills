@@ -49,7 +49,6 @@ node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
 assert "Skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills-unity' ]"
 assert "INDEX.md present" "[ -f '$TEST_PROJECT/.agents/skills-unity/INDEX.md' ]"
-assert "unity_context.md copied" "[ -f '$TEST_PROJECT/.agents/unity_context.md' ]"
 assert "GEMINI.md exists" "[ -f '$TEST_PROJECT/GEMINI.md' ]"
 
 # Count SKILL.md files
@@ -67,9 +66,9 @@ GEMINI_FILE="$TEST_PROJECT/GEMINI.md"
 
 assert "Contains BEGIN marker" "grep -q 'BEGIN antigravity-unity-skills' '$GEMINI_FILE'"
 assert "Contains END marker" "grep -q 'END antigravity-unity-skills' '$GEMINI_FILE'"
-assert "References unity_context.md" "grep -q '@.agents/unity_context.md' '$GEMINI_FILE'"
-assert "unity_context.md has INDEX ref" "grep -q '@.agents/skills-unity/INDEX.md' '$TEST_PROJECT/.agents/unity_context.md'"
-assert "unity_context.md has rules" "grep -q 'Mandatory Unity Skill Usage' '$TEST_PROJECT/.agents/unity_context.md'"
+assert "Contains INDEX.md reference" "grep -q '@.agents/skills-unity/INDEX.md' '$GEMINI_FILE'"
+assert "Contains rules" "grep -q 'Mandatory Unity Skill Usage' '$GEMINI_FILE'"
+assert "Contains skill triggers" "grep -q 'Red Flags' '$GEMINI_FILE'"
 
 # Count block occurrences
 BEGIN_COUNT=$(grep -c 'BEGIN antigravity-unity-skills' "$GEMINI_FILE")
