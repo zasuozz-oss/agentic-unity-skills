@@ -16,7 +16,7 @@ elif [ -d "$HOME/AI-Tool/antigravity-unity-skills/global-config" ]; then
 fi
 
 PROJECT_DIR="${1:-$(pwd)}"
-SKILLS_DST="$PROJECT_DIR/.agents/skills-unity"
+SKILLS_DST="$PROJECT_DIR/.agents/skills/unity-skills"
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║     Unity Skills — Update Workflow                        ║"

@@ -47,17 +47,20 @@ echo -e "${YELLOW}TC-01: Fresh Install${NC}"
 cd "$TEST_PROJECT"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
-assert "Skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills-unity' ]"
-assert "INDEX.md present" "[ -f '$TEST_PROJECT/.agents/skills-unity/INDEX.md' ]"
+assert "Skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills/unity-skills' ]"
 assert "GEMINI.md exists" "[ -f '$TEST_PROJECT/GEMINI.md' ]"
 
-# Count SKILL.md files
-SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills-unity" -name "SKILL.md" -type f | wc -l | tr -d ' ')
+# Count SKILL.md files (flat structure: .agents/skills/<name>/SKILL.md)
+SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
 assert "Skills installed ($SKILL_COUNT found, expect 60+)" "[ $SKILL_COUNT -ge 60 ]"
 
-# Count category directories
-CAT_COUNT=$(ls -1d "$TEST_PROJECT/.agents/skills-unity"/*/ 2>/dev/null | wc -l | tr -d ' ')
-assert "Category directories exist ($CAT_COUNT)" "[ $CAT_COUNT -ge 8 ]"
+# Verify flat structure — no nested category folders
+NESTED=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
+assert "Flat structure (no nested categories)" "[ $NESTED -eq 0 ]"
+
+# Spot check a skill
+assert "advanced-design-patterns exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/advanced-design-patterns/SKILL.md' ]"
+assert "state-machine-architect exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/state-machine-architect/SKILL.md' ]"
 echo ""
 
 # ─── TC-02: GEMINI.md Content ────────────────────────────────
@@ -67,7 +70,6 @@ GEMINI_FILE="$TEST_PROJECT/GEMINI.md"
 assert "Contains BEGIN marker" "grep -q 'BEGIN antigravity-unity-skills' '$GEMINI_FILE'"
 assert "Contains END marker" "grep -q 'END antigravity-unity-skills' '$GEMINI_FILE'"
 
-# Count block occurrences
 BEGIN_COUNT=$(grep -c 'BEGIN antigravity-unity-skills' "$GEMINI_FILE")
 assert "Only 1 BEGIN marker ($BEGIN_COUNT)" "[ $BEGIN_COUNT -eq 1 ]"
 echo ""
@@ -86,7 +88,6 @@ MD5_AFTER=$(md5 -q "$GEMINI_FILE" 2>/dev/null || md5sum "$GEMINI_FILE" | cut -d'
 assert "Line count unchanged ($LINES_BEFORE → $LINES_AFTER)" "[ '$LINES_BEFORE' = '$LINES_AFTER' ]"
 assert "MD5 unchanged" "[ '$MD5_BEFORE' = '$MD5_AFTER' ]"
 
-# Third run
 cd "$TEST_PROJECT"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 MD5_THIRD=$(md5 -q "$GEMINI_FILE" 2>/dev/null || md5sum "$GEMINI_FILE" | cut -d' ' -f1)
@@ -107,7 +108,6 @@ assert "Original content preserved" "grep -q 'My Project' '$TEST_PROJECT2/GEMINI
 assert "Original body preserved" "grep -q 'Some existing content here' '$TEST_PROJECT2/GEMINI.md'"
 assert "Unity block appended" "grep -q 'BEGIN antigravity-unity-skills' '$TEST_PROJECT2/GEMINI.md'"
 
-# Only 1 block
 BEGIN_COUNT2=$(grep -c 'BEGIN antigravity-unity-skills' "$TEST_PROJECT2/GEMINI.md")
 assert "Only 1 BEGIN marker ($BEGIN_COUNT2)" "[ $BEGIN_COUNT2 -eq 1 ]"
 
@@ -116,35 +116,24 @@ echo ""
 
 # ─── TC-05: Backup Created ──────────────────────────────────
 echo -e "${YELLOW}TC-05: Backup on Re-install${NC}"
-# Skills already exist from TC-01, re-run should create backup
 cd "$TEST_PROJECT"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
-BACKUP_COUNT=$(ls -1d "$TEST_PROJECT/.agents/skills-unity-backup-"* 2>/dev/null | wc -l | tr -d ' ')
+BACKUP_COUNT=$(ls -1d "$TEST_PROJECT/.agents/skills/unity-skills-backup-"* 2>/dev/null | wc -l | tr -d ' ')
 assert "Backup directory created ($BACKUP_COUNT)" "[ $BACKUP_COUNT -ge 1 ]"
-if [ $BACKUP_COUNT -ge 1 ]; then
-    BACKUP_ONE=$(ls -1d "$TEST_PROJECT/.agents/skills-unity-backup-"* 2>/dev/null | head -1)
-    assert "Backup contains INDEX.md" "[ -f '$BACKUP_ONE/INDEX.md' ]"
-fi
 echo ""
 
 # ─── TC-06: All Skills Have SKILL.md ─────────────────────────
 echo -e "${YELLOW}TC-06: All Skills Have SKILL.md${NC}"
-MISSING=0
-for category in "$TEST_PROJECT/.agents/skills-unity"/*/; do
-    CAT_NAME=$(basename "$category")
-    if [ "$CAT_NAME" = "INDEX.md" ]; then continue; fi
-    for skill_dir in "$category"*/; do
-        if [ -d "$skill_dir" ]; then
-            SKILL_NAME=$(basename "$skill_dir")
-            if [ -f "$skill_dir/SKILL.md" ]; then
-                assert "$CAT_NAME/$SKILL_NAME has SKILL.md" "true"
-            else
-                assert "$CAT_NAME/$SKILL_NAME has SKILL.md" "false"
-                MISSING=$((MISSING + 1))
-            fi
+for skill_dir in "$TEST_PROJECT/.agents/skills/unity-skills"/*/; do
+    if [ -d "$skill_dir" ]; then
+        SKILL_NAME=$(basename "$skill_dir")
+        if [ -f "$skill_dir/SKILL.md" ]; then
+            assert "$SKILL_NAME has SKILL.md" "true"
+        else
+            assert "$SKILL_NAME has SKILL.md" "false"
         fi
-    done
+    fi
 done
 echo ""
 

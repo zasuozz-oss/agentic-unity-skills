@@ -10,7 +10,7 @@ const ROOT = join(__dirname, '..');
 
 const PROJECT_DIR = process.cwd();
 const SKILLS_SRC = join(ROOT, 'global-config', 'skills');
-const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills-unity');
+const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills', 'unity-skills');
 const GEMINI_MD = join(PROJECT_DIR, 'GEMINI.md');
 
 const BLOCK_START = '<!-- BEGIN antigravity-unity-skills -->';
@@ -22,27 +22,13 @@ function log(icon, msg) {
   console.log(`   ${icon} ${msg}`);
 }
 
-function copyDir(src, dest) {
-  cpSync(src, dest, { recursive: true, force: true });
-}
-
 function countSkills(dir) {
   let count = 0;
   try {
     const entries = readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const subDir = join(dir, entry.name);
-        const subEntries = readdirSync(subDir, { withFileTypes: true });
-        for (const sub of subEntries) {
-          if (sub.isDirectory() && existsSync(join(subDir, sub.name, 'SKILL.md'))) {
-            count++;
-          } else if (sub.name === 'SKILL.md') {
-            // Skill directly in category dir
-            count++;
-            break;
-          }
-        }
+      if (entry.isDirectory() && existsSync(join(dir, entry.name, 'SKILL.md'))) {
+        count++;
       }
     }
   } catch {
@@ -51,12 +37,8 @@ function countSkills(dir) {
   return count;
 }
 
-function countDirs(dir) {
-  try {
-    return readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).length;
-  } catch {
-    return 0;
-  }
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // ─── Steps ─────────────────────────────────────────────────
@@ -82,7 +64,7 @@ function step2_backup() {
     const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const backupDir = `${SKILLS_DST}-backup-${ts}`;
     console.log('📦 Step 1: Backing up existing skills...');
-    copyDir(SKILLS_DST, backupDir);
+    cpSync(SKILLS_DST, backupDir, { recursive: true, force: true });
     log('✓', `Backup: ${backupDir}`);
     console.log('');
   }
@@ -90,25 +72,35 @@ function step2_backup() {
 
 function step3_installSkills() {
   console.log('📚 Step 2: Installing Unity skills...');
-  mkdirSync(join(PROJECT_DIR, '.agents'), { recursive: true });
-  if (existsSync(SKILLS_DST)) rmSync(SKILLS_DST, { recursive: true, force: true });
-  copyDir(SKILLS_SRC, SKILLS_DST);
-  const count = countSkills(SKILLS_DST);
-  log('✓', `${count} skills installed to .agents/skills-unity/`);
+  mkdirSync(SKILLS_DST, { recursive: true });
+
+  // Copy each skill folder directly (flat structure)
+  const entries = readdirSync(SKILLS_SRC, { withFileTypes: true });
+  let installed = 0;
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const src = join(SKILLS_SRC, entry.name);
+    if (!existsSync(join(src, 'SKILL.md'))) continue;
+
+    const dest = join(SKILLS_DST, entry.name);
+    if (existsSync(dest)) rmSync(dest, { recursive: true, force: true });
+    cpSync(src, dest, { recursive: true, force: true });
+    installed++;
+  }
+
+  log('✓', `${installed} skills installed to .agents/skills/`);
   console.log('');
 }
 
 function step4_updateGeminiMd() {
   console.log('📝 Step 3: Updating project GEMINI.md...');
 
-  // Block markers only — skills auto-discovered via YAML frontmatter
   const blockContent = `${BLOCK_START}\n${BLOCK_END}`;
 
   if (existsSync(GEMINI_MD)) {
     let content = readFileSync(GEMINI_MD, 'utf8');
 
     if (content.includes(BLOCK_START)) {
-      // Replace existing block
       const regex = new RegExp(
         escapeRegExp(BLOCK_START) + '[\\s\\S]*?' + escapeRegExp(BLOCK_END),
         'g'
@@ -117,13 +109,11 @@ function step4_updateGeminiMd() {
       writeFileSync(GEMINI_MD, content, 'utf8');
       log('✓', 'Updated existing block in: GEMINI.md');
     } else {
-      // Append block
       content = content.trimEnd() + '\n\n' + blockContent + '\n';
       writeFileSync(GEMINI_MD, content, 'utf8');
       log('✓', 'Appended block to: GEMINI.md');
     }
   } else {
-    // Create new file
     writeFileSync(GEMINI_MD, blockContent + '\n', 'utf8');
     log('✓', 'Created: GEMINI.md');
   }
@@ -133,10 +123,8 @@ function step4_updateGeminiMd() {
 function step5_verify() {
   console.log('✅ Verification...');
   const skillCount = countSkills(SKILLS_DST);
-  const categoryCount = countDirs(SKILLS_DST);
-  log('', `Skills:     ${skillCount}`);
-  log('', `Categories: ${categoryCount}`);
-  log('', `GEMINI.md:  ✓`);
+  log('', `Skills: ${skillCount}`);
+  log('', `GEMINI.md: ✓`);
   console.log('');
 }
 
@@ -147,7 +135,7 @@ function footer() {
   console.log('');
   console.log('📊 Summary:');
   log('', `Project:  ${PROJECT_DIR}`);
-  log('', `Skills:   .agents/skills-unity/`);
+  log('', `Skills:   .agents/skills/`);
   log('', `Config:   GEMINI.md updated`);
   console.log('');
   console.log('🚀 Next steps:');
@@ -155,10 +143,6 @@ function footer() {
   console.log('   2. Unity skills auto-load via YAML frontmatter');
   console.log('');
   console.log('✅ Done!');
-}
-
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // ─── Main ──────────────────────────────────────────────────
