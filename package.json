@@ -1,5 +1,5 @@
 {
-  "name": "ag-unity",
+  "name": "@zasuo/ag-unity",
   "version": "2.0.0",
   "description": "Unity skills for Antigravity AI agent — Install 70+ Unity skills into any project",
   "type": "module",
