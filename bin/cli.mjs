@@ -11,7 +11,6 @@ const ROOT = join(__dirname, '..');
 const PROJECT_DIR = process.cwd();
 const SKILLS_SRC = join(ROOT, 'global-config', 'skills');
 const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills-unity');
-const CONTEXT_SRC = join(ROOT, 'unity_context.md');
 const GEMINI_MD = join(PROJECT_DIR, 'GEMINI.md');
 
 const BLOCK_START = '<!-- BEGIN antigravity-unity-skills -->';
@@ -102,12 +101,8 @@ function step3_installSkills() {
 function step4_updateGeminiMd() {
   console.log('📝 Step 3: Updating project GEMINI.md...');
 
-  // Read unity_context.md content and embed into block
-  let contextContent = '@.agents/skills-unity/INDEX.md';
-  if (existsSync(CONTEXT_SRC)) {
-    contextContent = readFileSync(CONTEXT_SRC, 'utf8').trim();
-  }
-  const blockContent = `${BLOCK_START}\n${contextContent}\n${BLOCK_END}`;
+  // Block markers only — skills auto-discovered via YAML frontmatter
+  const blockContent = `${BLOCK_START}\n${BLOCK_END}`;
 
   if (existsSync(GEMINI_MD)) {
     let content = readFileSync(GEMINI_MD, 'utf8');
@@ -157,7 +152,7 @@ function footer() {
   console.log('');
   console.log('🚀 Next steps:');
   console.log('   1. Open Antigravity in this project');
-  console.log('   2. Unity skills auto-load via GEMINI.md');
+  console.log('   2. Unity skills auto-load via YAML frontmatter');
   console.log('');
   console.log('✅ Done!');
 }

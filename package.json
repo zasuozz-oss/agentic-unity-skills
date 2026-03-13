@@ -9,9 +9,7 @@
   "files": [
     "bin/",
     "global-config/",
-    "scripts/",
-    "unity_context.md",
-    "gemini-extension.json"
+    "scripts/"
   ],
   "keywords": [
     "unity",
