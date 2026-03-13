@@ -2,7 +2,9 @@
 
 70 Unity-specific skills for game development with Google Antigravity. Project-level extension — install skills directly into any Unity project.
 
-🌐 [Quick Start](#-quick-start) · [Features](#-whats-inside) · [Report Bug](https://github.com/zasuozz-oss/antigravity-unity-skills/issues)
+> **📦 This is a public, read-only repository.** Clone it and use the setup scripts to install skills into your projects.
+
+🌐 [Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Full Skill List](global-config/skills/INDEX.md)
 
 ## 📋 Requirements
 
@@ -22,33 +24,45 @@ Key features:
 
 ## ⚡ Quick Start
 
-### 1. Clone Repository
+### 1. Clone This Repository
 
 ```bash
 git clone https://github.com/zasuozz-oss/antigravity-unity-skills.git
 ```
 
-### 2. Setup Project
+### 2. Run Setup in Your Unity Project
+
+**macOS / Linux:**
 
 ```bash
 cd /path/to/your/unity-project
 bash /path/to/antigravity-unity-skills/setup-project.sh
 ```
 
-Windows (PowerShell):
+**Windows (PowerShell):**
 
 ```powershell
 cd C:\path\to\your\unity-project
 powershell -ExecutionPolicy Bypass -File C:\path\to\antigravity-unity-skills\setup-project.ps1
 ```
 
-### 3. Start Using
+### 3. Done — Start Using
 
 Open Antigravity in your project. Unity skills auto-load via `GEMINI.md`.
 
+### What Happens After Setup
+
+```
+your-project/
+├── GEMINI.md                # Updated with unity-skills block
+└── .agents/
+    └── skills-unity/        # 70 Unity skills installed here
+        └── INDEX.md
+```
+
 ## 📚 What's Inside
 
-### Categories (9)
+**70 skills** across **9 categories**:
 
 | Category | Skills | Description |
 |----------|--------|-------------|
@@ -62,48 +76,47 @@ Open Antigravity in your project. Unity skills auto-load via `GEMINI.md`.
 | 09-devops-automation | 2 | Build pipelines, CI/CD |
 | unity-specific | 6 | General Unity development, C# conventions |
 
-See [INDEX.md](global-config/skills/INDEX.md) for the full skill list.
+👉 See [INDEX.md](global-config/skills/INDEX.md) for the complete skill list with descriptions.
 
-## 📁 Structure
+## 🔄 Updating Skills
+
+To update skills in an existing project:
+
+```bash
+# 1. Pull latest from this repo
+cd /path/to/antigravity-unity-skills
+git pull
+
+# 2. Re-run setup in your project
+cd /path/to/your/unity-project
+bash /path/to/antigravity-unity-skills/setup-project.sh
+```
+
+Or use the update script:
+
+```bash
+cd /path/to/your/unity-project
+bash /path/to/antigravity-unity-skills/scripts/update-unity-skills.sh
+```
+
+## 📁 Repo Structure
 
 ```
 antigravity-unity-skills/
 ├── setup-project.sh         # Install script (macOS/Linux)
 ├── setup-project.ps1        # Install script (Windows)
-├── GEMINI.md                # Project configuration template
-├── gemini-extension.json    # Extension metadata
 ├── scripts/
 │   └── update-unity-skills.sh  # Update script
 ├── global-config/
 │   └── skills/              # 70 Unity skills
 │       ├── 01-architecture/
 │       ├── 02-gameplay/
-│       ├── 04-visuals-audio/
-│       ├── 05-ui-ux/
-│       ├── 06-performance/
-│       ├── 07-tools-pipeline/
-│       ├── 08-backend-monetization/
-│       ├── 09-devops-automation/
-│       ├── unity-specific/
+│       ├── ...
 │       └── INDEX.md
+├── GEMINI.md                # Project config template
+├── gemini-extension.json    # Extension metadata
 └── tests/
-    └── README.md            # 10 manual test cases
-```
-
-After setup in your project:
-
-```
-your-project/
-├── GEMINI.md                # Updated with unity-skills block
-└── .agents/
-    └── skills-unity/        # 70 Unity skills installed here
-```
-
-## 🔄 Updating
-
-```bash
-cd /path/to/your/unity-project
-bash /path/to/antigravity-unity-skills/scripts/update-unity-skills.sh
+    └── README.md            # Manual test cases
 ```
 
 ## 🤝 Works With Superpowers
@@ -112,8 +125,8 @@ This extension is **independent** of [antigravity-superpowers](https://github.co
 
 ## 🔗 Links
 
-- Superpowers (core skills): [zasuozz-oss/antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
-- Google Antigravity: [antigravity.google](https://antigravity.google)
+- **Superpowers (core skills):** [zasuozz-oss/antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
+- **Google Antigravity:** [antigravity.google](https://antigravity.google)
 
 ## 📝 License
 
