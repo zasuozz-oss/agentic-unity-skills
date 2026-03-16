@@ -59,8 +59,9 @@ NESTED=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -mindepth 3 -name "SKI
 assert "Flat structure (no nested categories)" "[ $NESTED -eq 0 ]"
 
 # Spot check a skill
-assert "advanced-design-patterns exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/advanced-design-patterns/SKILL.md' ]"
+assert "design-patterns exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/design-patterns/SKILL.md' ]"
 assert "state-machine-architect exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/state-machine-architect/SKILL.md' ]"
+assert "architecture-advisor exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/architecture-advisor/SKILL.md' ]"
 echo ""
 
 # ─── TC-02: GEMINI.md Content ────────────────────────────────

@@ -1,6 +1,6 @@
 # Antigravity Unity Skills
 
-70 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
+67 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
 
 > **📦 Public, read-only repository.** Install via npm or clone and run setup.
 
@@ -20,7 +20,7 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-That's it. 70 skills installed.
+That's it. 67 skills installed.
 
 <details>
 <summary>Alternative: Clone + Run</summary>
@@ -39,7 +39,7 @@ node /path/to/antigravity-unity-skills/bin/cli.mjs
 your-project/
 ├── GEMINI.md                # Updated with unity-skills block
 └── .agents/
-    └── skills-unity/        # 70 Unity skills installed here
+    └── skills/unity-skills/  # 67 Unity skills installed here
         └── INDEX.md
 ```
 
@@ -49,7 +49,7 @@ Open Antigravity in your project. Unity skills auto-load via `GEMINI.md`.
 
 ## 🎯 What Is This?
 
-A collection of **70 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
+A collection of **67 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
@@ -63,19 +63,20 @@ Key features:
 
 ## 📚 What's Inside
 
-**70 skills** across **9 categories**:
+**67 skills** across **10 categories**:
 
 | Category | Skills | Description |
 |----------|--------|-------------|
-| 01-architecture | 10 | Design patterns, DI, ECS, state machines |
-| 02-gameplay | 11 | Character, AI, inventory, combat, save/load |
-| 04-visuals-audio | 9 | Shaders, VFX, audio, Cinemachine, lighting |
-| 05-ui-ux | 6 | UI Toolkit, Canvas, Input System, responsive |
-| 06-performance | 5 | Addressables, pooling, profiling, mobile |
-| 07-tools-pipeline | 6 | Editor scripting, testing, localization, MCP |
-| 08-backend-monetization | 5 | Multiplayer, IAP, analytics, backend |
-| 09-devops-automation | 2 | Build pipelines, CI/CD |
-| unity-specific | 6 | General Unity development, C# conventions |
+| Advisory | 13 | Architecture, patterns, testability, performance advisors |
+| Architecture | 8 | Design patterns, DI, ECS, state machines |
+| Gameplay | 10 | Character, AI, inventory, combat, save/load |
+| Visuals & Audio | 7 | Shaders, VFX, audio, Cinemachine, lighting |
+| UI & UX | 5 | UI Toolkit, Canvas, Input System, responsive |
+| Performance | 5 | Addressables, pooling, profiling, mobile |
+| Tools & Pipeline | 6 | Editor scripting, testing, localization, MCP |
+| Backend & Monetization | 4 | Multiplayer, IAP, analytics, backend |
+| DevOps | 1 | Build pipelines |
+| Project-Specific | 5 | General Unity development, C# conventions |
 
 👉 See [INDEX.md](global-config/skills/INDEX.md) for the complete skill list with descriptions.
 
@@ -100,17 +101,14 @@ antigravity-unity-skills/
 ├── bin/
 │   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
-│   └── skills/              # 70 Unity skills
-│       ├── 01-architecture/
-│       ├── 02-gameplay/
+│   └── skills/              # 67 Unity skills (flat structure)
+│       ├── architecture-advisor/
+│       ├── design-patterns/
 │       ├── ...
 │       └── INDEX.md
-├── scripts/
-│   └── update-unity-skills.sh
 ├── tests/
 │   └── run-tests.sh         # Automated test suite
-├── unity_context.md         # Extension context + rules
-└── gemini-extension.json    # Extension metadata
+└── CHANGELOG.md
 ```
 
 ---
@@ -127,10 +125,14 @@ This extension is **independent** of [antigravity-superpowers](https://github.co
 - **Superpowers (core skills):** [zasuozz-oss/antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
 - **Google Antigravity:** [antigravity.google](https://antigravity.google)
 
+## 🙏 Credits
+
+Advisory skills adapted from [Besty0728/Unity-Skills](https://github.com/Besty0728/Unity-Skills) (MIT License).
+
 ## 📝 License
 
 MIT
 
 ---
 
-**Last Updated:** 2026-03-13
+**Last Updated:** 2026-03-16

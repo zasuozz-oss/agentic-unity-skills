@@ -1,7 +1,7 @@
 {
   "name": "ag-unity",
-  "version": "2.1.1",
-  "description": "Unity skills for Antigravity AI agent — Install 70+ Unity skills into any project",
+  "version": "3.0.0",
+  "description": "Unity skills for Antigravity AI agent — Install 67 Unity skills into any project",
   "type": "module",
   "bin": {
     "ag-unity": "bin/cli.mjs"
