@@ -1,15 +1,6 @@
 ---
 name: addressables-asset-management
-description: "Addressables asset loading and management. Use this when the user needs async asset loading, memory management, remote content delivery, or catalog updates."
-version: 1.0.0
-tags: ["performance", "Addressables", "assets", "async", "DLC"]
-argument-hint: "asset='BossPrefab' OR action='load' release='true'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Addressables asset loading and management. Use this skill whenever the user mentions loading assets, prefabs, scenes, or bundles at runtime — even if they don't say 'Addressables'. Also trigger for: memory management, DLC/hot update, remote content, asset bundles, Resources.Load migration, or any async asset workflow in Unity."
 ---
 
 # Addressables & Asset Management
@@ -90,15 +81,16 @@ public class AssetLoader
     public async UniTask<T> LoadAsync<T>(AssetReference reference) where T : Object
     {
         var handle = reference.LoadAssetAsync<T>();
-        await handle.Task;
+        var result = await handle.Task;
         
         if (handle.Status == AsyncOperationStatus.Succeeded)
         {
             _loadedAssets[reference.AssetGUID] = handle;
-            return handle.Result;
+            return result;
         }
         
-        Debug.LogError($"Failed to load: {reference}");
+        Addressables.Release(handle); // Release on failure
+        Debug.LogError($"[AssetLoader] Failed to load: {reference}");
         return null;
     }
     
@@ -162,29 +154,51 @@ public class AddressableSpawner : MonoBehaviour
 
 **Agent**:
 ```csharp
-public async UniTask PreloadLevelAsync(string levelLabel)
+// preloadedHandles should be stored and released when the level unloads
+public async UniTask<List<AsyncOperationHandle>> PreloadLevelAsync(string levelLabel)
 {
-    var locations = await Addressables.LoadResourceLocationsAsync(levelLabel);
-    
     var downloadSize = await Addressables.GetDownloadSizeAsync(levelLabel);
     if (downloadSize > 0)
     {
-        await Addressables.DownloadDependenciesAsync(levelLabel);
+        var downloadHandle = Addressables.DownloadDependenciesAsync(levelLabel);
+        await downloadHandle.Task;
+        Addressables.Release(downloadHandle);
     }
-    
-    foreach (var location in locations.Result)
+
+    var locHandle = Addressables.LoadResourceLocationsAsync(levelLabel);
+    var locations = await locHandle.Task;
+    Addressables.Release(locHandle);
+
+    var preloadedHandles = new List<AsyncOperationHandle>();
+    foreach (var location in locations)
     {
-        await Addressables.LoadAssetAsync<Object>(location);
+        var handle = Addressables.LoadAssetAsync<Object>(location);
+        await handle.Task;
+        preloadedHandles.Add(handle);
     }
+    return preloadedHandles; // Caller must Release all handles when done
 }
 ```
 
 ## Memory Management
 ```csharp
-// CRITICAL: Always pair Load with Release
+// ✅ CORRECT: Always pair Load with Release
 var handle = Addressables.LoadAssetAsync<GameObject>(key);
+var asset = await handle.Task;
 // ... use asset ...
-Addressables.Release(handle);
+Addressables.Release(handle); // Free memory when done
+
+// ✅ CORRECT: Use ReleaseInstance for Instantiate
+var go = await Addressables.InstantiateAsync(key).Task;
+// ... use object ...
+Addressables.ReleaseInstance(go); // Destroy + Release in one call
+
+// ❌ WRONG: Releasing handle after Instantiate
+var handle2 = Addressables.InstantiateAsync(key);
+Addressables.Release(handle2); // Does NOT destroy the object — memory leak!
+
+// ⚠️ NOTE: Each LoadAssetAsync creates a separate reference count
+// Loading the same asset 3 times → must Release 3 times
 ```
 
 ## Related Skills

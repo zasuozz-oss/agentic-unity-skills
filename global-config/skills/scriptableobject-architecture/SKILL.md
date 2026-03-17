@@ -1,15 +1,6 @@
 ---
 name: scriptableobject-architecture
-description: "Data-Driven Design using ScriptableObjects. Use this when the user needs SO-based event channels, runtime sets, game configuration data, or shared variables between systems."
-version: 1.0.0
-tags: ["architecture", "scriptableobject", "data-driven", "events", "configuration"]
-argument-hint: "type='event' name='OnPlayerDamaged' OR type='data' name='WeaponConfig'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Data-driven design using ScriptableObjects. Use this when the user needs SO-based event channels, runtime sets, game configuration data, shared variables, data-driven architecture, or modular design with ScriptableObjects."
 ---
 
 # ScriptableObject Architecture

@@ -1,15 +1,6 @@
 ---
 name: shader-graph-expert
 description: "Shader Graph development specialist. Use this when the user creates custom shaders, visual effects in Shader Graph, dissolve effects, or toon shading."
-version: 1.0.0
-tags: ["visuals", "shaders", "Shader-Graph", "materials", "rendering"]
-argument-hint: "shader_type='Lit' effect='dissolve' OR property='_MainColor'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Shader Graph Expert

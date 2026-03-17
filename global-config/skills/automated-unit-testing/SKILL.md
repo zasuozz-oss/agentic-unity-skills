@@ -1,15 +1,6 @@
 ---
 name: automated-unit-testing
 description: "Unity Test Framework specialist. Use this when the user needs unit tests, integration tests, Play Mode tests, or test-driven development in Unity."
-version: 1.0.0
-tags: ["testing", "nunit", "qa", "validation", "tdd"]
-argument-hint: "test_type='PlayMode' OR context='InventorySystem' coverage='strict'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Automated Unit Testing

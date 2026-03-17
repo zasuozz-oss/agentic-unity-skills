@@ -1,15 +1,6 @@
 ---
 name: menu-navigation-flow
 description: "UI navigation and screen management. Use this when the user builds menu systems, screen stacking, page transitions, or navigation history."
-version: 1.0.0
-tags: ["UI", "navigation", "screens", "stack", "menu"]
-argument-hint: "screen='MainMenu' OR action='push' transition='fade'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Menu Navigation & Flow

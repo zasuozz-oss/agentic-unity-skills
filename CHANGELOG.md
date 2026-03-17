@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [3.0.0] - 2026-03-17
+
+### Changed — Skill Cleanup & Standardization
+- **Reduced from 67 to 45 skills** — removed game-genre-specific skills (RPG combat, loot, quests, inventory, AI behavior, VR/AR, etc.)
+- **Merged `my-unity-mobile` into `mobile-optimization`** — coding rules + performance optimization in one skill
+- **Standardized YAML frontmatter** — stripped extra fields (`version`, `tags`, `argument-hint`, `allowed-tools`, etc.) to match Antigravity standard (name + description only)
+- **Fixed 19 trigger descriptions** — resolved overlaps, added disambiguation markers (FIRST/ONLY/BEFORE/DURING), expanded keyword coverage
+- Updated README, package.json, gemini-extension.json to reflect 45 skills
+- Updated category structure from 10 to 8 categories
+
+### Removed (21 skills)
+- Genre-specific: `damage-health-framework`, `status-effect-system`, `loot-rng-management`, `inventory-crafting-logic`, `dialogue-quest-system`, `advanced-character-controller`, `ai-behavior-trees`, `navmesh-pathfinding`, `procedural-animation-ik`
+- Niche: `dots-system-architect`, `multiplayer-netcode`, `cinemachine-specialist`, `physics-logic`, `vr-ar`
+- Redundant/thin: `game-audio` (merged into `audio-systems`), `kaizen` (TypeScript), `gameplay-blueprints`, `adr-records`, `game-design`, `juice-game-feel`, `analytics-heatmaps`
+
+---
+
 ## [2.0.0] - 2026-03-13
 
 ### Changed — Modern CLI Architecture

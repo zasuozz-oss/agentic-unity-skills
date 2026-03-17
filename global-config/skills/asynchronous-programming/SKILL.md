@@ -1,15 +1,6 @@
 ---
 name: asynchronous-programming
-description: "Async/await, UniTask, and Coroutine specialist for Unity. Use this when the user works with asynchronous operations, loading screens, API calls, or needs to convert coroutines to async/await."
-version: 1.0.0
-tags: ["architecture", "async", "await", "Task", "coroutines", "UniTask"]
-argument-hint: "operation='LoadScene' OR task='NetworkRequest'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Async/await, UniTask, and Coroutine implementation specialist. Use this skill whenever the user needs to write, fix, or refactor async code in Unity — even if they don't mention UniTask or coroutines explicitly. Also trigger for: loading screens, scene transitions, network/API calls, file I/O, sequential or parallel async chains, cancellation tokens, destroyCancellationToken, coroutine-to-async conversion, 'how do I wait for X', 'how to cancel an operation', 'fire-and-forget pattern', or timeout handling. Even if they just say 'load something' or 'fetch data', this skill applies. Do NOT use for deciding which async approach to pick — use async-strategy instead."
 ---
 
 # Asynchronous Programming
@@ -22,7 +13,9 @@ Handle long-running operations (loading, network, file I/O) without blocking the
 - Use when making network/web requests
 - Use when performing file I/O
 - Use when waiting for user input with timeouts
-- Use when orchestrating sequential async operations
+- Use when orchestrating sequential or parallel async operations
+- Use when converting coroutines to async/await
+- Use when adding cancellation support to existing code
 
 ## Async Options in Unity
 
@@ -39,9 +32,9 @@ Handle long-running operations (loading, network, file I/O) without blocking the
 IEnumerator LoadLevel()
 {
     _loadingScreen.SetActive(true);
-    
+
     yield return new WaitForSeconds(0.5f);
-    
+
     var operation = SceneManager.LoadSceneAsync("Level1");
     while (!operation.isDone)
     {
@@ -53,15 +46,16 @@ IEnumerator LoadLevel()
 
 ### Pattern 2: async/await with Task
 ```csharp
-async Task LoadLevelAsync()
+async Task LoadLevelAsync(CancellationToken token)
 {
     _loadingScreen.SetActive(true);
-    
-    await Task.Delay(500);
-    
+
+    await Task.Delay(500, token);
+
     var operation = SceneManager.LoadSceneAsync("Level1");
     while (!operation.isDone)
     {
+        token.ThrowIfCancellationRequested();
         _progressBar.value = operation.progress;
         await Task.Yield();
     }
@@ -70,56 +64,133 @@ async Task LoadLevelAsync()
 
 ### Pattern 3: UniTask (Recommended)
 ```csharp
-async UniTaskVoid LoadLevelAsync()
+async UniTaskVoid LoadLevelAsync(CancellationToken token)
 {
     _loadingScreen.SetActive(true);
-    
-    await UniTask.Delay(500);
-    
+
+    await UniTask.Delay(500, cancellationToken: token);
+
     await SceneManager.LoadSceneAsync("Level1").ToUniTask(
-        Progress.Create<float>(p => _progressBar.value = p)
+        Progress.Create<float>(p => _progressBar.value = p),
+        cancellationToken: token
     );
 }
 ```
 
 ## Best Practices
-- ✅ Use `CancellationToken` for cancellable operations
+- ✅ Use `CancellationToken` for every async method that touches Unity objects
 - ✅ Handle exceptions with try/catch in async methods
 - ✅ Use `async void` ONLY for event handlers (prefer `async UniTaskVoid`)
 - ✅ Check `destroyCancellationToken` for MonoBehaviour lifetime
 - ✅ Consider UniTask for zero-allocation async
+- ✅ Dispose `CancellationTokenSource` in `OnDestroy` or `finally`
 - ❌ **NEVER** use `Task.Run` for Unity API calls (not thread-safe!)
 - ❌ **NEVER** forget to await async calls (fire-and-forget = silent errors)
 - ❌ **NEVER** block with `.Result` or `.Wait()` (causes deadlock)
+
+## Anti-Pattern Examples
+
+### ❌ Fire-and-Forget (Silent Errors)
+```csharp
+// BAD: Exception is silently swallowed, no way to know it failed
+void Start()
+{
+    LoadDataAsync(); // not awaited — compiler warning CS4014
+}
+
+// GOOD: Use .Forget() with UniTask to explicitly acknowledge fire-and-forget
+void Start()
+{
+    LoadDataAsync(this.destroyCancellationToken).Forget();
+}
+```
+
+### ❌ Blocking with .Result / .Wait()
+```csharp
+// BAD: Deadlock on Unity main thread — the .Result call blocks
+// the thread that the synchronization context needs to resume on
+void Start()
+{
+    var data = LoadDataAsync().Result; // DEADLOCK!
+}
+
+// GOOD: Use async from the start
+async UniTaskVoid Start()
+{
+    var data = await LoadDataAsync(this.destroyCancellationToken);
+}
+```
+
+### ❌ Task.Run for Unity API
+```csharp
+// BAD: Unity APIs are NOT thread-safe
+Task.Run(() =>
+{
+    transform.position = Vector3.zero; // CRASH!
+});
+
+// GOOD: Stay on main thread or switch back explicitly
+await UniTask.SwitchToMainThread();
+transform.position = Vector3.zero; // Safe
+```
 
 ## Cancellation Pattern
 ```csharp
 private CancellationTokenSource _cts;
 
-async void Start()
+void OnEnable()
 {
     _cts = new CancellationTokenSource();
-    
+    LoadDataAsync(_cts.Token).Forget();
+}
+
+async UniTask LoadDataAsync(CancellationToken token)
+{
     try
     {
-        await LoadDataAsync(_cts.Token);
+        var data = await FetchFromServerAsync(token);
+        token.ThrowIfCancellationRequested();
+
+        await SaveToLocalAsync(data, token);
+        Debug.Log("Data loaded and saved");
     }
     catch (OperationCanceledException)
     {
         Debug.Log("Operation cancelled");
     }
+    catch (Exception ex)
+    {
+        Debug.LogError($"LoadData failed: {ex.Message}");
+    }
+}
+
+void OnDisable()
+{
+    _cts?.Cancel();
 }
 
 void OnDestroy()
 {
     _cts?.Cancel();
     _cts?.Dispose();
+    _cts = null;
 }
+```
 
-async Task LoadDataAsync(CancellationToken token)
+### Unity 2022+: Built-in Cancellation
+```csharp
+// destroyCancellationToken is auto-cancelled when MonoBehaviour is destroyed
+// No manual CancellationTokenSource needed for destroy-scoped work
+async UniTaskVoid LoadAsync()
 {
-    token.ThrowIfCancellationRequested();
-    // ... async work
+    try
+    {
+        await DoWorkAsync(this.destroyCancellationToken);
+    }
+    catch (OperationCanceledException)
+    {
+        // Normal — MonoBehaviour was destroyed during async work
+    }
 }
 ```
 
@@ -136,74 +207,110 @@ async Task LoadDataAsync(CancellationToken token)
 
 ## Few-Shot Examples
 
-### Example 1: Sequential Loading
+### Example 1: Sequential Loading with Error Recovery
 **User**: "Load player data, then inventory, then spawn player."
 
 **Agent**:
 ```csharp
-async UniTaskVoid InitializeGame()
+public class GameInitializer : MonoBehaviour
 {
-    var playerData = await LoadPlayerDataAsync();
-    var inventory = await LoadInventoryAsync(playerData.Id);
-    await SpawnPlayerAsync(playerData, inventory);
-    
-    Debug.Log("Game initialized!");
+    [SerializeField] private GameObject _loadingUI;
+
+    async UniTaskVoid Start()
+    {
+        var token = this.destroyCancellationToken;
+        _loadingUI.SetActive(true);
+
+        try
+        {
+            var playerData = await LoadPlayerDataAsync(token);
+            var inventory = await LoadInventoryAsync(playerData.Id, token);
+            await SpawnPlayerAsync(playerData, inventory, token);
+
+            Debug.Log("Game initialized!");
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("Initialization cancelled");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Init failed: {ex.Message}");
+        }
+        finally
+        {
+            if (this != null)
+                _loadingUI.SetActive(false);
+        }
+    }
 }
 ```
 
-### Example 2: Parallel Loading
-**User**: "Load multiple assets simultaneously."
+### Example 2: Parallel Loading with Progress
+**User**: "Load textures, sounds, and prefabs all at once with a progress bar."
 
 **Agent**:
 ```csharp
-async UniTask LoadAllAssets()
+public class AssetPreloader : MonoBehaviour
 {
-    var (textures, sounds, prefabs) = await UniTask.WhenAll(
-        LoadTexturesAsync(),
-        LoadSoundsAsync(),
-        LoadPrefabsAsync()
-    );
+    [SerializeField] private Slider _progressBar;
+
+    async UniTask PreloadAllAssets(CancellationToken token)
+    {
+        var progress = Progress.Create<float>(p => _progressBar.value = p);
+
+        // WhenAll runs all three concurrently
+        var (textures, sounds, prefabs) = await UniTask.WhenAll(
+            LoadTexturesAsync(token),
+            LoadSoundsAsync(token),
+            LoadPrefabsAsync(token)
+        );
+
+        Debug.Log($"Loaded {textures.Length} textures, "
+                + $"{sounds.Length} sounds, {prefabs.Length} prefabs");
+    }
+
+    async UniTaskVoid Start()
+    {
+        try
+        {
+            await PreloadAllAssets(this.destroyCancellationToken);
+        }
+        catch (OperationCanceledException) { }
+    }
 }
 ```
 
-### Example 3: Timeout Pattern
+### Example 3: Timeout with Proper Cleanup
 **User**: "Network request with 5 second timeout."
 
 **Agent**:
 ```csharp
-async UniTask<string> FetchWithTimeout(string url)
+async UniTask<string> FetchWithTimeout(string url, CancellationToken externalToken)
 {
-    var cts = new CancellationTokenSource();
+    // Link external token so both timeout and external cancel work
+    using var cts = CancellationTokenSource.CreateLinkedTokenSource(externalToken);
     cts.CancelAfter(TimeSpan.FromSeconds(5));
-    
+
     try
     {
         return await FetchDataAsync(url, cts.Token);
     }
-    catch (OperationCanceledException)
+    catch (OperationCanceledException) when (!externalToken.IsCancellationRequested)
     {
-        return "Request timed out";
+        // Only the timeout fired, not external cancellation
+        Debug.LogWarning($"Request to {url} timed out after 5s");
+        return null;
     }
+    // If externalToken was cancelled, let OperationCanceledException propagate
 }
 ```
 
-## Unity Main Thread Safety
-```csharp
-// BAD: Called from background thread
-Task.Run(() => 
-{
-    transform.position = Vector3.zero; // CRASH!
-});
-
-// GOOD: Return to main thread
-await UniTask.SwitchToMainThread();
-transform.position = Vector3.zero; // Safe
-```
-
 ## Related Skills
+- `@async-strategy` - Decide which async approach to use
 - `@advanced-game-bootstrapper` - Async initialization
 - `@addressables-asset-management` - Async asset loading
-- `@multiplayer-netcode` - Async network operations
+- `@backend-integration` - Async network operations
 
 ## Recommended Package
 ```

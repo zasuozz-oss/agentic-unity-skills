@@ -1,15 +1,6 @@
 ---
 name: backend-integration
 description: "Backend-as-a-Service integration (PlayFab, Firebase). Use this when the user needs cloud saves, authentication, leaderboards, or API integration."
-version: 1.0.0
-tags: ["backend", "playfab", "firebase", "api", "cloud-save", "auth"]
-argument-hint: "service='PlayFab' action='Login' OR feature='CloudData'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Backend Integration

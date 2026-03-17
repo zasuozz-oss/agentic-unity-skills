@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { cpSync, rmSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'fs';
+import { cpSync, rmSync, existsSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,10 +11,6 @@ const ROOT = join(__dirname, '..');
 const PROJECT_DIR = process.cwd();
 const SKILLS_SRC = join(ROOT, 'global-config', 'skills');
 const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills', 'unity-skills');
-const GEMINI_MD = join(PROJECT_DIR, 'GEMINI.md');
-
-const BLOCK_START = '<!-- BEGIN antigravity-unity-skills -->';
-const BLOCK_END = '<!-- END antigravity-unity-skills -->';
 
 // ─── Helpers ───────────────────────────────────────────────
 
@@ -37,10 +33,6 @@ function countSkills(dir) {
   return count;
 }
 
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 // ─── Steps ─────────────────────────────────────────────────
 
 function banner() {
@@ -59,22 +51,17 @@ function step1_checkSource() {
   }
 }
 
-function step2_backup() {
-  if (existsSync(SKILLS_DST) && readdirSync(SKILLS_DST).length > 0) {
-    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const backupDir = `${SKILLS_DST}-backup-${ts}`;
-    console.log('📦 Step 1: Backing up existing skills...');
-    cpSync(SKILLS_DST, backupDir, { recursive: true, force: true });
-    log('✓', `Backup: ${backupDir}`);
-    console.log('');
-  }
-}
 
 function step3_installSkills() {
-  console.log('📚 Step 2: Installing Unity skills...');
+  console.log('📚 Installing Unity skills...');
+
+  // Clean replace: remove entire folder to avoid leftover skills from previous versions
+  if (existsSync(SKILLS_DST)) {
+    rmSync(SKILLS_DST, { recursive: true, force: true });
+  }
   mkdirSync(SKILLS_DST, { recursive: true });
 
-  // Copy each skill folder directly (flat structure)
+  // Copy all skill folders fresh
   const entries = readdirSync(SKILLS_SRC, { withFileTypes: true });
   let installed = 0;
   for (const entry of entries) {
@@ -82,49 +69,18 @@ function step3_installSkills() {
     const src = join(SKILLS_SRC, entry.name);
     if (!existsSync(join(src, 'SKILL.md'))) continue;
 
-    const dest = join(SKILLS_DST, entry.name);
-    if (existsSync(dest)) rmSync(dest, { recursive: true, force: true });
-    cpSync(src, dest, { recursive: true, force: true });
+    cpSync(src, join(SKILLS_DST, entry.name), { recursive: true, force: true });
     installed++;
   }
 
-  log('✓', `${installed} skills installed to .agents/skills/`);
+  log('✓', `${installed} skills installed to .agents/skills/unity-skills/`);
   console.log('');
 }
 
-function step4_updateGeminiMd() {
-  console.log('📝 Step 3: Updating project GEMINI.md...');
-
-  const blockContent = `${BLOCK_START}\n${BLOCK_END}`;
-
-  if (existsSync(GEMINI_MD)) {
-    let content = readFileSync(GEMINI_MD, 'utf8');
-
-    if (content.includes(BLOCK_START)) {
-      const regex = new RegExp(
-        escapeRegExp(BLOCK_START) + '[\\s\\S]*?' + escapeRegExp(BLOCK_END),
-        'g'
-      );
-      content = content.replace(regex, blockContent);
-      writeFileSync(GEMINI_MD, content, 'utf8');
-      log('✓', 'Updated existing block in: GEMINI.md');
-    } else {
-      content = content.trimEnd() + '\n\n' + blockContent + '\n';
-      writeFileSync(GEMINI_MD, content, 'utf8');
-      log('✓', 'Appended block to: GEMINI.md');
-    }
-  } else {
-    writeFileSync(GEMINI_MD, blockContent + '\n', 'utf8');
-    log('✓', 'Created: GEMINI.md');
-  }
-  console.log('');
-}
-
-function step5_verify() {
+function step4_verify() {
   console.log('✅ Verification...');
   const skillCount = countSkills(SKILLS_DST);
   log('', `Skills: ${skillCount}`);
-  log('', `GEMINI.md: ✓`);
   console.log('');
 }
 
@@ -135,12 +91,11 @@ function footer() {
   console.log('');
   console.log('📊 Summary:');
   log('', `Project:  ${PROJECT_DIR}`);
-  log('', `Skills:   .agents/skills/`);
-  log('', `Config:   GEMINI.md updated`);
+  log('', `Skills:   .agents/skills/unity-skills/`);
   console.log('');
   console.log('🚀 Next steps:');
   console.log('   1. Open Antigravity in this project');
-  console.log('   2. Unity skills auto-load via YAML frontmatter');
+  console.log('   2. Skills auto-trigger via YAML frontmatter descriptions');
   console.log('');
   console.log('✅ Done!');
 }
@@ -150,10 +105,8 @@ function footer() {
 function main() {
   banner();
   step1_checkSource();
-  step2_backup();
   step3_installSkills();
-  step4_updateGeminiMd();
-  step5_verify();
+  step4_verify();
   footer();
 }
 

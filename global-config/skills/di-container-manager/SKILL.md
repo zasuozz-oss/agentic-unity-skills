@@ -1,15 +1,6 @@
 ---
 name: di-container-manager
-description: "Dependency Injection specialist using VContainer or Zenject. Use this when the user asks about decoupling systems, IoC containers, service registration, or testable architecture."
-version: 1.0.0
-tags: ["architecture", "DI", "dependency-injection", "IoC", "VContainer", "Zenject"]
-argument-hint: "container='VContainer' service='IAudioService'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Dependency Injection specialist using VContainer or Zenject. Use this ONLY when the user explicitly mentions DI, IoC containers, VContainer, Zenject, or service registration."
 ---
 
 # DI Container Manager

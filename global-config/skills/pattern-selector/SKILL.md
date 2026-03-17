@@ -1,6 +1,6 @@
 ---
 name: pattern-selector
-description: "Unity pattern selector advisor. Use this when the user wants advice on whether to use ScriptableObject, events, interfaces, state machines, object pools, services, or other patterns."
+description: "Unity pattern selector advisor. Use this when the user has a SPECIFIC decision between 2+ patterns (ScriptableObject vs events vs interfaces vs state machines vs object pools). Do NOT use for high-level architecture — use architecture-advisor instead."
 ---
 
 # Pattern Selector

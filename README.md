@@ -1,6 +1,6 @@
 # Antigravity Unity Skills
 
-67 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
+45 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
 
 > **📦 Public, read-only repository.** Install via npm or clone and run setup.
 
@@ -20,16 +20,18 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-That's it. 67 skills installed.
+That's it. 45 skills installed.
 
 <details>
 <summary>Alternative: Clone + Run</summary>
 
 ```bash
-git clone https://github.com/zasuozz-oss/antigravity-unity-skills.git
+git clone https://github.com/zasuozz-oss/antigravity-unity-skills.git ~/AI-Tool/antigravity-unity-skills
 cd /path/to/your/unity-project
-node /path/to/antigravity-unity-skills/bin/cli.mjs
+node ~/AI-Tool/antigravity-unity-skills/bin/cli.mjs
 ```
+
+> ⚠️ Replace `/path/to/your/unity-project` with your actual Unity project path.
 
 </details>
 
@@ -37,46 +39,45 @@ node /path/to/antigravity-unity-skills/bin/cli.mjs
 
 ```
 your-project/
-├── GEMINI.md                # Updated with unity-skills block
 └── .agents/
-    └── skills/unity-skills/  # 67 Unity skills installed here
+    └── skills/unity-skills/  # 45 Unity skills installed here
+        ├── architecture-advisor/
+        ├── design-patterns/
+        ├── ...
         └── INDEX.md
 ```
 
-Open Antigravity in your project. Unity skills auto-load via `GEMINI.md`.
+Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` configuration needed.
 
 ---
 
 ## 🎯 What Is This?
 
-A collection of **67 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
+A collection of **45 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
-- ✅ **Project-level install** — skills live in your project's `.agents/skills-unity/`
+- ✅ **Self-triggering** — skills activate via YAML frontmatter, no manual config
+- ✅ **Project-level install** — skills live in your project's `.agents/skills/unity-skills/`
 - ✅ **Cross-platform** — pure Node.js, no bash/powershell dependency
-- ✅ **Non-destructive setup** — preserves existing `GEMINI.md` content
-- ✅ **Block-based updates** — re-run setup to update without conflicts
 - ✅ **Backup on update** — existing skills backed up before overwrite
 
 ---
 
 ## 📚 What's Inside
 
-**67 skills** across **10 categories**:
+**45 skills** across **8 categories**:
 
 | Category | Skills | Description |
 |----------|--------|-------------|
-| Advisory | 13 | Architecture, patterns, testability, performance advisors |
-| Architecture | 8 | Design patterns, DI, ECS, state machines |
-| Gameplay | 10 | Character, AI, inventory, combat, save/load |
-| Visuals & Audio | 7 | Shaders, VFX, audio, Cinemachine, lighting |
+| Advisory | 10 | Architecture, patterns, testability, performance advisors |
+| Architecture | 8 | Design patterns, DI, state machines, event bus |
+| Visuals & Audio | 4 | Shaders, VFX, audio, lighting |
 | UI & UX | 5 | UI Toolkit, Canvas, Input System, responsive |
 | Performance | 5 | Addressables, pooling, profiling, mobile |
 | Tools & Pipeline | 6 | Editor scripting, testing, localization, MCP |
-| Backend & Monetization | 4 | Multiplayer, IAP, analytics, backend |
-| DevOps | 1 | Build pipelines |
-| Project-Specific | 5 | General Unity development, C# conventions |
+| Backend & Monetization | 2 | IAP, backend integration |
+| DevOps + Project | 5 | Build pipelines, C# conventions, general Unity |
 
 👉 See [INDEX.md](global-config/skills/INDEX.md) for the complete skill list with descriptions.
 
@@ -89,7 +90,7 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-Re-running the command updates skills without conflicts (block-based replacement). Existing skills are automatically backed up.
+Re-running the command updates skills. Existing skills are automatically backed up.
 
 ---
 
@@ -101,7 +102,7 @@ antigravity-unity-skills/
 ├── bin/
 │   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
-│   └── skills/              # 67 Unity skills (flat structure)
+│   └── skills/              # 45 Unity skills (flat structure)
 │       ├── architecture-advisor/
 │       ├── design-patterns/
 │       ├── ...
@@ -115,7 +116,7 @@ antigravity-unity-skills/
 
 ## 🤝 Works With Superpowers
 
-This extension is **independent** of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers), but they work great together. Both use separate block markers in `GEMINI.md` — no conflicts.
+This extension is **independent** of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers), but they work great together.
 
 ---
 
@@ -135,4 +136,4 @@ MIT
 
 ---
 
-**Last Updated:** 2026-03-16
+**Last Updated:** 2026-03-17

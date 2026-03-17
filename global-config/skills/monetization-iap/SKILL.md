@@ -1,15 +1,6 @@
 ---
 name: monetization-iap
 description: "In-App Purchase implementation using Unity Purchasing. Use this when the user needs IAP setup, product catalogs, receipt validation, or store integration."
-version: 1.0.0
-tags: ["iap", "monetization", "store", "billing", "revenue"]
-argument-hint: "action='buy' product='coins_100' OR type='consumable'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Monetization & IAP

@@ -1,21 +1,12 @@
 ---
 name: mobile-optimization
-description: "Mobile platform optimization for Android/iOS. Use this when the user targets mobile, needs framerate fixes, battery optimization, thermal throttling solutions, or build size reduction."
-version: 1.0.0
-tags: ["performance", "mobile", "Android", "iOS", "battery"]
-argument-hint: "fps='60' OR quality='medium' thermal='true'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Unity mobile development and optimization specialist for Android/iOS. Use this when the user targets mobile platforms, needs framerate fixes, battery optimization, thermal throttling solutions, build size reduction, mobile coding conventions, touch input, or mobile-specific patterns."
 ---
 
-# Mobile Optimization
+# Mobile Optimization & Conventions
 
 ## Overview
-Mobile-specific performance optimization for Android/iOS. Covers framerate targeting, resolution scaling, thermal throttling, and battery efficiency.
+Mobile-specific performance optimization and coding conventions for Android/iOS. Covers framerate targeting, resolution scaling, thermal throttling, battery efficiency, and mobile-first coding rules.
 
 ## When to Use
 - Use for Android/iOS builds
@@ -23,31 +14,74 @@ Mobile-specific performance optimization for Android/iOS. Covers framerate targe
 - Use when device overheats
 - Use for adaptive quality
 - Use for low-end device support
+- Use for mobile coding patterns and conventions
+- Use for touch input handling
 
-## Mobile Constraints
+---
+
+## Mobile Coding Rules
+
+### Performance Rules
+- No LINQ in Update or loops
+- No allocations in Update/LateUpdate
+- No GameObject.Find/FindObjectOfType at runtime
+- Cache references in Awake
+- Use object pooling for frequently spawned objects
+
+### Lifecycle Rules
+- Awake: cache references only (GetComponent, transform)
+- Start: scene-dependent init
+- FixedUpdate: physics only
+- OnEnable/OnDisable: register/unregister events
+- Awake MUST NOT be used for gameplay logic, state init, event registration, or data loading
+
+### Animation Rules
+- No hardcoded animator parameter names — use Animator.StringToHash
+- DOTween is the default tweening solution
+- Kill tweens on disable/destroy
+- Prefer DOTween over Animator for simple UI
+
+### UI Rules
+- All UI text MUST use TextMeshProUGUI (not UnityEngine.UI.Text)
+- Button callbacks MUST be assigned via Inspector (not AddListener)
+- Inspector serialized fields are assumed REQUIRED — no unnecessary null checks
+
+### Logging Rules
+- No log spam in release builds
+- Format: [ClassName] message
+- Guard hot path logs with `#if UNITY_EDITOR || DEVELOPMENT_BUILD`
+
+### API Integrity
+- Do NOT invent Unity APIs, methods, attributes, packages, or settings
+- Only use verified Unity APIs
+- If unsure: state "cannot verify"
+
+---
+
+## Mobile Performance Optimization
+
+### Mobile Constraints
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                 MOBILE PERFORMANCE PYRAMID                  │
 ├─────────────────────────────────────────────────────────────┤
-│                                                             │
 │                    ┌────────┐                               │
 │                    │ BATTERY│                               │
 │                    └────┬───┘                               │
 │                ┌────────┴────────┐                          │
 │                │    THERMAL      │                          │
 │                └────────┬────────┘                          │
-│           ┌─────────────┴─────────────┐                     │
-│           │         MEMORY            │                     │
-│           └─────────────┬─────────────┘                     │
-│      ┌──────────────────┴──────────────────┐                │
-│      │             CPU / GPU               │                │
-│      └─────────────────────────────────────┘                │
-│                                                             │
+│           ┌─────────────┴─────────────┐                    │
+│           │         MEMORY            │                    │
+│           └─────────────┬─────────────┘                    │
+│      ┌──────────────────┴──────────────────┐               │
+│      │             CPU / GPU               │               │
+│      └─────────────────────────────────────┘               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Key Settings
+### Key Settings
 
 | Setting | Low Device | High Device |
 |---------|:----------:|:-----------:|
@@ -57,7 +91,7 @@ Mobile-specific performance optimization for Android/iOS. Covers framerate targe
 | Texture Quality | Half | Full |
 | MSAA | Off | 2x |
 
-## Optimization Techniques
+### Optimization Techniques
 
 | Technique | Impact | Implementation |
 |-----------|:------:|----------------|
@@ -67,7 +101,7 @@ Mobile-specific performance optimization for Android/iOS. Covers framerate targe
 | GPU Skinning | Medium | Player Settings |
 | Texture Streaming | High | QualitySettings |
 
-## Best Practices
+### Best Practices
 - ✅ Profile on actual device
 - ✅ Use Adaptive Performance (Samsung)
 - ✅ Implement quality presets
@@ -79,41 +113,7 @@ Mobile-specific performance optimization for Android/iOS. Covers framerate targe
 
 ## Few-Shot Examples
 
-### Example 1: App Configuration
-**User**: "Set up mobile performance."
-
-**Agent**:
-```csharp
-public class MobileConfig : MonoBehaviour
-{
-    [Header("Performance")]
-    [SerializeField] private int _targetFPS = 60;
-    [SerializeField] private bool _enableVSync = true;
-    [SerializeField] private float _resolutionScale = 1f;
-    
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Initialize()
-    {
-        var config = new MobileConfig();
-        config.ApplySettings();
-    }
-    
-    public void ApplySettings()
-    {
-        Application.targetFrameRate = _targetFPS;
-        QualitySettings.vSyncCount = _enableVSync ? 1 : 0;
-        
-        if (_resolutionScale < 1f)
-        {
-            int width = (int)(Screen.width * _resolutionScale);
-            int height = (int)(Screen.height * _resolutionScale);
-            Screen.SetResolution(width, height, true);
-        }
-    }
-}
-```
-
-### Example 2: Adaptive Quality
+### Example 1: Adaptive Quality
 **User**: "Auto-adjust quality based on FPS."
 
 **Agent**:
@@ -123,42 +123,36 @@ public class AdaptiveQuality : MonoBehaviour
     [SerializeField] private int _targetFPS = 30;
     [SerializeField] private int _fpsThresholdLow = 25;
     [SerializeField] private int _fpsThresholdHigh = 40;
-    
+
     private float _checkInterval = 5f;
     private float _timer;
     private float _avgFPS;
-    
+
     private void Update()
     {
         _avgFPS = Mathf.Lerp(_avgFPS, 1f / Time.deltaTime, 0.1f);
         _timer += Time.deltaTime;
-        
+
         if (_timer >= _checkInterval)
         {
             AdjustQuality();
             _timer = 0;
         }
     }
-    
+
     private void AdjustQuality()
     {
         int current = QualitySettings.GetQualityLevel();
-        
+
         if (_avgFPS < _fpsThresholdLow && current > 0)
-        {
             QualitySettings.DecreaseLevel();
-            Debug.Log("Quality decreased");
-        }
         else if (_avgFPS > _fpsThresholdHigh && current < QualitySettings.names.Length - 1)
-        {
             QualitySettings.IncreaseLevel();
-            Debug.Log("Quality increased");
-        }
     }
 }
 ```
 
-### Example 3: Battery Saver Mode
+### Example 2: Battery Saver
 **User**: "Add battery saving option."
 
 **Agent**:
@@ -168,16 +162,16 @@ public void EnableBatterySaver(bool enabled)
     if (enabled)
     {
         Application.targetFrameRate = 30;
-        QualitySettings.SetQualityLevel(0); // Lowest
+        QualitySettings.SetQualityLevel(0);
         Screen.brightness = 0.5f;
     }
     else
     {
         Application.targetFrameRate = 60;
-        QualitySettings.SetQualityLevel(2); // Medium
+        QualitySettings.SetQualityLevel(2);
         Screen.brightness = 1f;
     }
-    
+
     PlayerPrefs.SetInt("BatterySaver", enabled ? 1 : 0);
 }
 ```
@@ -191,3 +185,4 @@ public void EnableBatterySaver(bool enabled)
 - `@object-pooling-system` - GC-free spawning
 - `@lod-occlusion-culling` - Rendering optimization
 - `@memory-profiler-expert` - Memory limits
+- `@my-csharp-conventions` - C# naming conventions

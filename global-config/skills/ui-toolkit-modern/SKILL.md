@@ -1,15 +1,6 @@
 ---
 name: ui-toolkit-modern
-description: "Modern Unity UI Toolkit specialist. Use this when the user builds professional, scalable runtime UI with UXML, USS, data binding, or responsive layouts."
-version: 1.0.0
-tags: ["UI", "UI-Toolkit", "UXML", "USS", "responsive", "modern"]
-argument-hint: "component='Button' OR view='MainMenu' binding='playerHealth'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Modern Unity UI Toolkit (UITK) specialist. Use this ONLY for UI Toolkit development: UXML, USS, UIDocument, data binding, VisualElement. Do NOT use for UGUI/Canvas — use responsive-ui-design instead."
 ---
 
 # UI Toolkit Modern

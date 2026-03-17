@@ -1,4 +1,5 @@
 ---
+name: my-csharp-conventions
 description: "C# naming conventions and code style for Unity 6 projects. Use this when the user writes new C# scripts, needs naming guidance, or code style review."
 ---
 

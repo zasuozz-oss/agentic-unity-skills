@@ -1,15 +1,6 @@
 ---
 name: interface-driven-development
-description: "Contract-Based Modularity using interfaces and ISP. Use this when the user asks to decouple systems, create testable code, or apply Interface Segregation Principle."
-version: 1.0.0
-tags: ["architecture", "interfaces", "SOLID", "ISP", "decoupling", "testability"]
-argument-hint: "interface_name='IDamageable' methods='TakeDamage(float),IsAlive'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Contract-based modularity using C# interfaces and ISP. Use this ONLY when the user explicitly asks about interfaces, Interface Segregation Principle, or contract-based design patterns."
 ---
 
 # Interface-Driven Development

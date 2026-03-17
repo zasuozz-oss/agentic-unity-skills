@@ -1,15 +1,6 @@
 ---
 name: custom-editor-scripting
 description: "Custom Unity Editor tools and windows. Use this when the user needs custom inspectors, editor windows, property drawers, or editor automation tools."
-version: 1.0.0
-tags: ["editor", "tools", "inspector", "efficiency", "pipeline"]
-argument-hint: "tool='LevelEditor' OR inspector='EnemyStats' type='PropertyDrawer'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Custom Editor Scripting

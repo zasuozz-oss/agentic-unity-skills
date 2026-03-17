@@ -1,15 +1,6 @@
 ---
 name: event-bus-system
 description: "Global decoupled Event Bus for cross-system communication. Use this when the user needs systems to communicate without direct references, pub/sub patterns, or zero-allocation struct events."
-version: 1.0.0
-tags: ["architecture", "events", "decoupling", "observer", "messaging"]
-argument-hint: "event_name='PlayerDamaged' namespace='Game.Events'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Event Bus System

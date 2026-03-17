@@ -1,15 +1,6 @@
 ---
 name: asset-import-pipeline
-description: "Asset import automation and configuration. Use this when the user needs texture import settings, model import rules, asset postprocessors, or batch import configuration."
-version: 1.0.0
-tags: ["tech-art", "import-settings", "optimization", "automation", "pipeline"]
-argument-hint: "action='ForceCompression' type='Texture'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Asset import automation and configuration. Use this skill whenever the user mentions texture compression, FBX import settings, asset postprocessor, mobile optimization for assets, or naming convention enforcement. Also trigger for: 'textures too large', 'materials messing up on import', 'how to automate import settings', 'batch configure assets', or any Unity asset pipeline customization."
 ---
 
 # Asset Import Pipeline
@@ -68,7 +59,24 @@ void OnPreprocessTexture()
 {
     TextureImporter importer = (TextureImporter)assetImporter;
     importer.textureCompression = TextureImporterCompression.Compressed;
-    // Set platform specific overrides...
+
+    var androidOverride = new TextureImporterPlatformSettings
+    {
+        name = "Android",
+        overridden = true,
+        format = TextureImporterFormat.ASTC_6x6,
+        maxTextureSize = 1024
+    };
+    importer.SetPlatformTextureSettings(androidOverride);
+
+    var iosOverride = new TextureImporterPlatformSettings
+    {
+        name = "iPhone",
+        overridden = true,
+        format = TextureImporterFormat.ASTC_6x6,
+        maxTextureSize = 1024
+    };
+    importer.SetPlatformTextureSettings(iosOverride);
 }
 ```
 
@@ -81,6 +89,26 @@ void OnPreprocessModel()
 {
     ModelImporter modelImporter = (ModelImporter)assetImporter;
     modelImporter.materialImportMode = ModelImporterMaterialImportMode.None;
+}
+
+### Example 3: Naming Convention Validation
+**User**: "Enforce texture naming prefix T_ automatically."
+
+**Agent**:
+```csharp
+public class AssetNamingValidator : AssetPostprocessor
+{
+    static void OnPostprocessAllAssets(
+        string[] importedAssets, string[] deletedAssets,
+        string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (var path in importedAssets)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            if (path.Contains("/Textures/") && !fileName.StartsWith("T_"))
+                Debug.LogWarning($"[NamingConvention] Texture should start with 'T_': {path}");
+        }
+    }
 }
 ```
 

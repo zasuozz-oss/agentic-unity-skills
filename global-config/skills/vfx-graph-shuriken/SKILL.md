@@ -1,15 +1,6 @@
 ---
 name: vfx-graph-shuriken
 description: "VFX Graph and Particle System specialist. Use this when the user creates particle effects, explosions, trails, magic spells, or environmental VFX."
-version: 1.0.0
-tags: ["visuals", "VFX", "particles", "effects", "Shuriken"]
-argument-hint: "effect_type='explosion' OR system='fire' spawn_rate='100'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # VFX Graph & Shuriken

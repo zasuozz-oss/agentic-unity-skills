@@ -1,15 +1,6 @@
 ---
 name: state-machine-architect
 description: "Flexible State Machine system generator. Use this when the user needs player state management, AI states, game states, menu states, or any state-based logic with transitions."
-version: 1.0.0
-tags: ["architecture", "state-machine", "FSM", "player-controller", "AI"]
-argument-hint: "name='PlayerController' namespace='Game.Player' states='Idle,Walk,Run,Jump'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # State Machine Architect

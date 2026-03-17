@@ -1,18 +1,6 @@
 ---
 name: unity-mcp-connector
-description: "Unity MCP integration specialist. Use this when the user connects Unity to external tools via Model Context Protocol or needs MCP server setup."
-version: 1.0.0
-tags: ["mcp", "integration", "editor-api", "automation", "bridge"]
-argument-hint: "action='ping' OR target='selection' scope='scene'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - mcp_unityMCP_manage_editor
-  - mcp_unityMCP_find_gameobjects
-  - mcp_unityMCP_manage_scene
-  - mcp_unityMCP_manage_components
-  - run_command
-  - list_dir
+description: "Unity MCP integration specialist. Use this when the user connects Unity to external AI tools via Model Context Protocol, needs MCP server setup, editor automation, or remote control of Unity."
 ---
 
 # Unity MCP Connector

@@ -1,6 +1,6 @@
 ---
 name: design-patterns
-description: "SOLID principles and GoF design patterns for Unity C#. Use this when the user needs Strategy, Factory, Observer, Command patterns, refactoring God Classes, clean architecture, or class design guidance."
+description: "SOLID principles and GoF design patterns for Unity C#. Use this when the user EXPLICITLY needs Strategy, Factory, Observer, Command, Singleton patterns, or wants to refactor God Classes using established GoF patterns."
 ---
 
 # Design Patterns for Unity

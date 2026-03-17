@@ -1,15 +1,6 @@
 ---
 name: memory-profiler-expert
 description: "Memory profiling and optimization specialist. Use this when the user has memory leaks, high GC allocation, texture memory issues, or needs memory profiling guidance."
-version: 1.0.0
-tags: ["performance", "profiling", "memory", "GC", "debugging"]
-argument-hint: "profile='memory' OR analyze='allocations' target='mobile'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Memory & Performance Profiler Expert

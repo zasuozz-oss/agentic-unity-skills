@@ -1,15 +1,6 @@
 ---
 name: advanced-game-bootstrapper
-description: "Game initialization and bootstrapping system architect. Use this when the user asks to set up game startup flow, scene loading order, manager initialization, or singleton alternatives."
-version: 1.0.0
-tags: ["architecture", "bootstrap", "initialization", "managers", "singleton-alternative"]
-argument-hint: "name='GameBootstrapper' namespace='Game.Core'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Game initialization and bootstrapping system. Use this skill whenever the user mentions startup flow, manager initialization, singleton problems, scene loading order, or race conditions between systems — even if they don't say 'bootstrapper'. Also trigger for: DontDestroyOnLoad abuse, 'Manager not ready' errors, loading screens, or any global system initialization in Unity."
 ---
 
 # Advanced Game Bootstrapper

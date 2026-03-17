@@ -1,15 +1,6 @@
 ---
 name: localization-specialist
-description: "Localization system implementation. Use this when the user needs multi-language support, string tables, font fallbacks, or RTL text handling."
-version: 1.0.0
-tags: ["localization", "i18n", "translation", "language", "csv"]
-argument-hint: "key='MainMenu_Play' OR language='es-ES' table='UI_Text'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
+description: "Localization system implementation. Use this for multi-language support, string tables, font fallbacks, RTL text, translation workflow, i18n, L10n, or Unity Localization package setup."
 ---
 
 # Localization Specialist

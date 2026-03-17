@@ -1,15 +1,6 @@
 ---
 name: version-control-git
 description: "Git workflow for Unity projects. Use this when the user needs .gitignore setup, LFS configuration, merge strategies for Unity files, or Git workflow guidance."
-version: 1.0.0
-tags: ["git", "version-control", "lfs", "workflow", "collaborative"]
-argument-hint: "action='gitignore' OR config='LFS' strategy='gitflow'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Version Control Git

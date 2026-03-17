@@ -1,11 +1,9 @@
 ---
 name: architecture-advisor
-description: "Unity architecture decision advisor. Use this when the user needs architecture guidance, wants to avoid over-engineering, needs to choose between patterns, or is designing system boundaries."
+description: "Unity architecture decision advisor. Use this FIRST when the user asks how to structure a project, design system boundaries, avoid over-engineering, or organize modules and folders. Also trigger for: 'how should I architect this', 'is this too complex', 'should I use DI', 'how many abstraction layers', or any question about project-level design decisions. Do NOT use for individual pattern choice — use pattern-selector instead."
 ---
 
 # Architecture Advisor
-
-> Adapted from [Besty0728/Unity-Skills](https://github.com/Besty0728/Unity-Skills) (MIT License)
 
 Use this skill when architecture decisions need practical guidance with guardrails against over-engineering.
 
@@ -37,6 +35,28 @@ Use this skill when architecture decisions need practical guidance with guardrai
 - ❌ Don't use event bus when 2 scripts talk to each other
 - ❌ Don't architect for "someday maybe" requirements
 
+## Few-Shot Examples
+
+### Example 1: Jam Project Over-Engineering
+**User**: "I'm making a 48h jam game, should I use Zenject for dependency injection?"
+
+**Agent**:
+Assessment: Prototype/Jam phase, 1 developer, 48h timeline.
+Tier: MonoBehaviour + ScriptableObject config only.
+Recommended: Direct references, no patterns.
+Not recommended yet: DI container, event bus, interfaces.
+Reason: Zenject adds 2-4h setup overhead. Zero ROI for a jam.
+
+### Example 2: Growing Codebase
+**User**: "Our 3-dev project is getting messy, managers are calling each other everywhere."
+
+**Agent**:
+Assessment: Small→Medium transition, 3 devs, scaling pain.
+Tier: Medium — introduce interfaces at hot seams + asmdef boundaries.
+Recommended: IEventBus for cross-manager communication, asmdef to enforce boundaries.
+Not recommended yet: Full DI container (overhead not justified yet).
+Migration path: Add interfaces first → enforce asmdef → evaluate DI at 5+ devs.
+
 ## Output Format
 
 - Current project size/phase assessment
@@ -48,4 +68,4 @@ Use this skill when architecture decisions need practical guidance with guardrai
 ## Related Skills
 - `@pattern-selector` - Which specific pattern to use
 - `@project-scout` - Inspect existing project before advising
-- `@adr-records` - Document architecture decisions
+- `@asmdef-advisor` - Assembly definition boundaries

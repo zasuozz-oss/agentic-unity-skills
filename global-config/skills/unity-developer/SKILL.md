@@ -1,6 +1,6 @@
 ---
 name: unity-developer
-description: "General Unity development knowledge base. Use this when the user asks Unity fundamentals, project setup, scene management, or general Unity questions."
+description: "General Unity development fallback. Use this ONLY when no other specific skill matches the request. Covers Unity fundamentals, project setup, scene management, and general Unity questions."
   and proper asset management. Masters Unity 6 LTS, URP/HDRP pipelines, and
   cross-platform deployment. Handles gameplay systems, UI implementation, and
   platform optimization. Use PROACTIVELY for Unity performance issues, game

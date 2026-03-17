@@ -1,6 +1,6 @@
 {
   "name": "unity-skills",
-  "description": "70 Unity-specific skills for game development: architecture, gameplay, visuals, UI, performance, tools, backend, and devops",
-  "version": "2.0.0",
+  "description": "45 Unity-specific skills for game development: architecture, visuals, UI, performance, tools, and devops",
+  "version": "3.0.0",
   "contextFileName": "unity_context.md"
 }

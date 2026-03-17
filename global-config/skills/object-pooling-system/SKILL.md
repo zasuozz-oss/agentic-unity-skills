@@ -1,15 +1,6 @@
 ---
 name: object-pooling-system
 description: "Object pooling implementation. Use this when the user needs to pool bullets, enemies, particles, or any frequently instantiated/destroyed objects to reduce GC."
-version: 1.0.0
-tags: ["performance", "pooling", "memory", "GC", "optimization"]
-argument-hint: "prefab='Bullet' initial_size='20' OR pool_type='generic'"
-disable-model-invocation: false
-user-invocable: true
-allowed-tools:
-  - run_command
-  - list_dir
-  - write_to_file
 ---
 
 # Object Pooling System
