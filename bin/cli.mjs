@@ -9,8 +9,23 @@ const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..');
 
 const PROJECT_DIR = process.cwd();
-const SKILLS_SRC = join(ROOT, 'global-config', 'skills');
-const SKILLS_DST = join(PROJECT_DIR, '.agents', 'skills', 'unity-skills');
+
+// ─── Skill Groups ──────────────────────────────────────────
+
+const SKILL_GROUPS = [
+  {
+    name: 'unity-skills',
+    src: join(ROOT, 'global-config', 'skills', 'unity-skills'),
+    dst: join(PROJECT_DIR, '.agents', 'skills', 'unity-skills'),
+    label: 'Unity',
+  },
+  {
+    name: 'qa-skills',
+    src: join(ROOT, 'global-config', 'skills', 'qa-skills'),
+    dst: join(PROJECT_DIR, '.agents', 'skills', 'qa-skills'),
+    label: 'QA',
+  },
+];
 
 // ─── Helpers ───────────────────────────────────────────────
 
@@ -33,54 +48,68 @@ function countSkills(dir) {
   return count;
 }
 
+function installSkillGroup(group) {
+  // Clean replace: remove entire folder to avoid leftover skills from previous versions
+  if (existsSync(group.dst)) {
+    rmSync(group.dst, { recursive: true, force: true });
+  }
+  mkdirSync(group.dst, { recursive: true });
+
+  // Copy all skill folders fresh
+  const entries = readdirSync(group.src, { withFileTypes: true });
+  let installed = 0;
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const src = join(group.src, entry.name);
+    if (!existsSync(join(src, 'SKILL.md'))) continue;
+
+    cpSync(src, join(group.dst, entry.name), { recursive: true, force: true });
+    installed++;
+  }
+
+  return installed;
+}
+
 // ─── Steps ─────────────────────────────────────────────────
 
 function banner() {
   console.log('');
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║     Unity Skills — Project Setup                          ║');
+  console.log('║     AG Skills — Project Setup                             ║');
   console.log('║     npx ag-unity                                         ║');
   console.log('╚════════════════════════════════════════════════════════════╝');
   console.log('');
 }
 
-function step1_checkSource() {
-  if (!existsSync(SKILLS_SRC)) {
-    console.error('❌ Error: global-config/skills/ not found');
-    process.exit(1);
+function step1_checkSources() {
+  for (const group of SKILL_GROUPS) {
+    if (!existsSync(group.src)) {
+      console.error(`❌ Error: ${group.name} source not found at ${group.src}`);
+      process.exit(1);
+    }
   }
 }
 
+function step2_installSkills() {
+  let totalInstalled = 0;
 
-function step3_installSkills() {
-  console.log('📚 Installing Unity skills...');
-
-  // Clean replace: remove entire folder to avoid leftover skills from previous versions
-  if (existsSync(SKILLS_DST)) {
-    rmSync(SKILLS_DST, { recursive: true, force: true });
-  }
-  mkdirSync(SKILLS_DST, { recursive: true });
-
-  // Copy all skill folders fresh
-  const entries = readdirSync(SKILLS_SRC, { withFileTypes: true });
-  let installed = 0;
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const src = join(SKILLS_SRC, entry.name);
-    if (!existsSync(join(src, 'SKILL.md'))) continue;
-
-    cpSync(src, join(SKILLS_DST, entry.name), { recursive: true, force: true });
-    installed++;
+  for (const group of SKILL_GROUPS) {
+    console.log(`📚 Installing ${group.label} skills...`);
+    const count = installSkillGroup(group);
+    log('✓', `${count} skills installed to .agents/skills/${group.name}/`);
+    totalInstalled += count;
   }
 
-  log('✓', `${installed} skills installed to .agents/skills/unity-skills/`);
   console.log('');
+  return totalInstalled;
 }
 
-function step4_verify() {
+function step3_verify() {
   console.log('✅ Verification...');
-  const skillCount = countSkills(SKILLS_DST);
-  log('', `Skills: ${skillCount}`);
+  for (const group of SKILL_GROUPS) {
+    const count = countSkills(group.dst);
+    log('', `${group.label}: ${count} skills`);
+  }
   console.log('');
 }
 
@@ -91,7 +120,9 @@ function footer() {
   console.log('');
   console.log('📊 Summary:');
   log('', `Project:  ${PROJECT_DIR}`);
-  log('', `Skills:   .agents/skills/unity-skills/`);
+  for (const group of SKILL_GROUPS) {
+    log('', `${group.label}:     .agents/skills/${group.name}/`);
+  }
   console.log('');
   console.log('🚀 Next steps:');
   console.log('   1. Open Antigravity in this project');
@@ -104,9 +135,9 @@ function footer() {
 
 function main() {
   banner();
-  step1_checkSource();
-  step3_installSkills();
-  step4_verify();
+  step1_checkSources();
+  step2_installSkills();
+  step3_verify();
   footer();
 }
 

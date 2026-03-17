@@ -1,5 +1,5 @@
 #!/bin/bash
-# Update Unity Skills from upstream repository
+# Update Skills from upstream repository
 # Pulls latest from the antigravity-unity-skills repo, checks for changes,
 # and re-installs to the current project.
 # Usage: bash scripts/update-unity-skills.sh [project-path]
@@ -16,10 +16,13 @@ elif [ -d "$HOME/AI-Tool/antigravity-unity-skills/global-config" ]; then
 fi
 
 PROJECT_DIR="${1:-$(pwd)}"
-SKILLS_DST="$PROJECT_DIR/.agents/skills/unity-skills"
+SKILLS_BASE="$PROJECT_DIR/.agents/skills"
+
+# Skill groups to manage
+SKILL_GROUPS=("unity-skills" "qa-skills")
 
 echo "╔════════════════════════════════════════════════════════════╗"
-echo "║     Unity Skills — Update Workflow                        ║"
+echo "║     AG Skills — Update Workflow                            ║"
 echo "║     Pull upstream → Check changes → Re-install            ║"
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
@@ -31,16 +34,20 @@ if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR/global-config/skills" ]; then
 fi
 
 # Step 1: Backup
-if [ -d "$SKILLS_DST" ]; then
-    BACKUP_DIR="$SKILLS_DST-backup-$(date +%Y%m%d-%H%M%S)"
-    echo "📦 Step 1: Creating backup..."
-    cp -r "$SKILLS_DST" "$BACKUP_DIR"
-    echo "   ✓ Backup: $BACKUP_DIR"
-    echo ""
-else
-    echo "📦 Step 1: No existing skills to backup"
-    echo ""
-fi
+echo "📦 Step 1: Creating backups..."
+BACKUP_DIRS=()
+for group in "${SKILL_GROUPS[@]}"; do
+    GROUP_DST="$SKILLS_BASE/$group"
+    if [ -d "$GROUP_DST" ]; then
+        BACKUP_DIR="$GROUP_DST-backup-$(date +%Y%m%d-%H%M%S)"
+        cp -r "$GROUP_DST" "$BACKUP_DIR"
+        BACKUP_DIRS+=("$BACKUP_DIR")
+        echo "   ✓ $group → $BACKUP_DIR"
+    else
+        echo "   - $group: no existing skills to backup"
+    fi
+done
+echo ""
 
 # Step 2: Pull latest from git
 echo "🔄 Step 2: Pulling latest from repository..."
@@ -56,29 +63,32 @@ echo ""
 
 # Step 3: Check for changes
 echo "🔍 Step 3: Checking for updates..."
-if [ -d "$SKILLS_DST" ]; then
-    DIFF_FILE="/tmp/unity-skills-diff-$(date +%Y%m%d-%H%M%S).txt"
-    diff -r "$SKILLS_DST/" "$REPO_DIR/global-config/skills/" > "$DIFF_FILE" 2>&1 || true
+DIFF_FILE="/tmp/ag-skills-diff-$(date +%Y%m%d-%H%M%S).txt"
+HAS_CHANGES=false
 
-    if [ -s "$DIFF_FILE" ]; then
-        CHANGED=$(grep -cE "^(Only in|diff)" "$DIFF_FILE" 2>/dev/null || echo "0")
-        echo "   ✓ $CHANGED changes found"
-        echo ""
-    else
-        echo "   ✓ Already up to date!"
-        rm -f "$DIFF_FILE"
-        exit 0
+for group in "${SKILL_GROUPS[@]}"; do
+    GROUP_DST="$SKILLS_BASE/$group"
+    GROUP_SRC="$REPO_DIR/global-config/skills/$group"
+    if [ -d "$GROUP_DST" ] && [ -d "$GROUP_SRC" ]; then
+        diff -r "$GROUP_DST/" "$GROUP_SRC/" >> "$DIFF_FILE" 2>&1 || true
     fi
-else
-    echo "   ✓ Fresh install (no existing skills)"
-    DIFF_FILE=""
+done
+
+if [ -s "$DIFF_FILE" ]; then
+    CHANGED=$(grep -cE "^(Only in|diff)" "$DIFF_FILE" 2>/dev/null || echo "0")
+    echo "   ✓ $CHANGED changes found"
+    HAS_CHANGES=true
     echo ""
+else
+    echo "   ✓ Already up to date!"
+    rm -f "$DIFF_FILE"
+    exit 0
 fi
 
 # Step 4: Choose action
 echo "📝 Step 4: What to do?"
 echo "   1. Update all skills (overwrite)"
-if [ -n "$DIFF_FILE" ]; then
+if [ "$HAS_CHANGES" = true ]; then
 echo "   2. Show diff only"
 fi
 echo "   3. Cancel"
@@ -93,7 +103,7 @@ case $option in
         node "$REPO_DIR/bin/cli.mjs"
         ;;
     2)
-        if [ -n "$DIFF_FILE" ]; then
+        if [ "$HAS_CHANGES" = true ]; then
             echo ""
             cat "$DIFF_FILE"
             echo ""
@@ -121,14 +131,16 @@ echo "╚═══════════════════════�
 echo ""
 echo "📊 Summary:"
 echo "   - Project:  $PROJECT_DIR"
-echo "   - Skills:   ✓ Updated"
-if [ -n "$BACKUP_DIR" ]; then
-echo "   - Backup:   $BACKUP_DIR"
-fi
+for group in "${SKILL_GROUPS[@]}"; do
+    echo "   - $group: ✓ Updated"
+done
+if [ ${#BACKUP_DIRS[@]} -gt 0 ]; then
 echo ""
 echo "🔄 Rollback if needed:"
-if [ -n "$BACKUP_DIR" ]; then
-echo "   rm -rf $SKILLS_DST && cp -r $BACKUP_DIR $SKILLS_DST"
+for backup in "${BACKUP_DIRS[@]}"; do
+    group_name=$(basename "$backup" | sed 's/-backup-.*//')
+    echo "   rm -rf $SKILLS_BASE/$group_name && cp -r $backup $SKILLS_BASE/$group_name"
+done
 fi
 echo ""
 echo "✅ Done!"
