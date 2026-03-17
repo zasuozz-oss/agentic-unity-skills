@@ -1,0 +1,212 @@
+---
+name: state-machine-architect
+description: "Flexible State Machine system generator. Use this when the user needs player state management, AI states, game states, menu states, or any state-based logic with transitions. Also trigger for: 'too many if/else for states', 'boolean soup', 'isGrounded isJumping isFalling', 'enemy AI behavior', 'game flow control', or any question about mutually exclusive states — even if they don't say 'state machine'."
+---
+
+# State Machine Architect
+
+## Overview
+Generate flexible, modular state machines for player controllers, AI, UI systems, or any state-based logic. Uses the State Pattern with generic typing for maximum reusability.
+
+## When to Use
+- Use when implementing player character states (Idle, Walk, Run, Jump)
+- Use when creating AI behavior states (Patrol, Chase, Attack, Flee)
+- Use when managing UI screen flow (MainMenu, Settings, Gameplay)
+- Use when game states need clear boundaries (Playing, Paused, GameOver)
+- Use instead of complex if/else or switch statements
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    StateMachine<TContext>                   │
+├─────────────────────────────────────────────────────────────┤
+│  AddState<TState>(state)                                    │
+│  ChangeState<TState>()                                      │
+│  Update() / FixedUpdate()                                   │
+└─────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┼───────────────┐
+              ↓               ↓               ↓
+      ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+      │  IdleState  │ │  WalkState  │ │  JumpState  │
+      │ : IState<T> │ │ : IState<T> │ │ : IState<T> │
+      └─────────────┘ └─────────────┘ └─────────────┘
+```
+
+## Components
+
+| Component | Purpose |
+|-----------|---------|
+| `IState<TContext>` | Interface for all states |
+| `StateMachine<TContext>` | Manages state instances and transitions |
+| `StateBase<TContext>` | Abstract base class with boilerplate |
+
+## Best Practices
+- ✅ Use the Context object to access shared data
+- ✅ Keep states focused (Single Responsibility)
+- ✅ Use `OnStateChanged` event for debugging/logging
+- ✅ Consider state history for "return to previous state"
+- ✅ Use `StateBase<T>` for cleaner code
+- ❌ **NEVER** put transition logic outside states
+- ❌ **NEVER** use strings for state identification (use types)
+- ❌ **NEVER** access private MonoBehaviour members directly
+
+## Few-Shot Examples
+
+### Example 1: Player Controller
+**User**: "Create a state machine for player movement with Idle, Walk, Run, Jump."
+
+**Agent**:
+```csharp
+// Context is the PlayerController MonoBehaviour
+public class IdleState : StateBase<PlayerController>
+{
+    public override void Enter(PlayerController ctx)
+    {
+        ctx.Animator.Play("Idle");
+    }
+
+    public override void Update(PlayerController ctx)
+    {
+        if (ctx.Input.MoveVector.magnitude > 0.1f)
+            TransitionTo<WalkState>();
+        if (ctx.Input.JumpPressed)
+            TransitionTo<JumpState>();
+    }
+}
+
+// In PlayerController.cs
+private StateMachine<PlayerController> _stateMachine;
+
+void Start()
+{
+    _stateMachine = new StateMachine<PlayerController>(this);
+    _stateMachine.AddState(new IdleState());
+    _stateMachine.AddState(new WalkState());
+    _stateMachine.AddState(new JumpState());
+    _stateMachine.ChangeState<IdleState>();
+}
+
+void Update() => _stateMachine.Update();
+void FixedUpdate() => _stateMachine.FixedUpdate();
+```
+
+### Example 2: AI Enemy
+**User**: "Create enemy AI with Patrol, Chase, Attack states."
+
+**Agent**:
+```csharp
+public class PatrolState : StateBase<EnemyAI>
+{
+    public override void Update(EnemyAI ctx)
+    {
+        ctx.MoveToNextWaypoint();
+        if (ctx.CanSeePlayer)
+            TransitionTo<ChaseState>();
+    }
+}
+
+public class ChaseState : StateBase<EnemyAI>
+{
+    public override void Enter(EnemyAI ctx)
+    {
+        ctx.Agent.speed = ctx.Config.ChaseSpeed;
+    }
+
+    public override void Update(EnemyAI ctx)
+    {
+        ctx.Agent.SetDestination(ctx.PlayerTransform.position);
+
+        float dist = Vector3.Distance(ctx.transform.position, ctx.PlayerTransform.position);
+        if (dist <= ctx.Config.AttackRange)
+            TransitionTo<AttackState>();
+        else if (dist > ctx.Config.DetectionRange)
+            TransitionTo<PatrolState>();
+    }
+}
+
+public class AttackState : StateBase<EnemyAI>
+{
+    private float _attackTimer;
+
+    public override void Enter(EnemyAI ctx)
+    {
+        ctx.Agent.isStopped = true;
+        _attackTimer = 0f;
+    }
+
+    public override void Update(EnemyAI ctx)
+    {
+        _attackTimer += Time.deltaTime;
+        if (_attackTimer >= ctx.Config.AttackCooldown)
+        {
+            ctx.PerformAttack();
+            _attackTimer = 0f;
+        }
+
+        float dist = Vector3.Distance(ctx.transform.position, ctx.PlayerTransform.position);
+        if (dist > ctx.Config.AttackRange)
+            TransitionTo<ChaseState>();
+    }
+
+    public override void Exit(EnemyAI ctx)
+    {
+        ctx.Agent.isStopped = false;
+    }
+}
+```
+
+### Example 3: Game Flow Manager
+**User**: "State machine for MainMenu, Playing, Paused, GameOver."
+
+**Agent**:
+```csharp
+public class PlayingState : StateBase<GameFlowManager>
+{
+    public override void Enter(GameFlowManager ctx)
+    {
+        Time.timeScale = 1f;
+        ctx.GameplayUI.SetActive(true);
+        ctx.PauseUI.SetActive(false);
+    }
+
+    public override void Update(GameFlowManager ctx)
+    {
+        if (ctx.Input.PausePressed)
+            TransitionTo<PausedState>();
+        if (ctx.IsGameOver)
+            TransitionTo<GameOverState>();
+    }
+}
+
+public class PausedState : StateBase<GameFlowManager>
+{
+    public override void Enter(GameFlowManager ctx)
+    {
+        Time.timeScale = 0f;
+        ctx.PauseUI.SetActive(true);
+    }
+
+    public override void Update(GameFlowManager ctx)
+    {
+        if (ctx.Input.PausePressed)
+            TransitionTo<PlayingState>();
+    }
+
+    public override void Exit(GameFlowManager ctx)
+    {
+        Time.timeScale = 1f;
+        ctx.PauseUI.SetActive(false);
+    }
+}
+```
+
+## Related Skills
+- `@design-patterns` - State pattern fundamentals
+- `@script-roles` - Deciding script types for FSM
+
+## Template Files
+- `templates/IState.cs.txt` - Core state interface
+- `templates/StateMachine.cs.txt` - Generic state machine
+- `templates/StateBase.cs.txt` - Abstract state base class
