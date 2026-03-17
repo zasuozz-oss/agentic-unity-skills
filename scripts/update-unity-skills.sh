@@ -16,10 +16,11 @@ elif [ -d "$HOME/AI-Tool/antigravity-unity-skills/global-config" ]; then
 fi
 
 PROJECT_DIR="${1:-$(pwd)}"
-SKILLS_BASE="$PROJECT_DIR/.agents/skills"
+SKILLS_DIR="$PROJECT_DIR/.agents/skills"
+MANIFEST_FILE="$SKILLS_DIR/.ag-manifest.json"
 
-# Skill groups to manage
-SKILL_GROUPS=("unity-skills" "qa-skills")
+# Source groups to check
+SOURCE_GROUPS=("unity-skills" "qa-skills")
 
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║     AG Skills — Update Workflow                            ║"
@@ -34,19 +35,15 @@ if [ -z "$REPO_DIR" ] || [ ! -d "$REPO_DIR/global-config/skills" ]; then
 fi
 
 # Step 1: Backup
-echo "📦 Step 1: Creating backups..."
-BACKUP_DIRS=()
-for group in "${SKILL_GROUPS[@]}"; do
-    GROUP_DST="$SKILLS_BASE/$group"
-    if [ -d "$GROUP_DST" ]; then
-        BACKUP_DIR="$GROUP_DST-backup-$(date +%Y%m%d-%H%M%S)"
-        cp -r "$GROUP_DST" "$BACKUP_DIR"
-        BACKUP_DIRS+=("$BACKUP_DIR")
-        echo "   ✓ $group → $BACKUP_DIR"
-    else
-        echo "   - $group: no existing skills to backup"
-    fi
-done
+echo "📦 Step 1: Creating backup..."
+if [ -f "$MANIFEST_FILE" ]; then
+    BACKUP_DIR="$SKILLS_DIR-backup-$(date +%Y%m%d-%H%M%S)"
+    cp -r "$SKILLS_DIR" "$BACKUP_DIR"
+    echo "   ✓ Skills backed up → $BACKUP_DIR"
+else
+    BACKUP_DIR=""
+    echo "   - No existing manifest, skipping backup"
+fi
 echo ""
 
 # Step 2: Pull latest from git
@@ -66,11 +63,21 @@ echo "🔍 Step 3: Checking for updates..."
 DIFF_FILE="/tmp/ag-skills-diff-$(date +%Y%m%d-%H%M%S).txt"
 HAS_CHANGES=false
 
-for group in "${SKILL_GROUPS[@]}"; do
-    GROUP_DST="$SKILLS_BASE/$group"
+for group in "${SOURCE_GROUPS[@]}"; do
     GROUP_SRC="$REPO_DIR/global-config/skills/$group"
-    if [ -d "$GROUP_DST" ] && [ -d "$GROUP_SRC" ]; then
-        diff -r "$GROUP_DST/" "$GROUP_SRC/" >> "$DIFF_FILE" 2>&1 || true
+    if [ -d "$GROUP_SRC" ]; then
+        # Compare each skill folder directly against flat .agents/skills/<skill>/
+        for skill_dir in "$GROUP_SRC"/*/; do
+            if [ -d "$skill_dir" ] && [ -f "$skill_dir/SKILL.md" ]; then
+                SKILL_NAME=$(basename "$skill_dir")
+                INSTALLED_SKILL="$SKILLS_DIR/$SKILL_NAME"
+                if [ -d "$INSTALLED_SKILL" ]; then
+                    diff -r "$INSTALLED_SKILL/" "$skill_dir" >> "$DIFF_FILE" 2>&1 || true
+                else
+                    echo "Only in source: $group/$SKILL_NAME" >> "$DIFF_FILE"
+                fi
+            fi
+        done
     fi
 done
 
@@ -131,16 +138,11 @@ echo "╚═══════════════════════�
 echo ""
 echo "📊 Summary:"
 echo "   - Project:  $PROJECT_DIR"
-for group in "${SKILL_GROUPS[@]}"; do
-    echo "   - $group: ✓ Updated"
-done
-if [ ${#BACKUP_DIRS[@]} -gt 0 ]; then
+echo "   - Skills:   .agents/skills/ (flat structure)"
+if [ -n "$BACKUP_DIR" ]; then
 echo ""
 echo "🔄 Rollback if needed:"
-for backup in "${BACKUP_DIRS[@]}"; do
-    group_name=$(basename "$backup" | sed 's/-backup-.*//')
-    echo "   rm -rf $SKILLS_BASE/$group_name && cp -r $backup $SKILLS_BASE/$group_name"
-done
+echo "   rm -rf $SKILLS_DIR && cp -r $BACKUP_DIR $SKILLS_DIR"
 fi
 echo ""
 echo "✅ Done!"

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { cpSync, rmSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { cpSync, rmSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -9,6 +9,10 @@ const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..');
 
 const PROJECT_DIR = process.cwd();
+const SKILLS_DIR = join(PROJECT_DIR, '.agents', 'skills');
+const WORKFLOWS_SRC = join(ROOT, 'global-config', 'workflow');
+const WORKFLOWS_DIR = join(PROJECT_DIR, '.agents', 'workflows');
+const MANIFEST_PATH = join(SKILLS_DIR, '.ag-manifest.json');
 
 // ─── Skill Groups ──────────────────────────────────────────
 
@@ -16,13 +20,11 @@ const SKILL_GROUPS = [
   {
     name: 'unity-skills',
     src: join(ROOT, 'global-config', 'skills', 'unity-skills'),
-    dst: join(PROJECT_DIR, '.agents', 'skills', 'unity-skills'),
     label: 'Unity',
   },
   {
     name: 'qa-skills',
     src: join(ROOT, 'global-config', 'skills', 'qa-skills'),
-    dst: join(PROJECT_DIR, '.agents', 'skills', 'qa-skills'),
     label: 'QA',
   },
 ];
@@ -33,12 +35,88 @@ function log(icon, msg) {
   console.log(`   ${icon} ${msg}`);
 }
 
-function countSkills(dir) {
+function readManifest() {
+  try {
+    if (existsSync(MANIFEST_PATH)) {
+      return JSON.parse(readFileSync(MANIFEST_PATH, 'utf-8'));
+    }
+  } catch {
+    // corrupted manifest — treat as empty
+  }
+  return { version: null, groups: {} };
+}
+
+function writeManifest(groups, workflows) {
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf-8'));
+  const manifest = {
+    version: pkg.version,
+    installed_at: new Date().toISOString(),
+    groups,
+    workflows: workflows || [],
+  };
+  writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n');
+}
+
+function getSkillNames(srcDir) {
+  const names = [];
+  try {
+    const entries = readdirSync(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory() && existsSync(join(srcDir, entry.name, 'SKILL.md'))) {
+        names.push(entry.name);
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return names;
+}
+
+function cleanupOldSkills(groupName, newSkillNames) {
+  const manifest = readManifest();
+  const oldSkills = manifest.groups[groupName] || [];
+
+  // Remove skills that were previously installed but are no longer in the source
+  for (const skillName of oldSkills) {
+    const skillDir = join(SKILLS_DIR, skillName);
+    if (existsSync(skillDir) && !newSkillNames.includes(skillName)) {
+      rmSync(skillDir, { recursive: true, force: true });
+    }
+  }
+
+  // Also remove skills that will be re-installed (clean replace)
+  for (const skillName of newSkillNames) {
+    const skillDir = join(SKILLS_DIR, skillName);
+    if (existsSync(skillDir)) {
+      rmSync(skillDir, { recursive: true, force: true });
+    }
+  }
+}
+
+function installSkillGroup(group) {
+  const skillNames = getSkillNames(group.src);
+
+  // Clean up old skills from this group before installing
+  cleanupOldSkills(group.name, skillNames);
+
+  // Copy each skill directly into .agents/skills/<skill-name>/
+  let installed = 0;
+  for (const skillName of skillNames) {
+    const src = join(group.src, skillName);
+    const dst = join(SKILLS_DIR, skillName);
+    cpSync(src, dst, { recursive: true, force: true });
+    installed++;
+  }
+
+  return { installed, skillNames };
+}
+
+function countSkillsFlat() {
   let count = 0;
   try {
-    const entries = readdirSync(dir, { withFileTypes: true });
+    const entries = readdirSync(SKILLS_DIR, { withFileTypes: true });
     for (const entry of entries) {
-      if (entry.isDirectory() && existsSync(join(dir, entry.name, 'SKILL.md'))) {
+      if (entry.isDirectory() && existsSync(join(SKILLS_DIR, entry.name, 'SKILL.md'))) {
         count++;
       }
     }
@@ -48,26 +126,26 @@ function countSkills(dir) {
   return count;
 }
 
-function installSkillGroup(group) {
-  // Clean replace: remove entire folder to avoid leftover skills from previous versions
-  if (existsSync(group.dst)) {
-    rmSync(group.dst, { recursive: true, force: true });
-  }
-  mkdirSync(group.dst, { recursive: true });
+// ─── Workflow Helpers ──────────────────────────────────────
 
-  // Copy all skill folders fresh
-  const entries = readdirSync(group.src, { withFileTypes: true });
-  let installed = 0;
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const src = join(group.src, entry.name);
-    if (!existsSync(join(src, 'SKILL.md'))) continue;
-
-    cpSync(src, join(group.dst, entry.name), { recursive: true, force: true });
-    installed++;
+function installWorkflows() {
+  if (!existsSync(WORKFLOWS_SRC)) {
+    return [];
   }
 
-  return installed;
+  mkdirSync(WORKFLOWS_DIR, { recursive: true });
+
+  const files = readdirSync(WORKFLOWS_SRC).filter(f => f.endsWith('.md'));
+  for (const file of files) {
+    cpSync(join(WORKFLOWS_SRC, file), join(WORKFLOWS_DIR, file), { force: true });
+  }
+
+  if (files.length > 0) {
+    console.log(`📋 Installing workflows...`);
+    log('✓', `${files.length} workflows installed to .agents/workflows/`);
+  }
+
+  return files;
 }
 
 // ─── Steps ─────────────────────────────────────────────────
@@ -91,13 +169,33 @@ function step1_checkSources() {
 }
 
 function step2_installSkills() {
+  mkdirSync(SKILLS_DIR, { recursive: true });
+
+  const manifestGroups = {};
   let totalInstalled = 0;
 
   for (const group of SKILL_GROUPS) {
     console.log(`📚 Installing ${group.label} skills...`);
-    const count = installSkillGroup(group);
-    log('✓', `${count} skills installed to .agents/skills/${group.name}/`);
-    totalInstalled += count;
+    const { installed, skillNames } = installSkillGroup(group);
+    manifestGroups[group.name] = skillNames;
+    log('✓', `${installed} skills installed to .agents/skills/`);
+    totalInstalled += installed;
+  }
+
+  // Install workflows
+  const workflowNames = installWorkflows();
+
+  // Write manifest for idempotent cleanup on next run
+  writeManifest(manifestGroups, workflowNames);
+  log('✓', 'Manifest written to .agents/skills/.ag-manifest.json');
+
+  // Clean up legacy group folders if they exist (migration from v2 structure)
+  for (const group of SKILL_GROUPS) {
+    const legacyDir = join(SKILLS_DIR, group.name);
+    if (existsSync(legacyDir)) {
+      rmSync(legacyDir, { recursive: true, force: true });
+      log('✓', `Removed legacy folder: ${group.name}/`);
+    }
   }
 
   console.log('');
@@ -106,10 +204,17 @@ function step2_installSkills() {
 
 function step3_verify() {
   console.log('✅ Verification...');
+  const total = countSkillsFlat();
+  log('', `Total: ${total} skills in .agents/skills/`);
+
+  const manifest = readManifest();
   for (const group of SKILL_GROUPS) {
-    const count = countSkills(group.dst);
-    log('', `${group.label}: ${count} skills`);
+    const groupSkills = manifest.groups[group.name] || [];
+    log('', `${group.label}: ${groupSkills.length} skills`);
   }
+
+  const workflows = manifest.workflows || [];
+  log('', `Workflows: ${workflows.length} in .agents/workflows/`);
   console.log('');
 }
 
@@ -119,10 +224,9 @@ function footer() {
   console.log('╚════════════════════════════════════════════════════════════╝');
   console.log('');
   console.log('📊 Summary:');
-  log('', `Project:  ${PROJECT_DIR}`);
-  for (const group of SKILL_GROUPS) {
-    log('', `${group.label}:     .agents/skills/${group.name}/`);
-  }
+  log('', `Project:    ${PROJECT_DIR}`);
+  log('', `Skills:     .agents/skills/`);
+  log('', `Workflows:  .agents/workflows/`);
   console.log('');
   console.log('🚀 Next steps:');
   console.log('   1. Open Antigravity in this project');

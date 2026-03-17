@@ -40,11 +40,14 @@ node ~/AI-Tool/antigravity-unity-skills/bin/cli.mjs
 ```
 your-project/
 └── .agents/
-    └── skills/unity-skills/  # 45 Unity skills installed here
-        ├── architecture-advisor/
-        ├── design-patterns/
-        ├── ...
-        └── INDEX.md
+    ├── skills/                # All skills installed flat here
+    │   ├── architecture-advisor/
+    │   ├── design-patterns/
+    │   ├── qa-doc-parser/
+    │   ├── ...
+    │   └── .ag-manifest.json  # Tracks group membership
+    └── workflows/             # Workflow files
+        └── build-ui-mcp.md
 ```
 
 Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` configuration needed.
@@ -58,7 +61,7 @@ A collection of **45 Unity-specific skills** organized by category, designed to 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
 - ✅ **Self-triggering** — skills activate via YAML frontmatter, no manual config
-- ✅ **Project-level install** — skills live in your project's `.agents/skills/unity-skills/`
+- ✅ **Project-level install** — skills live in your project's `.agents/skills/`
 - ✅ **Cross-platform** — pure Node.js, no bash/powershell dependency
 - ✅ **Backup on update** — existing skills backed up before overwrite
 
@@ -102,11 +105,13 @@ antigravity-unity-skills/
 ├── bin/
 │   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
-│   └── skills/              # 45 Unity skills (flat structure)
-│       ├── architecture-advisor/
-│       ├── design-patterns/
-│       ├── ...
-│       └── INDEX.md
+│   ├── skills/              # Source skills (grouped)
+│   │   ├── unity-skills/    # 45 Unity skills
+│   │   └── qa-skills/       # 4 QA skills
+│   └── workflow/            # Source workflows
+│       └── build-ui-mcp.md
+├── scripts/
+│   └── update-unity-skills.sh
 ├── tests/
 │   └── run-tests.sh         # Automated test suite
 └── CHANGELOG.md

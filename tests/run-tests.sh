@@ -42,89 +42,79 @@ echo "║     AG Skills — Automated Test Suite                       ║"
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
 
-# ─── TC-01: Fresh Install ───────────────────────────────────
-echo -e "${YELLOW}TC-01: Fresh Install${NC}"
+# ─── TC-01: Fresh Install (Flat Structure) ──────────────────
+echo -e "${YELLOW}TC-01: Fresh Install — Flat Structure${NC}"
 cd "$TEST_PROJECT"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
-assert "Unity skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills/unity-skills' ]"
-assert "QA skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills/qa-skills' ]"
+assert "Skills directory exists" "[ -d '$TEST_PROJECT/.agents/skills' ]"
+assert "No legacy unity-skills group folder" "[ ! -d '$TEST_PROJECT/.agents/skills/unity-skills' ]"
+assert "No legacy qa-skills group folder" "[ ! -d '$TEST_PROJECT/.agents/skills/qa-skills' ]"
 assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 
-# Count Unity SKILL.md files
-UNITY_COUNT=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Unity skills installed ($UNITY_COUNT found, expect 40+)" "[ $UNITY_COUNT -ge 40 ]"
+# Count all SKILL.md files (flat — exactly 1 level deep)
+SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
+assert "Total skills installed ($SKILL_COUNT found, expect 40+)" "[ $SKILL_COUNT -ge 40 ]"
 
-# Count QA SKILL.md files
-QA_COUNT=$(find "$TEST_PROJECT/.agents/skills/qa-skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "QA skills installed ($QA_COUNT found, expect 4)" "[ $QA_COUNT -eq 4 ]"
+# Verify truly flat — no SKILL.md at depth 3+
+NESTED=$(find "$TEST_PROJECT/.agents/skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
+assert "Flat structure (no nested SKILL.md)" "[ $NESTED -eq 0 ]"
 
-# Verify flat structure — no nested category folders
-NESTED=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Unity: flat structure (no nested categories)" "[ $NESTED -eq 0 ]"
+# Spot check unity skills at flat level
+assert "design-patterns exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/design-patterns/SKILL.md' ]"
+assert "mobile-optimization exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/mobile-optimization/SKILL.md' ]"
+assert "architecture-advisor exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/architecture-advisor/SKILL.md' ]"
 
-QA_NESTED=$(find "$TEST_PROJECT/.agents/skills/qa-skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "QA: flat structure (no nested categories)" "[ $QA_NESTED -eq 0 ]"
-
-# Spot check skills
-assert "design-patterns exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/design-patterns/SKILL.md' ]"
-assert "mobile-optimization exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/mobile-optimization/SKILL.md' ]"
-assert "architecture-advisor exists" "[ -f '$TEST_PROJECT/.agents/skills/unity-skills/architecture-advisor/SKILL.md' ]"
-
-# Spot check QA skills
-assert "qa-doc-parser exists" "[ -f '$TEST_PROJECT/.agents/skills/qa-skills/qa-doc-parser/SKILL.md' ]"
-assert "qa-testcase-generator exists" "[ -f '$TEST_PROJECT/.agents/skills/qa-skills/qa-testcase-generator/SKILL.md' ]"
-assert "qa-test-verifier exists" "[ -f '$TEST_PROJECT/.agents/skills/qa-skills/qa-test-verifier/SKILL.md' ]"
-assert "qa-test-scorer exists" "[ -f '$TEST_PROJECT/.agents/skills/qa-skills/qa-test-scorer/SKILL.md' ]"
+# Spot check QA skills at flat level
+assert "qa-doc-parser exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-doc-parser/SKILL.md' ]"
+assert "qa-testcase-generator exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-testcase-generator/SKILL.md' ]"
+assert "qa-test-verifier exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-test-verifier/SKILL.md' ]"
+assert "qa-test-scorer exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-test-scorer/SKILL.md' ]"
 echo ""
 
 # ─── TC-02: YAML Frontmatter Validation ─────────────────────
 echo -e "${YELLOW}TC-02: YAML Frontmatter Validation${NC}"
 INVALID_FM=0
-for group in unity-skills qa-skills; do
-    for skill_dir in "$TEST_PROJECT/.agents/skills/$group"/*/; do
-        if [ -d "$skill_dir" ]; then
-            SKILL_FILE="$skill_dir/SKILL.md"
-            if [ -f "$SKILL_FILE" ]; then
-                has_name=$(grep -c '^name:' "$SKILL_FILE" 2>/dev/null || echo 0)
-                has_desc=$(grep -c '^description:' "$SKILL_FILE" 2>/dev/null || echo 0)
-                if [ "$has_name" -ne 1 ] || [ "$has_desc" -ne 1 ]; then
-                    INVALID_FM=$((INVALID_FM + 1))
-                fi
+for skill_dir in "$TEST_PROJECT/.agents/skills"/*/; do
+    if [ -d "$skill_dir" ]; then
+        SKILL_FILE="$skill_dir/SKILL.md"
+        if [ -f "$SKILL_FILE" ]; then
+            # Extract only frontmatter (between first pair of ---)
+            frontmatter=$(awk '/^---$/{n++; next} n==1{print} n>=2{exit}' "$SKILL_FILE")
+            has_name=$(echo "$frontmatter" | grep -c '^name:' 2>/dev/null || echo 0)
+            has_desc=$(echo "$frontmatter" | grep -c '^description:' 2>/dev/null || echo 0)
+            if [ "$has_name" -ne 1 ] || [ "$has_desc" -ne 1 ]; then
+                INVALID_FM=$((INVALID_FM + 1))
             fi
         fi
-    done
+    fi
 done
 assert "All skills have valid frontmatter (name + description)" "[ $INVALID_FM -eq 0 ]"
 
 # Check no extra YAML fields (Antigravity standard: name + description only)
 EXTRA_FIELDS=0
-for group in unity-skills qa-skills; do
-    for skill_dir in "$TEST_PROJECT/.agents/skills/$group"/*/; do
-        if [ -d "$skill_dir" ] && [ -f "$skill_dir/SKILL.md" ]; then
-            extras=$(grep -c -E '^(version:|tags:|argument-hint:|disable-model|user-invocable|allowed-tools:)' "$skill_dir/SKILL.md" 2>/dev/null || true)
-            extras=${extras:-0}
-            extras=$(echo "$extras" | tr -d '[:space:]')
-            EXTRA_FIELDS=$((EXTRA_FIELDS + extras))
-        fi
-    done
+for skill_dir in "$TEST_PROJECT/.agents/skills"/*/; do
+    if [ -d "$skill_dir" ] && [ -f "$skill_dir/SKILL.md" ]; then
+        extras=$(grep -c -E '^(version:|tags:|argument-hint:|disable-model|user-invocable|allowed-tools:)' "$skill_dir/SKILL.md" 2>/dev/null || true)
+        extras=${extras:-0}
+        extras=$(echo "$extras" | tr -d '[:space:]')
+        EXTRA_FIELDS=$((EXTRA_FIELDS + extras))
+    fi
 done
 assert "No extra YAML fields (Antigravity standard)" "[ $EXTRA_FIELDS -eq 0 ]"
 echo ""
 
 # ─── TC-03: Idempotent (No Duplication) ─────────────────────
 echo -e "${YELLOW}TC-03: Idempotent — No Duplication${NC}"
-UNITY_COUNT_BEFORE=$UNITY_COUNT
-QA_COUNT_BEFORE=$QA_COUNT
+SKILL_COUNT_BEFORE=$SKILL_COUNT
 
 cd "$TEST_PROJECT"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
-UNITY_COUNT_AFTER=$(find "$TEST_PROJECT/.agents/skills/unity-skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-QA_COUNT_AFTER=$(find "$TEST_PROJECT/.agents/skills/qa-skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Unity count unchanged ($UNITY_COUNT_BEFORE → $UNITY_COUNT_AFTER)" "[ '$UNITY_COUNT_BEFORE' = '$UNITY_COUNT_AFTER' ]"
-assert "QA count unchanged ($QA_COUNT_BEFORE → $QA_COUNT_AFTER)" "[ '$QA_COUNT_BEFORE' = '$QA_COUNT_AFTER' ]"
+SKILL_COUNT_AFTER=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
+assert "Skill count unchanged ($SKILL_COUNT_BEFORE → $SKILL_COUNT_AFTER)" "[ '$SKILL_COUNT_BEFORE' = '$SKILL_COUNT_AFTER' ]"
 assert "Still no GEMINI.md" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
+assert "Still no legacy group folders" "[ ! -d '$TEST_PROJECT/.agents/skills/unity-skills' ] && [ ! -d '$TEST_PROJECT/.agents/skills/qa-skills' ]"
 echo ""
 
 # ─── TC-04: Existing Project — No Side Effects ───────────────
@@ -138,15 +128,14 @@ cd "$TEST_PROJECT2"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
 assert "Existing GEMINI.md untouched" "diff -q '$TEST_PROJECT2/GEMINI.md' <(echo -e '# My Project\n\nSome existing content here.') > /dev/null 2>&1"
-assert "Unity skills installed alongside existing files" "[ -d '$TEST_PROJECT2/.agents/skills/unity-skills' ]"
-assert "QA skills installed alongside existing files" "[ -d '$TEST_PROJECT2/.agents/skills/qa-skills' ]"
+assert "Skills installed alongside existing files" "[ -d '$TEST_PROJECT2/.agents/skills' ]"
 
 rm -rf "$TEST_PROJECT2"
 echo ""
 
-# ─── TC-05: All Unity Skills Have SKILL.md ────────────────────
-echo -e "${YELLOW}TC-05: All Unity Skills Have SKILL.md${NC}"
-for skill_dir in "$TEST_PROJECT/.agents/skills/unity-skills"/*/; do
+# ─── TC-05: All Skills Have SKILL.md ──────────────────────────
+echo -e "${YELLOW}TC-05: All Skills Have SKILL.md${NC}"
+for skill_dir in "$TEST_PROJECT/.agents/skills"/*/; do
     if [ -d "$skill_dir" ]; then
         SKILL_NAME=$(basename "$skill_dir")
         if [ -f "$skill_dir/SKILL.md" ]; then
@@ -158,18 +147,51 @@ for skill_dir in "$TEST_PROJECT/.agents/skills/unity-skills"/*/; do
 done
 echo ""
 
-# ─── TC-06: All QA Skills Have SKILL.md ──────────────────────
-echo -e "${YELLOW}TC-06: All QA Skills Have SKILL.md${NC}"
-for skill_dir in "$TEST_PROJECT/.agents/skills/qa-skills"/*/; do
-    if [ -d "$skill_dir" ]; then
-        SKILL_NAME=$(basename "$skill_dir")
-        if [ -f "$skill_dir/SKILL.md" ]; then
-            assert "$SKILL_NAME has SKILL.md" "true"
-        else
-            assert "$SKILL_NAME has SKILL.md" "false"
-        fi
-    fi
-done
+# ─── TC-06: Manifest File ────────────────────────────────────
+echo -e "${YELLOW}TC-06: Manifest File${NC}"
+MANIFEST_FILE="$TEST_PROJECT/.agents/skills/.ag-manifest.json"
+assert "Manifest file exists" "[ -f '$MANIFEST_FILE' ]"
+assert "Manifest has version field" "grep -q '\"version\"' '$MANIFEST_FILE'"
+assert "Manifest has installed_at field" "grep -q '\"installed_at\"' '$MANIFEST_FILE'"
+assert "Manifest has groups field" "grep -q '\"groups\"' '$MANIFEST_FILE'"
+assert "Manifest lists unity-skills group" "grep -q '\"unity-skills\"' '$MANIFEST_FILE'"
+assert "Manifest lists qa-skills group" "grep -q '\"qa-skills\"' '$MANIFEST_FILE'"
+echo ""
+
+# ─── TC-07: Legacy Migration ─────────────────────────────────
+echo -e "${YELLOW}TC-07: Legacy Migration — Removes Old Group Folders${NC}"
+TEST_PROJECT3=$(mktemp -d)
+
+# Simulate legacy v2 structure
+mkdir -p "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns"
+echo "---" > "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
+echo "name: design-patterns" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
+echo "description: old" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
+echo "---" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
+
+cd "$TEST_PROJECT3"
+node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
+
+assert "Legacy unity-skills folder removed" "[ ! -d '$TEST_PROJECT3/.agents/skills/unity-skills' ]"
+assert "Skills installed flat after migration" "[ -f '$TEST_PROJECT3/.agents/skills/design-patterns/SKILL.md' ]"
+
+rm -rf "$TEST_PROJECT3"
+echo ""
+echo ""
+
+# ─── TC-08: Workflow Installation ────────────────────────────
+echo -e "${YELLOW}TC-08: Workflow Installation${NC}"
+assert "Workflows directory exists" "[ -d '$TEST_PROJECT/.agents/workflows' ]"
+assert "build-ui-mcp.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/build-ui-mcp.md' ]"
+assert "Manifest has workflows field" "grep -q '\"workflows\"' '$MANIFEST_FILE'"
+assert "Manifest lists build-ui-mcp.md" "grep -q 'build-ui-mcp.md' '$MANIFEST_FILE'"
+
+# Verify idempotent — count unchanged after re-run
+WF_COUNT_BEFORE=$(find "$TEST_PROJECT/.agents/workflows" -name "*.md" -type f | wc -l | tr -d ' ')
+cd "$TEST_PROJECT"
+node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
+WF_COUNT_AFTER=$(find "$TEST_PROJECT/.agents/workflows" -name "*.md" -type f | wc -l | tr -d ' ')
+assert "Workflow count unchanged after re-run ($WF_COUNT_BEFORE → $WF_COUNT_AFTER)" "[ '$WF_COUNT_BEFORE' = '$WF_COUNT_AFTER' ]"
 echo ""
 
 # ─── Summary ─────────────────────────────────────────────────
