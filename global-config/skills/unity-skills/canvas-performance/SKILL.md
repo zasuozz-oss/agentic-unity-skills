@@ -136,6 +136,6 @@ public class InventoryListView : MonoBehaviour
 - [ ] Profile scroll views with 100+ items
 
 ## Related Skills
-- `@ui-toolkit-modern` - UI Toolkit development
+- `@responsive-ui-design` - UI layout design
 - `@responsive-ui-design` - Layout design
 - `@memory-profiler-expert` - UI memory issues

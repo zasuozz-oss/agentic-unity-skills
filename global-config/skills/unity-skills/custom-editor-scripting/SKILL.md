@@ -183,6 +183,6 @@ public class MinMaxRangeDrawer : PropertyDrawer
 ```
 
 ## Related Skills
-- `@inspector-design` - Inspector field organization
-- `@asmdef-advisor` - Editor assembly separation
+- `@script-design-review` - Script quality review
+- `@design-patterns` - Editor architecture patterns
 - `@unity-mcp-connector` - Editor automation via MCP

@@ -175,6 +175,6 @@ public static class TextureMemoryAudit
 6. Fix and re-profile
 
 ## Related Skills
-- `@performance-advisor` - CPU performance issues
+- `@mobile-optimization` - Performance issues
 - `@addressables-asset-management` - Asset release patterns
 - `@object-pooling-system` - Reduce allocation frequency

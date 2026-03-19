@@ -186,5 +186,5 @@ public class PurchaseRestorer : MonoBehaviour
 
 ## Related Skills
 - `@backend-integration` - Server-side receipt validation
-- `@save-load-serialization` - Local purchase persistence
+- `@backend-integration` - Server-validated purchases
 - `@canvas-performance` - Store UI performance

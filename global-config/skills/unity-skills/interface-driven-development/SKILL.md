@@ -214,6 +214,6 @@ public class Player : MonoBehaviour, IDamageable, IHealable, IMovable, ISaveable
 ```
 
 ## Related Skills
-- `@di-container-manager` - Injecting interface implementations
-- `@testability-advisor` - Designing testable seams
+- `@design-patterns` - Pattern implementations with interfaces
+- `@script-design-review` - Script quality and testability
 - `@design-patterns` - Strategy/Observer with interfaces

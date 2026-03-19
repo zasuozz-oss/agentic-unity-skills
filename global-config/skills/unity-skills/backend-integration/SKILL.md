@@ -181,7 +181,118 @@ public static class ApiRetry
 // var profile = await ApiRetry.WithRetry(ct => _api.GetAsync<Profile>("profile", ct));
 ```
 
+## Component-Level Gating
+
+### Why Not Global Blocking
+A single global `_isRequestInProgress` flag blocks ALL requests. In multi-tab UIs, a slow load for Tab A prevents Tab B from loading.
+
+```csharp
+// ❌ BAD: Global block — breaks multi-tab usability
+private static bool _isRequestInProgress;
+public static async UniTask GetRequest(string url) {
+    if (_isRequestInProgress) { Debug.LogWarning("Blocked"); return; }
+    _isRequestInProgress = true;
+    // ...
+    _isRequestInProgress = false;
+}
+
+// ✅ GOOD: Each component owns its own guard
+public class MyAdapter
+{
+    private bool _isFetching;
+
+    public void TriggerLoad()
+    {
+        if (_isFetching) return;
+        _isFetching = true;          // SET SYNCHRONOUSLY
+        LoadAsync().Forget();
+    }
+}
+```
+
+### Synchronous State Principle
+When triggering async from `Update()`, set guard flag **synchronously** before the async call:
+```csharp
+void Update()
+{
+    if (ReachThreshold()) TriggerLoad();
+}
+
+void TriggerLoad()
+{
+    if (_isFetching) return;
+    _isFetching = true;   // IMMEDIATE — prevents race with next frame
+    LoadAsync().Forget();
+}
+```
+
+### Redundant Activation Guard
+```csharp
+public void ActivePage(string identifier)
+{
+    // Skip if already active and initialized for same context
+    if (IsActive && IsInit && currentId == identifier) return;
+
+    // Skip fetch if already fetching same context
+    if (IsFetchingData && currentId == identifier) { IsActive = true; return; }
+
+    currentId = identifier;
+    IsActive = true;
+    IsFetchingData = true;
+    StartFetch(identifier).Forget();
+}
+```
+
+## Throttling & Cooldown
+
+### Post-Load Cooldown (Success Throttling)
+Prevent rapid consecutive loads during aggressive scrolling:
+```csharp
+public async UniTask LoadAsync()
+{
+    _isFetching = true;
+    var result = await FetchData();
+    Process(result);
+
+    // Cooldown: prevent next fetch for 800ms even though data is ready
+    await UniTask.Delay(800);
+    _isFetching = false;
+}
+```
+
+### Failed Request Cooldown (Spam Prevention)
+Without cooldown, `Update()` immediately retries on next frame:
+```csharp
+public async UniTask LoadAsync()
+{
+    _isFetching = true;
+    var result = await FetchData();
+
+    if (result == null)
+    {
+        // COOLDOWN: break infinite retry loop
+        await UniTask.Delay(500);
+        _isFetching = false;
+        return;
+    }
+
+    Process(result);
+    _isFetching = false;
+}
+```
+
+## HTTP 429 Troubleshooting
+
+| Symptom | Probable Cause | Fix |
+|---------|---------------|-----|
+| "Blocked Request" in Console | Global `_isRequestInProgress` too restrictive | Move gating to calling component |
+| 429 on high page index (Page 3+) | Fast scrolling triggers rapid sequential hits | Add 800ms **success cooldown** after load |
+| Actual HTTP 429 in Network Log | Component interval too short | Increase cooldown or find unthrottled rogue requests |
+| Same-page request spam | User/system spamming same index | Skip redundant fetches for same index within 1s |
+| 70+ request logs/sec | Guard flag reset immediately after failure | Add 500ms **failed request cooldown** |
+
 ## Related Skills
 - `@asynchronous-programming` - UniTask patterns
-- `@save-load-serialization` - Local data persistence
+- `@asynchronous-programming` - Async patterns
 - `@monetization-iap` - Server-validated purchases
+- `@ui-state-safety` - UI state consistency during network ops

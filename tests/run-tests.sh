@@ -54,7 +54,7 @@ assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 
 # Count all SKILL.md files (flat — exactly 1 level deep)
 SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Total skills installed ($SKILL_COUNT found, expect 40+)" "[ $SKILL_COUNT -ge 40 ]"
+assert "Total skills installed ($SKILL_COUNT found, expect 20+)" "[ $SKILL_COUNT -ge 20 ]"
 
 # Verify truly flat — no SKILL.md at depth 3+
 NESTED=$(find "$TEST_PROJECT/.agents/skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
@@ -63,7 +63,7 @@ assert "Flat structure (no nested SKILL.md)" "[ $NESTED -eq 0 ]"
 # Spot check unity skills at flat level
 assert "design-patterns exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/design-patterns/SKILL.md' ]"
 assert "mobile-optimization exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/mobile-optimization/SKILL.md' ]"
-assert "architecture-advisor exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/architecture-advisor/SKILL.md' ]"
+assert "script-design-review exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/script-design-review/SKILL.md' ]"
 
 # Spot check QA skills at flat level
 assert "qa-doc-parser exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-doc-parser/SKILL.md' ]"
@@ -183,6 +183,8 @@ echo ""
 echo -e "${YELLOW}TC-08: Workflow Installation${NC}"
 assert "Workflows directory exists" "[ -d '$TEST_PROJECT/.agents/workflows' ]"
 assert "build-ui-mcp.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/build-ui-mcp.md' ]"
+assert "verify-assets.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-assets.md' ]"
+assert "verify-scripts.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-scripts.md' ]"
 assert "Manifest has workflows field" "grep -q '\"workflows\"' '$MANIFEST_FILE'"
 assert "Manifest lists build-ui-mcp.md" "grep -q 'build-ui-mcp.md' '$MANIFEST_FILE'"
 

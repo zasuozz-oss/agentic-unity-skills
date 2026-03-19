@@ -179,5 +179,5 @@ public class LevelPreloader : MonoBehaviour
 
 ## Related Skills
 - `@memory-profiler-expert` - Tracking asset memory usage
-- `@asset-import-pipeline` - Import settings optimization
+- `@mobile-optimization` - Performance optimization
 - `@mobile-optimization` - Mobile asset loading strategies

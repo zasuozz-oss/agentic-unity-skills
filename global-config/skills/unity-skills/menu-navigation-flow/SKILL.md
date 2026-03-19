@@ -196,6 +196,6 @@ public class SettingsScreen : ScreenBase
 ```
 
 ## Related Skills
-- `@ui-toolkit-modern` - UI Toolkit screens
+- `@responsive-ui-design` - UI layout patterns
 - `@responsive-ui-design` - Screen layout
 - `@canvas-performance` - UI performance

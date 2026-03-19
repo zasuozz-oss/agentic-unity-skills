@@ -173,9 +173,9 @@ public class WaveManager : MonoBehaviour
 ```
 
 ## Related Skills
-- `@event-bus-system` - Static alternative to SO events
+- `@asynchronous-programming` - Async patterns with SO
 - `@design-patterns` - Patterns using SO data
-- `@di-container-manager` - Injecting SO dependencies
+- `@design-patterns` - Pattern selection for SO usage
 
 ## Template Files
 - `templates/GameEventSO.cs.txt` - Event channel

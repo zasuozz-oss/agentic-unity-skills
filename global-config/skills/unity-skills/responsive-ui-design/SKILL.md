@@ -162,6 +162,6 @@ public class ResponsiveController : MonoBehaviour
 | **Console** | Gamepad focus, overscan |
 
 ## Related Skills
-- `@ui-toolkit-modern` - Core UI Toolkit
-- `@input-system-new` - Multi-device input
+- `@canvas-performance` - UI performance optimization
+- `@menu-navigation-flow` - Multi-screen navigation
 - `@canvas-performance` - Performance optimization

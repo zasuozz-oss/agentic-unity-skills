@@ -1,6 +1,6 @@
 ---
 name: design-patterns
-description: "SOLID principles and GoF design patterns for Unity. Use this when the user is working with design patterns, refactoring code for maintainability, applying SRP, Factory, Observer, Command, or Strategy patterns, or decoupling tightly-coupled systems. Also trigger for: 'this class does too much', 'how to apply SOLID', 'factory pattern in Unity', 'command pattern for undo', or any question about writing clean, extensible code — even if they don't say 'design pattern'. Do NOT use for choosing between patterns — use pattern-selector instead."
+description: "SOLID principles and GoF design patterns for Unity. Use this when the user is working with design patterns, choosing between patterns, refactoring code, applying SRP, Factory, Observer, Command, or Strategy patterns, or decoupling systems. Also trigger for: 'this class does too much', 'how to apply SOLID', 'factory pattern in Unity', 'command pattern for undo', 'which pattern should I use', 'SO vs events', 'should I use a state machine for this', 'is object pooling worth it here', or any question about design patterns — even if they don't say 'design pattern'."
 ---
 
 # Design Patterns (Unity)
@@ -230,7 +230,21 @@ public class CommandHistory
 - Deep inheritance (>3 levels)
 - Premature abstraction (interface for only 1 implementation)
 
+## Pattern Selection Guide
+
+Use this when deciding whether a pattern is justified. **Recommend at most 1-3 patterns**, and explain why simpler options are not enough.
+
+| Pattern | Use When | Avoid When |
+|---------|----------|------------|
+| **ScriptableObject** | Authored config, shared data, event channels | Per-run mutable gameplay state |
+| **C# events/delegates** | One-to-many notifications with clear ownership | Flows needing ordering or return values |
+| **Global event bus** | Broad decoupled notifications | Default answer to coupling (hides ownership) |
+| **Interfaces** | Multiple implementations or dependency boundaries | Wrapping every class without a real seam |
+| **State machine** | 3+ mutually exclusive states with transitions | A few booleans or small command flow |
+| **Object pool** | Frequent spawn/despawn (bullets, VFX, UI) | Rare objects with simple lifetime |
+| **Service layer** | Cross-scene systems with explicit bootstrap | Turning everything into hidden singletons |
+
 ## Related Skills
-- `@pattern-selector` - Choosing between patterns
-- `@architecture-advisor` - Project-level design
 - `@script-design-review` - Script quality review
+- `@script-design-review` - Script quality review
+- `@scriptableobject-architecture` - SO-specific patterns

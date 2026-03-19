@@ -1,6 +1,6 @@
 ---
 name: script-design-review
-description: "Unity script quality reviewer. Use this when the user wants script design feedback, responsibility analysis, coupling review, lifecycle safety checks, or inspector UX improvements. Also trigger for: 'review this script', 'is this class too big', 'code smell', 'should I split this class', 'this script does too much', or any question about script quality and maintainability — even if they don't say 'review'. Do NOT use for performance-specific concerns — use performance-advisor instead."
+description: "Unity script quality reviewer and role planner. Use this when the user wants script design feedback, responsibility analysis, coupling review, lifecycle safety checks, role assignment (MonoBehaviour vs SO vs pure C#), or inspector UX improvements. Also trigger for: 'review this script', 'is this class too big', 'code smell', 'should I split this class', 'what class type should this be', 'should this be a MonoBehaviour', 'planning new scripts', or any question about script quality — even if they don't say 'review'."
 ---
 
 # Script Design Review
@@ -141,7 +141,25 @@ public class Weapon : MonoBehaviour
 - Suggested changes (ranked by impact)
 - What's already good (reinforce)
 
+## Role Assignment Guide
+
+Before creating a batch of scripts, assign explicit roles so AI does not generate everything as MonoBehaviour.
+
+| Role | When to Use |
+|------|-------------|
+| **MonoBehaviour bridge** | Needs Transform, collisions, or Unity lifecycle |
+| **ScriptableObject config** | Authored data, shared between instances |
+| **Pure C# service** | Stateless logic, testable without Unity |
+| **Presenter / Controller** | Bridges domain logic to UI or visuals |
+| **State / FSM node** | Discrete state in a state machine |
+| **Installer / Bootstrap** | Scene setup, dependency wiring |
+
+### Guardrails
+- Do not make every class a MonoBehaviour
+- Do not force ScriptableObject onto runtime mutable state
+- Prefer the simplest role that satisfies the requirement
+
 ## Related Skills
-- `@testability-advisor` - Deeper testability analysis
-- `@inspector-design` - Inspector UX specifics
+- `@my-csharp-conventions` - C# naming and style
 - `@design-patterns` - Pattern recommendations
+- `@mobile-optimization` - Performance review

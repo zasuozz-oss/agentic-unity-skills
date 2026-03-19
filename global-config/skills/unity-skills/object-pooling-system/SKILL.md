@@ -216,6 +216,6 @@ public class DamageEvent
 - Objects that live the entire scene lifetime
 
 ## Related Skills
-- `@performance-advisor` - When to use pooling
-- `@vfx-graph-shuriken` - VFX pooling
+- `@mobile-optimization` - When to use pooling
+- `@mobile-optimization` - Performance tuning
 - `@memory-profiler-expert` - Pool size tuning

@@ -1,6 +1,6 @@
 ---
 name: mobile-optimization
-description: "Unity mobile development optimizer for Android/iOS. Use this when the user needs mobile performance tuning, battery optimization, thermal throttling, texture compression, resolution scaling, or frame rate management on mobile devices. Also trigger for: 'game runs slow on phone', 'battery drains fast', 'heating on mobile', 'texture format for Android', 'target frame rate mobile', or any question about mobile game performance — even if they don't say 'mobile'. Do NOT use for general desktop performance — use performance-advisor instead."
+description: "Unity mobile and general performance optimizer for Android/iOS. Use this when the user needs performance tuning, battery optimization, thermal throttling, hot-path analysis, GC allocation review, Update optimization, or frame rate management. Also trigger for: 'game runs slow', 'battery drains fast', 'heating on mobile', 'frame drops', 'GC spikes', 'slow Update loop', 'too many draw calls', 'how to optimize this script', or any question about runtime performance — even if they don't say 'performance' or 'mobile'."
 ---
 
 # Mobile Optimization
@@ -203,7 +203,36 @@ public static class GameLog
 | Min API | 24 (Android 7) | iOS 14 |
 | Architecture | ARM64 | ARM64 |
 
+## General Performance Red Flags
+
+These apply to ALL platforms but are critical on mobile:
+
+### Update Loop
+- ❌ `Camera.main` not cached (uses `FindGameObjectWithTag` internally)
+- ❌ `GetComponent<T>()` per frame (cache in Awake/Start)
+- ❌ `FindObjectOfType` at runtime
+- ❌ LINQ (`.Where`, `.Select`, `.Any`) in hot paths
+- ❌ String concatenation (`+`, `$""`) per frame
+- ❌ `new List<T>()` / closures / lambdas per frame
+
+### Caching
+- ✅ Cache component references in Awake/Start
+- ✅ Use `sqrMagnitude` instead of `Distance`
+- ✅ Use `Animator.StringToHash` for parameters
+- ✅ Use `const string` for status comparisons
+
+### Allocation Reduction
+- ✅ Use object pooling for frequent spawn/destroy
+- ✅ Use `StringBuilder` for string building in loops
+- ✅ Replace `foreach` with `for` on non-List collections
+- ✅ Cache delegates/lambdas as fields
+
+### Event-Driven vs Polling
+- Replace `Update()` checks with C# Events or `UnityEvent` triggers
+- If polling is required, use timer throttling
+
 ## Related Skills
-- `@performance-advisor` - General performance
-- `@lod-occlusion-culling` - Rendering optimization
+- `@memory-profiler-expert` - Deep memory analysis
+- `@addressables-asset-management` - Asset management
 - `@canvas-performance` - UI optimization
+- `@object-pooling-system` - Pooling implementation

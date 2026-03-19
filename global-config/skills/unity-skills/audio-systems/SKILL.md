@@ -167,4 +167,4 @@ public class EnvironmentalAudio : MonoBehaviour
 ## Related Skills
 - `@mobile-optimization` - Audio compression for mobile
 - `@addressables-asset-management` - Async audio loading
-- `@save-load-serialization` - Persisting volume settings
+- `@backend-integration` - Persisting settings via API
