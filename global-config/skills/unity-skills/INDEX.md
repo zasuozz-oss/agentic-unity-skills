@@ -2,98 +2,68 @@
 
 Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 
-**Total:** 21 skills across 7 categories
+**Total:** 9 skills across 6 categories
 
 ---
 
-## Architecture (4 skills)
+## Architecture (1 skill)
 
 | Skill | Description |
 |-------|-------------|
-| asynchronous-programming | Async/await, Coroutines, UniTask, lifecycle safety, async model selection |
-| design-patterns | SOLID, GoF patterns + pattern selection guide |
-| interface-driven-development | Interface-based design: IDamageable, ISaveable, TryGetComponent |
-| scriptableobject-architecture | SO-based data, event channels, runtime sets |
+| unity-async-patterns | Async/await, Coroutines, UniTask, lifecycle safety |
 
 ---
 
-## UI & UX (3 skills)
+## UI & UX (1 skill)
 
 | Skill | Description |
 |-------|-------------|
-| canvas-performance | Canvas rebuild, overdraw, raycast optimization |
-| menu-navigation-flow | Screen stack, back button, push/pop UI |
-| responsive-ui-design | Canvas Scaler, safe area (notch), multi-device |
+| unity-ui-performance | Canvas rebuild, overdraw, raycast, state safety, responsive design, safe area |
 
 ---
 
-## Performance (4 skills)
+## Performance (1 skill)
 
 | Skill | Description |
 |-------|-------------|
-| addressables-asset-management | Addressables async loading, memory-safe release |
-| memory-profiler-expert | Memory profiling, leak detection, heap analysis |
-| mobile-optimization | Mobile + general perf: GC, hot-path, caching, battery |
-| object-pooling-system | Object pool for frequent spawn/destroy |
+| unity-addressables | Addressables async loading, memory-safe release |
 
 ---
 
-## Safety & Reliability (2 skills)
+## Safety & Reliability (1 skill)
 
 | Skill | Description |
 |-------|-------------|
-| dotween-safety | DOTween lifecycle, SetLink, kill patterns, leak prevention |
-| ui-state-safety | UI state consistency, animation race conditions |
+| unity-dotween-safety | DOTween lifecycle, SetLink, kill patterns, leak prevention |
 
 ---
 
-## Backend & Monetization (2 skills)
+## Tools & Standards (5 skills)
 
 | Skill | Description |
 |-------|-------------|
-| backend-integration | REST API, JWT, retry, throttling, cooldown |
-| monetization-iap | In-app purchases, ad integration |
-
----
-
-## QA Verification (2 skills)
-
-| Skill | Description |
-|-------|-------------|
-| asset-verify-checklist | Comprehensive checklist for auditing Unity assets: textures, models, materials, shaders, audio, rendering, batching, UI canvas, overdraw, memory budgets |
-| scripts-verify-checklist | Comprehensive checklist for auditing C# scripts: caching, GC allocations, coroutines, async/await safety, object pooling, DOTween, physics, UI code, Addressables, ANR prevention |
-
----
-
-## Tools & Standards (4 skills)
-
-| Skill | Description |
-|-------|-------------|
-| audio-systems | AudioMixer, volume control, 3D audio |
-| custom-editor-scripting | Editor windows, PropertyDrawers, scene tools |
-| my-csharp-conventions | C# naming conventions |
-| script-design-review | Script quality review + role assignment |
+| unity-csharp-standards | C# conventions, script design review, mobile & performance optimization |
+| unity-editor-tools | Editor windows, PropertyDrawers, scene tools |
+| unity-asset-audit | Comprehensive checklist for auditing Unity assets |
+| unity-script-audit | Comprehensive checklist for auditing C# scripts |
+| unity-logic-audit | Logic correctness audit — state management, race conditions, resource pairing |
 
 ---
 
 ## Quick Access
 
 ### Code quality
-- `script-design-review` → Script review + role assignment
-- `design-patterns` → Pattern decisions
-- `my-csharp-conventions` → C# naming
+- `unity-csharp-standards` → C# conventions + script review + performance
 
 ### Safety & crash prevention
-- `dotween-safety` → DOTween leak prevention
-- `ui-state-safety` → UI state consistency
-- `asynchronous-programming` → Async lifecycle guards
-- `backend-integration` → Network resiliency
+- `unity-dotween-safety` → DOTween leak prevention
+- `unity-ui-performance` → UI state + performance + responsive
+- `unity-async-patterns` → Async lifecycle guards
 
 ### Performance
-- `mobile-optimization` → Hot-path + mobile constraints
-- `memory-profiler-expert` → Memory analysis
-- `canvas-performance` → UI optimization
+- `unity-csharp-standards` → Hot-path + mobile constraints
+- `unity-ui-performance` → UI rendering + state + responsive
 
 ---
 
-**Last Updated:** 2026-03-19
+**Last Updated:** 2026-03-20

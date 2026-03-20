@@ -4,12 +4,12 @@ description: Run the Asset Verify Checklist against a Unity project to audit tex
 
 # Asset Verify Workflow
 
-Audit all non-code asset factors affecting Unity performance using the `asset-verify-checklist` skill.
+Audit all non-code asset factors affecting Unity performance using the `unity-asset-audit` skill.
 
 ## Steps
 
 1. **Activate the skill**
-   - Read `.agents/skills/asset-verify-checklist/SKILL.md` to load the full checklist.
+   - Read `.agents/skills/unity-asset-audit/SKILL.md` to load the full checklist.
 
 2. **Identify scope**
    - Ask the user which scenes, prefabs, or asset folders to audit.

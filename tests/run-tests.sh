@@ -54,22 +54,21 @@ assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 
 # Count all SKILL.md files (flat — exactly 1 level deep)
 SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Total skills installed ($SKILL_COUNT found, expect 20+)" "[ $SKILL_COUNT -ge 20 ]"
+assert "Total skills installed ($SKILL_COUNT found, expect 13+)" "[ $SKILL_COUNT -ge 13 ]"
 
 # Verify truly flat — no SKILL.md at depth 3+
 NESTED=$(find "$TEST_PROJECT/.agents/skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
 assert "Flat structure (no nested SKILL.md)" "[ $NESTED -eq 0 ]"
 
 # Spot check unity skills at flat level
-assert "design-patterns exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/design-patterns/SKILL.md' ]"
-assert "mobile-optimization exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/mobile-optimization/SKILL.md' ]"
-assert "script-design-review exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/script-design-review/SKILL.md' ]"
+assert "unity-ui-performance exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-ui-performance/SKILL.md' ]"
+assert "unity-csharp-standards exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-csharp-standards/SKILL.md' ]"
 
 # Spot check QA skills at flat level
-assert "qa-doc-parser exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-doc-parser/SKILL.md' ]"
-assert "qa-testcase-generator exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-testcase-generator/SKILL.md' ]"
-assert "qa-test-verifier exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-test-verifier/SKILL.md' ]"
-assert "qa-test-scorer exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/qa-test-scorer/SKILL.md' ]"
+assert "unity-qa-parser exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-qa-parser/SKILL.md' ]"
+assert "unity-qa-generator exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-qa-generator/SKILL.md' ]"
+assert "unity-qa-verifier exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-qa-verifier/SKILL.md' ]"
+assert "unity-qa-scorer exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-qa-scorer/SKILL.md' ]"
 echo ""
 
 # ─── TC-02: YAML Frontmatter Validation ─────────────────────
@@ -163,17 +162,17 @@ echo -e "${YELLOW}TC-07: Legacy Migration — Removes Old Group Folders${NC}"
 TEST_PROJECT3=$(mktemp -d)
 
 # Simulate legacy v2 structure
-mkdir -p "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns"
-echo "---" > "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
-echo "name: design-patterns" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
-echo "description: old" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
-echo "---" >> "$TEST_PROJECT3/.agents/skills/unity-skills/design-patterns/SKILL.md"
+mkdir -p "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety"
+echo "---" > "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety/SKILL.md"
+echo "name: dotween-safety" >> "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety/SKILL.md"
+echo "description: old" >> "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety/SKILL.md"
+echo "---" >> "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety/SKILL.md"
 
 cd "$TEST_PROJECT3"
 node "$SCRIPT_DIR/bin/cli.mjs" > /dev/null 2>&1
 
 assert "Legacy unity-skills folder removed" "[ ! -d '$TEST_PROJECT3/.agents/skills/unity-skills' ]"
-assert "Skills installed flat after migration" "[ -f '$TEST_PROJECT3/.agents/skills/design-patterns/SKILL.md' ]"
+assert "Skills installed flat after migration" "[ -f '$TEST_PROJECT3/.agents/skills/unity-dotween-safety/SKILL.md' ]"
 
 rm -rf "$TEST_PROJECT3"
 echo ""
@@ -185,6 +184,7 @@ assert "Workflows directory exists" "[ -d '$TEST_PROJECT/.agents/workflows' ]"
 assert "build-ui-mcp.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/build-ui-mcp.md' ]"
 assert "verify-assets.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-assets.md' ]"
 assert "verify-scripts.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-scripts.md' ]"
+assert "verify-logics.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-logics.md' ]"
 assert "Manifest has workflows field" "grep -q '\"workflows\"' '$MANIFEST_FILE'"
 assert "Manifest lists build-ui-mcp.md" "grep -q 'build-ui-mcp.md' '$MANIFEST_FILE'"
 

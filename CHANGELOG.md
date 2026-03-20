@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [4.0.0] - 2026-03-20
+
+### Changed — Focused Skill Set
+- **Reduced from 45 to 13 skills** (9 Unity + 4 QA) — removed generic/advisory skills, kept only project-specific essentials
+- **Merged overlapping skills**: `canvas-performance` + `ui-state-safety` → `unity-ui-performance`; `mobile-optimization` + `script-design-review` + `my-csharp-conventions` → `unity-csharp-standards`
+- **Renamed all skills to ASO standard** — added `unity-` prefix for searchability and global product branding
+- **Fixed broken cross-references** in 6 SKILL.md files pointing to deleted skills
+- Updated README, INDEX.md, package.json, gemini-extension.json to reflect 12 skills
+- Reduced categories from 7 to 5
+
+### Removed (Unity skills)
+- Architecture: `design-patterns`, `interface-driven-development`, `scriptableobject-architecture`
+- UI: `menu-navigation-flow`
+- Performance: `memory-profiler-expert`, `object-pooling-system`
+- Backend: `backend-integration`, `monetization-iap`
+- Tools: `audio-systems`
+
+### Renamed (ASO Standard)
+- `addressables-asset-management` → `unity-addressables`
+- `asset-verify-checklist` → `unity-asset-audit`
+- `asynchronous-programming` → `unity-async-patterns`
+- `csharp-quality` → `unity-csharp-standards`
+- `custom-editor-scripting` → `unity-editor-tools`
+- `dotween-safety` → `unity-dotween-safety`
+- `scripts-verify-checklist` → `unity-script-audit`
+- `ui-optimization` → `unity-ui-performance`
+- `qa-doc-parser` → `unity-qa-parser`
+- `qa-testcase-generator` → `unity-qa-generator`
+- `qa-test-verifier` → `unity-qa-verifier`
+- `qa-test-scorer` → `unity-qa-scorer`
+
+---
+
 ## [3.0.0] - 2026-03-17
 
 ### Changed — Skill Cleanup & Standardization

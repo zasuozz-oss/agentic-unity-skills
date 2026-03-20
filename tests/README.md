@@ -1,103 +1,72 @@
 # Test Cases — Unity Skills
 
-Manual test cases for verifying Unity skills setup works correctly.
+Manual and automated test cases for verifying Unity skills setup.
 
 ---
 
-## 🔵 Installation Tests
+## 🔵 Automated Tests
 
-### TC-01: Fresh Project Setup
-**Prompt:** Run `bash /path/to/setup-project.sh` in an empty directory
-**Expected:**
-- `.agents/skills-unity/` created with 9 category directories
-- 70 `SKILL.md` files present
-- `GEMINI.md` created with `<!-- BEGIN/END antigravity-unity-skills -->` block
-- `INDEX.md` present in `.agents/skills-unity/`
+Run `bash tests/run-tests.sh` to execute the automated test suite.
 
-### TC-02: Existing Project — Append Block
-**Prompt:** Run setup in a project that already has `GEMINI.md` without unity block
-**Expected:**
-- Unity block appended to existing `GEMINI.md`
-- Original `GEMINI.md` content preserved
-- No duplicated blocks
+### TC-01: Fresh Install — Flat Structure
+- Skills directory `.agents/skills/` created
+- Skills installed flat (no nested group folders)
+- 12+ skills installed (SKILL.md present)
 
-### TC-03: Re-run — Update Block
-**Prompt:** Run setup again in a project where it was already installed
-**Expected:**
-- Skills directory refreshed
-- Unity block in `GEMINI.md` replaced (not duplicated)
-- Block count remains 1
+### TC-02: YAML Frontmatter Validation
+- All skills have `name` + `description` in YAML frontmatter
+- No extra YAML fields
+
+### TC-03: Idempotent — No Duplication
+- Re-running install doesn't duplicate skills
+- Skill count unchanged after re-run
+
+### TC-04: Existing Project — No Side Effects
+- Existing GEMINI.md untouched
+- Skills installed alongside existing files
+
+### TC-05: All Skills Have SKILL.md
+- Every skill directory contains a SKILL.md file
+
+### TC-06: Manifest File
+- `.ag-manifest.json` exists with version, installed_at, groups, workflows
+
+### TC-07: Legacy Migration
+- Old group folders (`unity-skills/`, `qa-skills/`) removed during install
+- Skills migrated to flat structure
+
+### TC-08: Workflow Installation
+- Workflows directory `.agents/workflows/` created
+- `build-ui-mcp.md`, `verify-assets.md`, `verify-scripts.md` installed
+- Workflow count unchanged after re-run
 
 ---
 
-## 🟢 Skill Loading Tests
+## 🟢 Manual Skill Loading Tests
 
-### TC-04: Skills Auto-Load
+### TC-09: Skills Auto-Load
 **Prompt:** Open Antigravity in a project after setup, ask "what Unity skills do you have?"
 **Expected:**
-- Agent references `INDEX.md`
+- Agent references INDEX.md
 - Agent can list Unity skill categories
-- Agent knows about all 9 categories
 
-### TC-05: Skill Invocation
-**Prompt:** "I need help with object pooling in Unity"
+### TC-10: Skill Invocation
+**Prompt:** "I need help with DOTween safety in Unity"
 **Expected:**
-- Agent reads `06-performance/object-pooling-system/SKILL.md`
+- Agent reads `dotween-safety/SKILL.md`
 - Response uses skill's patterns and recommendations
-
-### TC-06: Specific Skill Reference
-**Prompt:** `view_file(".agents/skills-unity/01-architecture/di-container-manager/SKILL.md")`
-**Expected:**
-- File loads successfully
-- Skill content is complete and readable
-
----
-
-## 🟠 Cross-Platform Tests
-
-### TC-07: Windows Setup
-**Prompt:** Run `powershell -ExecutionPolicy Bypass -File setup-project.ps1`
-**Expected:**
-- Same results as TC-01 but on Windows
-- `.agents\skills-unity\` created
-- `GEMINI.md` updated
-
-### TC-08: Update Script
-**Prompt:** Run `bash scripts/update-unity-skills.sh`
-**Expected:**
-- Pulls latest from git (if remote configured)
-- Re-installs skills to current project
-- Existing GEMINI.md block updated
-
----
-
-## 🔴 Edge Case Tests
-
-### TC-09: Superpowers + Unity Skills Coexistence
-**Prompt:** Install both superpowers and unity-skills in the same project
-**Expected:**
-- Both `<!-- BEGIN antigravity-superpowers -->` and `<!-- BEGIN antigravity-unity-skills -->` blocks present
-- No conflicts between blocks
-- Both sets of skills available
-
-### TC-10: Missing Source Directory
-**Prompt:** Run setup-project.sh from wrong directory
-**Expected:**
-- Error message: "global-config/skills/ not found"
-- No partial installation
-- Exit code 1
 
 ---
 
 ## Verification Checklist
 
-- [ ] TC-01: Fresh setup works
-- [ ] TC-02: Append to existing GEMINI.md
-- [ ] TC-03: Idempotent re-run
-- [ ] TC-04: Skills auto-load in Antigravity
-- [ ] TC-05: Skill invocation works
-- [ ] TC-06: Direct skill file access
-- [ ] TC-07: Windows setup works
-- [ ] TC-08: Update script works
-- [ ] TC-09: Coexistence with superpowers
-- [ ] TC-10: Error handling
+- [ ] TC-01: Fresh setup works (automated)
+- [ ] TC-02: YAML frontmatter valid (automated)
+- [ ] TC-03: Idempotent re-run (automated)
+- [ ] TC-04: No side effects (automated)
+- [ ] TC-05: All skills have SKILL.md (automated)
+- [ ] TC-06: Manifest file valid (automated)
+- [ ] TC-07: Legacy migration works (automated)
+- [ ] TC-08: Workflow installation (automated)
+- [ ] TC-09: Skills auto-load in Antigravity
+- [ ] TC-10: Skill invocation works

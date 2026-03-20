@@ -1,10 +1,10 @@
 # Antigravity Unity Skills
 
-45 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
+13 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
 
 > **📦 Public, read-only repository.** Install via npm or clone and run setup.
 
-🌐 [Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Full Skill List](global-config/skills/INDEX.md)
+🌐 [Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Full Skill List](global-config/skills/unity-skills/INDEX.md)
 
 ## 📋 Requirements
 
@@ -20,7 +20,7 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-That's it. 45 skills installed.
+That's it. 13 skills installed.
 
 <details>
 <summary>Alternative: Clone + Run</summary>
@@ -41,13 +41,17 @@ node ~/AI-Tool/antigravity-unity-skills/bin/cli.mjs
 your-project/
 └── .agents/
     ├── skills/                # All skills installed flat here
-    │   ├── architecture-advisor/
-    │   ├── design-patterns/
-    │   ├── qa-doc-parser/
+    │   ├── unity-addressables/
+    │   ├── unity-csharp-standards/
+    │   ├── unity-logic-audit/
+    │   ├── unity-qa-parser/
     │   ├── ...
     │   └── .ag-manifest.json  # Tracks group membership
     └── workflows/             # Workflow files
-        └── build-ui-mcp.md
+        ├── build-ui-mcp.md
+        ├── verify-assets.md
+        ├── verify-scripts.md
+        └── verify-logics.md
 ```
 
 Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` configuration needed.
@@ -56,7 +60,7 @@ Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` 
 
 ## 🎯 What Is This?
 
-A collection of **45 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
+A collection of **13 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
@@ -69,20 +73,28 @@ Key features:
 
 ## 📚 What's Inside
 
-**45 skills** across **8 categories**:
+**13 skills** across **2 groups**:
+
+### Unity Skills (9)
 
 | Category | Skills | Description |
 |----------|--------|-------------|
-| Advisory | 10 | Architecture, patterns, testability, performance advisors |
-| Architecture | 8 | Design patterns, DI, state machines, event bus |
-| Visuals & Audio | 4 | Shaders, VFX, audio, lighting |
-| UI & UX | 5 | UI Toolkit, Canvas, Input System, responsive |
-| Performance | 5 | Addressables, pooling, profiling, mobile |
-| Tools & Pipeline | 6 | Editor scripting, testing, localization, MCP |
-| Backend & Monetization | 2 | IAP, backend integration |
-| DevOps + Project | 5 | Build pipelines, C# conventions, general Unity |
+| Architecture | 1 | Async/await, Coroutines, UniTask, lifecycle safety |
+| UI & UX | 1 | Canvas rebuild, overdraw, raycast, state safety, responsive |
+| Performance | 1 | Addressables async loading, memory-safe release |
+| Safety | 1 | DOTween lifecycle, SetLink, kill patterns, leak prevention |
+| Tools & Standards | 5 | C# conventions, editor scripting, asset/script/logic verification |
 
-👉 See [INDEX.md](global-config/skills/INDEX.md) for the complete skill list with descriptions.
+### QA Skills (4)
+
+| Skill | Description |
+|-------|-------------|
+| unity-qa-parser | Parse QA documents |
+| unity-qa-generator | Generate test cases |
+| unity-qa-verifier | Verify test results |
+| unity-qa-scorer | Score test quality |
+
+👉 See [INDEX.md](global-config/skills/unity-skills/INDEX.md) for the complete Unity skill list with descriptions.
 
 ---
 
@@ -106,14 +118,19 @@ antigravity-unity-skills/
 │   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
 │   ├── skills/              # Source skills (grouped)
-│   │   ├── unity-skills/    # 45 Unity skills
+│   │   ├── unity-skills/    # 9 Unity skills
 │   │   └── qa-skills/       # 4 QA skills
 │   └── workflow/            # Source workflows
-│       └── build-ui-mcp.md
-├── scripts/
-│   └── update-unity-skills.sh
+│       ├── build-ui-mcp.md
+│       ├── verify-assets.md
+│       ├── verify-scripts.md
+│       └── verify-logics.md
+├── docs/                    # Source references
+│   ├── SOURCES.md           # Skill → source mapping
+│   ├── unity/               # Unity performance docs
+│   └── agent-qa/            # QA system design docs
 ├── tests/
-│   └── run-tests.sh         # Automated test suite
+│   └── run-tests.sh         # Automated test suite (48 tests)
 └── CHANGELOG.md
 ```
 
@@ -141,4 +158,4 @@ MIT
 
 ---
 
-**Last Updated:** 2026-03-17
+**Last Updated:** 2026-03-20
