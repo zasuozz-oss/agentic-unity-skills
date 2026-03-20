@@ -6,10 +6,15 @@ Mapping từ docs/ → skills. Mỗi skill được tạo từ các nguồn tham
 
 ## Unity Skills
 
-### unity-script-audit
+### unity-code-audit
 - [Unity Performance Checklist - Lite v2.2.pdf](unity/Unity%20Performance%20Checklist%20-%20Lite%20v2.2.pdf) — Checklist gốc từ Unity performance guide
 - [scripts-verify-checklist.md](unity/scripts-verify-checklist.md) — Checklist scripts đã chuẩn hoá
 - [unity_anr_crash_checklist.md](unity/unity_anr_crash_checklist.md) — ANR/crash prevention items
+- Source: Knowledge Items (KI) từ project thực tế
+  - `unity_mobile_code_review` — workflow, refactoring patterns, mobile engineering rules
+  - `osa_grid_adapter_implementation` — state management, pagination, race condition prevention
+  - `unity_ui_utility_helpers` — lifecycle safety patterns
+- Verification patterns derived from SDU project audit evaluation (2026-03-20)
 
 ### unity-asset-audit
 - [Unity Performance Checklist - Lite v2.2.pdf](unity/Unity%20Performance%20Checklist%20-%20Lite%20v2.2.pdf) — Checklist gốc từ Unity performance guide
@@ -17,12 +22,6 @@ Mapping từ docs/ → skills. Mỗi skill được tạo từ các nguồn tham
 
 ### unity-ui-performance
 - [thegamedev_guru_level_3_unity_ui_development_diagram.pdf](unity/thegamedev_guru_level_3_unity_ui_development_diagram.pdf) — UI development best practices diagram
-
-### unity-logic-audit
-- Source: Knowledge Items (KI) từ project thực tế
-  - `unity_mobile_code_review` — workflow, refactoring patterns, mobile engineering rules
-  - `osa_grid_adapter_implementation` — state management, pagination, race condition prevention
-  - `unity_ui_utility_helpers` — lifecycle safety patterns
 
 ### unity-csharp-standards
 - Source: Knowledge Items (KI) từ project thực tế

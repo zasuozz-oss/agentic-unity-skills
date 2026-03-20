@@ -1,6 +1,6 @@
 ---
 name: unity-asset-audit
-description: "ASSET-LEVEL performance audit checklist. Activate when auditing Unity project assets — rendering settings, batching, materials, textures, models, audio, UI canvas setup, overdraw, memory budgets, and mobile-specific configurations. For C# CODE review, use unity-csharp-standards or unity-script-audit instead. Trigger keywords: 'asset audit', 'texture optimization', 'draw calls', 'rendering settings', 'batching', 'materials', 'models', 'audio settings', 'overdraw', 'memory budget', 'LOD', 'mesh optimization', 'import settings', 'SRP Batcher', 'build size'."
+description: "ASSET-LEVEL performance audit checklist. Activate when auditing Unity project assets — rendering settings, batching, materials, textures, models, audio, UI canvas setup, overdraw, memory budgets, and mobile-specific configurations. For C# CODE review, use unity-csharp-standards or unity-code-audit instead. Trigger keywords: 'asset audit', 'texture optimization', 'draw calls', 'rendering settings', 'batching', 'materials', 'models', 'audio settings', 'overdraw', 'memory budget', 'LOD', 'mesh optimization', 'import settings', 'SRP Batcher', 'build size'."
 ---
 
 # Asset Verify Checklist — Unity Performance
@@ -333,3 +333,125 @@ description: "ASSET-LEVEL performance audit checklist. Activate when auditing Un
 | **Build Report Tool** | Analyze build size components |
 | **ShoeBox** | Alternative sprite atlasing |
 | **TheGamedevGuru Rebuild Detector** | Detect excessive canvas rebuilds |
+
+---
+
+## Few-Shot Examples
+
+### Example 1: Texture Import Audit (File-Based)
+**User**: "Audit texture import settings in Assets/UI/Textures."
+
+**Agent**:
+```
+# Reading .meta files for texture import settings...
+
+find Assets/UI/Textures -name "*.png.meta" -o -name "*.jpg.meta" | head -20
+# Found 34 texture assets. Checking import settings...
+```
+
+```
+# Findings — Texture Import (§4)
+
+🔴 §4.1 Texture Compression — 12 textures using Uncompressed
+   Files: bg_main.png, bg_shop.png, popup_frame.png ... (12 total)
+   Setting: textureCompression = 0 (None)
+   Fix: Set Override for Android → ASTC 6×6, iOS → ASTC 6×6
+
+🟡 §4.2 Read/Write Enabled — 8 textures have Read/Write ON
+   Files: icon_avatar.png, btn_primary.png ... (8 total)
+   Impact: Doubles memory — each texture stored in both CPU + GPU
+   Fix: Disable Read/Write in Import Settings (unless GetPixel is needed)
+
+🟡 §4.3 Mipmaps enabled on UI textures — 22 of 34 textures
+   Impact: +33% memory waste (UI textures are always screen-sized)
+   Fix: Disable "Generate Mip Maps" for all UI textures
+
+🟢 §4.2 Oversized textures — 3 textures at 2048×2048 for small UI icons
+   Files: icon_star.png (64×64 on screen), icon_gem.png, icon_coin.png
+   Fix: Reduce Max Size to 256 or 512
+
+Summary: 34 checked / 9 passed / 25 violations
+🔴 Critical: 12 | 🟡 High: 30 | 🟢 Low: 3
+```
+
+### Example 2: Audio Settings Audit
+**User**: "Check audio import settings for mobile optimization."
+
+**Agent**:
+```
+# Scanning audio assets...
+find Assets -name "*.wav.meta" -o -name "*.mp3.meta" -o -name "*.ogg.meta" | wc -l
+# Found 47 audio files. Reading .meta importers...
+```
+
+```
+# Findings — Audio (§7)
+
+🔴 §7.1 Uncompressed audio on mobile — 5 music tracks using PCM
+   Files: bgm_main.wav (18MB), bgm_battle.wav (22MB) ... (5 total)
+   Impact: ~85MB uncompressed audio in RAM
+   Fix: Set Load Type → Streaming for long tracks (>10s)
+
+🟡 §7.1 Short SFX using Streaming — 12 sound effects
+   Files: sfx_click.wav, sfx_coin.wav ... (12 total)
+   Impact: Streaming overhead for tiny files (<100KB)
+   Fix: Set Load Type → Decompress on Load for short clips (<1s)
+
+🟡 §7.2 No AudioMixer groups configured
+   Impact: Cannot adjust volume categories independently
+   Fix: Create AudioMixer with groups: Master → Music, SFX, Voice, Ambient
+
+🟢 §7.1 WAV format used instead of compressed — 15 SFX files
+   Impact: Build size bloat (~45MB could be ~8MB with Vorbis)
+   Fix: Set Compression Format → Vorbis (Quality 70%)
+
+Summary: 47 checked / 15 passed / 32 violations
+Budget: ~103MB audio memory (limit: 30MB) — ⚠️ OVER BUDGET
+```
+
+### Example 3: Canvas & UI Overdraw Audit (MCP Mode)
+**User**: "Audit UI canvas setup and overdraw in MainMenu scene."
+
+**Agent**:
+```
+# Using MCP to inspect scene hierarchy...
+find_gameobjects(by_component, "Canvas")
+# Found 1 Canvas — "MainCanvas" with 847 children
+
+# Checking raycastTarget on non-interactive elements...
+```
+
+```
+# Findings — Canvas & UI (§9)
+
+🔴 §9.1 Single canvas for entire UI — 847 elements on 1 canvas
+   Impact: ANY change rebuilds entire canvas (Canvas.BuildBatch spike)
+   Fix: Split into 3 sub-canvases:
+   - StaticCanvas (background, frames — never changes)
+   - HUDCanvas (scores, currency — event-driven updates)
+   - DynamicCanvas (animations, timers — per-frame changes)
+
+🟡 §9.1 raycastTarget enabled on 312 non-interactive elements
+   Impact: Extra physics queries on every touch input
+   Fix: Bulk-disable raycastTarget on Labels, decorative Images, backgrounds
+   Tool: Use RaycastTargetOptimizer editor script (see unity-ui-performance skill)
+
+🟡 §9.2 UI overdraw — 4 stacked full-screen layers detected
+   Layers: bg_gradient → bg_pattern → panel_frame → content_bg
+   Impact: 4× fill rate for entire screen area
+   Fix: Merge bg layers into single pre-composited sprite, or use opaque shader
+
+🟢 §9.2 Sprite Mesh Type = Full Rect on 28 sprites
+   Impact: Transparent areas rendered as opaque rectangles
+   Fix: Set Mesh Type → Tight in Sprite Import Settings
+
+Summary: 847 elements checked / 205 passed / 642 violations
+Draw calls from UI: 89 (budget: < 50) — ⚠️ OVER BUDGET
+```
+
+---
+
+## Related Skills
+- `@unity-ui-performance` — UI performance optimization and state safety
+- `@unity-code-audit` — C# code audit for scripts (performance + logic)
+- `@unity-addressables` — Asset loading and memory-safe release patterns

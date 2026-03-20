@@ -37,7 +37,7 @@ Run `bash tests/run-tests.sh` to execute the automated test suite.
 
 ### TC-08: Workflow Installation
 - Workflows directory `.agents/workflows/` created
-- `build-ui-mcp.md`, `verify-assets.md`, `verify-scripts.md` installed
+- `build-ui-mcp.md`, `verify-assets.md`, `verify-code.md` installed
 - Workflow count unchanged after re-run
 
 ---

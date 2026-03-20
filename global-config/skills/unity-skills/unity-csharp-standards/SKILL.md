@@ -1,6 +1,6 @@
 ---
 name: unity-csharp-standards
-description: "MANDATORY for ALL C# work in Unity. Real-time coding guidance covering three pillars: (1) C# naming/casing/formatting conventions, (2) script design review — responsibility, coupling, lifecycle safety, role assignment, and (3) mobile & general performance optimization — GC, hot-path, caching, battery, frame rate. For systematic script AUDIT with checklist, use unity-script-audit instead. Trigger for: 'create script', 'new MonoBehaviour', 'review this script', 'is this class too big', 'code smell', 'naming convention', 'how to optimize', 'game runs slow', 'frame drops', 'GC spikes', or any C# quality/performance question."
+description: "MANDATORY for ALL C# work in Unity. Real-time coding guidance covering three pillars: (1) C# naming/casing/formatting conventions, (2) script design review — responsibility, coupling, lifecycle safety, role assignment, and (3) mobile & general performance optimization — GC, hot-path, caching, battery, frame rate. For systematic script AUDIT with checklist, use unity-code-audit instead. Trigger for: 'create script', 'new MonoBehaviour', 'review this script', 'is this class too big', 'code smell', 'naming convention', 'how to optimize', 'game runs slow', 'frame drops', 'GC spikes', or any C# quality/performance question."
 ---
 
 # C# Quality Skill (Unity 6)
@@ -490,4 +490,4 @@ public static class GameLog
 - `@unity-ui-performance` - UI rendering, state safety, responsive design
 - `@unity-dotween-safety` - DOTween lifecycle and memory patterns
 - `@unity-async-patterns` - Async/await lifecycle and cancellation
-- `@unity-logic-audit` - Logic correctness audit (state, race conditions, resource pairing)
+- `@unity-code-audit` - Full C# audit checklist with verification rules

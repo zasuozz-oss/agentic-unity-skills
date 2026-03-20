@@ -56,6 +56,13 @@ assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
 assert "Total skills installed ($SKILL_COUNT found, expect 13+)" "[ $SKILL_COUNT -ge 13 ]"
 
+# Verify new audit skill exists (v5.0 redesign → v5.1 merge)
+assert "unity-code-audit exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-code-audit/SKILL.md' ]"
+
+# Verify old audit skills removed
+assert "unity-script-audit removed" "[ ! -d '$TEST_PROJECT/.agents/skills/unity-script-audit' ]"
+assert "unity-logic-audit removed" "[ ! -d '$TEST_PROJECT/.agents/skills/unity-logic-audit' ]"
+
 # Verify truly flat — no SKILL.md at depth 3+
 NESTED=$(find "$TEST_PROJECT/.agents/skills" -mindepth 3 -name "SKILL.md" -type f | wc -l | tr -d ' ')
 assert "Flat structure (no nested SKILL.md)" "[ $NESTED -eq 0 ]"
@@ -183,8 +190,9 @@ echo -e "${YELLOW}TC-08: Workflow Installation${NC}"
 assert "Workflows directory exists" "[ -d '$TEST_PROJECT/.agents/workflows' ]"
 assert "build-ui-mcp.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/build-ui-mcp.md' ]"
 assert "verify-assets.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-assets.md' ]"
-assert "verify-scripts.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-scripts.md' ]"
-assert "verify-logics.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-logics.md' ]"
+assert "verify-code.md installed" "[ -f '$TEST_PROJECT/.agents/workflows/verify-code.md' ]"
+assert "verify-scripts.md removed" "[ ! -f '$TEST_PROJECT/.agents/workflows/verify-scripts.md' ]"
+assert "verify-logics.md removed" "[ ! -f '$TEST_PROJECT/.agents/workflows/verify-logics.md' ]"
 assert "Manifest has workflows field" "grep -q '\"workflows\"' '$MANIFEST_FILE'"
 assert "Manifest lists build-ui-mcp.md" "grep -q 'build-ui-mcp.md' '$MANIFEST_FILE'"
 

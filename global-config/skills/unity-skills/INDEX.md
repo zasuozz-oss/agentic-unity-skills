@@ -38,15 +38,21 @@ Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 
 ---
 
-## Tools & Standards (5 skills)
+## Tools & Standards (2 skills)
 
 | Skill | Description |
 |-------|-------------|
 | unity-csharp-standards | C# conventions, script design review, mobile & performance optimization |
 | unity-editor-tools | Editor windows, PropertyDrawers, scene tools |
+
+---
+
+## Audit & Verification (2 skills)
+
+| Skill | Description |
+|-------|-------------|
 | unity-asset-audit | Comprehensive checklist for auditing Unity assets |
-| unity-script-audit | Comprehensive checklist for auditing C# scripts |
-| unity-logic-audit | Logic correctness audit — state management, race conditions, resource pairing |
+| unity-code-audit | Full C# audit checklist (§1-§33) with grep patterns + context verification rules |
 
 ---
 
@@ -63,6 +69,9 @@ Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 ### Performance
 - `unity-csharp-standards` → Hot-path + mobile constraints
 - `unity-ui-performance` → UI rendering + state + responsive
+
+### Audit
+- `unity-code-audit` → Full checklist + verification rules (screen mode or deep mode)
 
 ---
 

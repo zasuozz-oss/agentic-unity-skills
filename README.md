@@ -42,16 +42,15 @@ your-project/
 └── .agents/
     ├── skills/                # All skills installed flat here
     │   ├── unity-addressables/
+    │   ├── unity-code-audit/
     │   ├── unity-csharp-standards/
-    │   ├── unity-logic-audit/
     │   ├── unity-qa-parser/
     │   ├── ...
     │   └── .ag-manifest.json  # Tracks group membership
     └── workflows/             # Workflow files
         ├── build-ui-mcp.md
         ├── verify-assets.md
-        ├── verify-scripts.md
-        └── verify-logics.md
+        └── verify-code.md
 ```
 
 Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` configuration needed.
@@ -83,7 +82,8 @@ Key features:
 | UI & UX | 1 | Canvas rebuild, overdraw, raycast, state safety, responsive |
 | Performance | 1 | Addressables async loading, memory-safe release |
 | Safety | 1 | DOTween lifecycle, SetLink, kill patterns, leak prevention |
-| Tools & Standards | 5 | C# conventions, editor scripting, asset/script/logic verification |
+| Tools & Standards | 2 | C# conventions, editor scripting |
+| Audit & Verification | 2 | Asset audit, comprehensive code audit (screen + deep modes) |
 
 ### QA Skills (4)
 
@@ -123,8 +123,7 @@ antigravity-unity-skills/
 │   └── workflow/            # Source workflows
 │       ├── build-ui-mcp.md
 │       ├── verify-assets.md
-│       ├── verify-scripts.md
-│       └── verify-logics.md
+│       └── verify-code.md
 ├── docs/                    # Source references
 │   ├── SOURCES.md           # Skill → source mapping
 │   ├── unity/               # Unity performance docs

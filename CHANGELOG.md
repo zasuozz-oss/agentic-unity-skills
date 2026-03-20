@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [5.1.0] - 2026-03-20
+
+### Changed — Phase 0.5 Evaluation Improvements
+- **unity-code-audit**: Added Severity Classification Guide (CRITICAL/HIGH/MEDIUM/LOW with criteria)
+- **unity-code-audit**: Added §34 Production Data Safety (+2 checklist items, now 243 total)
+- **unity-code-audit**: Fixed PART C Addressables verification — manual release pattern now recognized as PASS
+- **verify-code.md**: Added Accuracy Check Rule (precise language, full method context)
+- **verify-code.md**: Findings Template now requires Suggested Fix + Priority columns
+- **verify-code.md**: Added Count Reconciliation step for grouped violations
+- **verify-code.md**: Added Priority Triage step before Fix phase
+- **verify-code.md**: Findings format changed from table → checkbox list for interactive triage
+- **verify-code.md**: Added User Review step — AI pauses, user marks `[x]` to skip items in VS Code, AI only fixes `[ ]` items
+
+---
+
+## [5.0.0] - 2026-03-20
+
+### Changed — Audit Skills Redesign
+- **BREAKING:** Replaced `unity-script-audit` + `unity-logic-audit` with unified `unity-code-audit`
+- **BREAKING:** Replaced `verify-scripts.md` + `verify-logics.md` with unified `verify-code.md` (screen/deep modes)
+- Updated INDEX.md — new "Audit & Verification" category
+- Updated test suite with new assertions for screener + deep-audit
+- Updated cross-references in `unity-csharp-standards`
+
+### Added
+- `unity-code-screener` — grep-level screening with patterns, exceptions, severity markers, and `[EDITOR-ONLY]`/`[CONTEXT-REQUIRED]` tags
+- `unity-deep-audit` — multi-phase verified audit with hierarchical flow (Discovery → sub-phases → verify → final report)
+- `verify-code.md` — unified workflow with `--mode=screen` (default) and `--mode=deep`
+
+### Removed
+- `unity-script-audit` — replaced by screener (grep items) + deep-audit (verification rules)
+- `unity-logic-audit` — merged into screener + deep-audit
+- `verify-scripts.md` — replaced by `verify-code.md`
+- `verify-logics.md` — replaced by `verify-code.md`
+
+---
+
 ## [4.0.0] - 2026-03-20
 
 ### Changed — Focused Skill Set
