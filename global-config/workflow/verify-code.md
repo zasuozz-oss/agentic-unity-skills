@@ -1,14 +1,45 @@
 ---
 description: Deep verified code audit workflow for Unity C# projects. Feature-based phasing with GitNexus auto-detection. Each feature is fully audited + fixed before moving to the next. Uses unity-code-audit skill.
 ---
-
 # Code Verification Workflow
 
-Deep verified audit for Unity C# code quality. Every violation confirmed by reading code context (`view_file`). Phased by feature — completed features are 100% done even if interrupted.
+Deep verified audit for Unity C# code quality. Every violation confirmed by `view_file`. Phased by feature — completed features are 100% done even if interrupted.
 
-> **CRITICAL RULE:** NEVER batch-grep. Every file MUST be `view_file` regardless of size.
+> **CRITICAL RULES:**
+> 1. NEVER batch-grep. Every file MUST be `view_file` regardless of size.
+> 2. AI MUST write `audit-session.md` BEFORE every pause/notify_user — **#1 cause of context loss**.
+> 3. Findings MUST use table format — NO heading-based prose (`### C01 — ...`).
+> 4. ALL links MUST use `file:///` absolute paths for clickable artifact links.
+> 5. **LANGUAGE:** Issue/Fix descriptions, summaries, section headers → Vietnamese. Code identifiers, variable names → English.
+> 6. **FILE SUMMARY TABLE:** Findings header MUST include a table listing every reviewed file with columns: File, Lines, Lỗi (error count per file).
+> 7. **LOCATION LINK FORMAT:** `[FileName.cs:Line](file:///absolute/path/to/FileName.cs#LLine)` — filename MUST include `.cs` extension.
 
-> **CRITICAL RULE:** Before every pause for user input, write ALL findings and context to `audit-session.md`. Never rely on in-memory context across sessions. On resume, ALWAYS read `audit-session.md` + `phase-N-findings.md` before proceeding.
+---
+
+## Context Preservation (OpenMemory / Fallback)
+
+**Dual-layer:** File = structured source of truth, OpenMemory = semantic context (reasoning, decisions, patterns).
+
+**At workflow start**, check if `openmemory` MCP is available:
+- **Available** → use `openmemory_store` / `openmemory_query` with tags below
+- **Not available** → append same content to `audit-context.md` with `[timestamp] [phase:N]` headers
+
+**Tags** (OpenMemory mode): `project:<name>`, `workflow:verify-code`, `audit-phase:<N>`, `audit-scope:<path>`
+
+**Store at 3 checkpoints** (keep ≤ 3 sentences, patterns only, NO full tables):
+
+| When | Content |
+|------|---------|
+| After creating audit-plan | Scope, phase list, detection method, file counts |
+| After auditing each file | Key patterns, violation count, notable insights |
+| After completing each phase | Recurring patterns, health, triage summary |
+
+**Query at 2 triggers:**
+
+| When | Query |
+|------|-------|
+| Resuming session | `"verify-code audit <project>"` → restore context before reading files |
+| Starting new phase | `"verify-code phase <N-1> patterns <project>"` → cross-phase patterns |
 
 ---
 
@@ -18,245 +49,206 @@ Deep verified audit for Unity C# code quality. Every violation confirmed by read
 
 Read `.agents/skills/unity-code-audit/SKILL.md` — use PART A + PART B for checklist, PART C for verification rules.
 
-### 2. Phase 0: Discovery — Feature Detection
+### 2. Discovery — Feature Detection
 
-**Step 2a: Try GitNexus MCP (preferred)**
-
-Check if `gitnexus` MCP server is available. If yes:
-
+**2a: Try GitNexus (preferred)**
 ```cypher
--- List indexed repos
-gitnexus.list_repos()
-
--- If project is indexed, query feature communities
 MATCH (s)-[:CodeRelation {type: 'MEMBER_OF'}]->(c:Community)
 WHERE c.heuristicLabel IS NOT NULL
-  AND s.filePath STARTS WITH '<scope>/'
-WITH c.heuristicLabel AS feature,
-     collect(DISTINCT s.filePath) AS files
+  AND s.filePath STARTS WITH '/'
+WITH c.heuristicLabel AS feature, collect(DISTINCT s.filePath) AS files
 ORDER BY size(files) DESC
 RETURN feature, size(files) AS fileCount, files
 ```
 
-GitNexus auto-detects features using Leiden community algorithm on the call graph.
-
 **Grouping rules for GitNexus results:**
-- Communities with similar names → merge (e.g., "Challenge & Submit" + "Challenge" → "Challenge System")
-- Communities `Cluster_XXXX` (unnamed) → merge into "Misc"
+- Similar community names → merge (e.g., "Challenge & Submit" + "Challenge" → "Challenge System")
+- `Cluster_XXXX` (unnamed) → merge into "Misc"
 - Communities ≤3 files → merge into "Misc" or nearest related feature
-- Shared infrastructure files (APIManager, Data, GameManager, LoadController) → separate "Infrastructure" phase, audit FIRST
 
-**Step 2b: Fallback — Folder-based (no GitNexus)**
+**Phase 0.5 — Infrastructure:**
+Include ONLY files that meet ALL conditions:
+- Is a true singleton or static global manager (single instance for entire app)
+- Contains NO feature-specific business logic
+- Cannot be assigned to any single feature phase
 
-If GitNexus is NOT available or project is NOT indexed, ask user:
+**Phase 0.6 — Shared/Utilities (if needed):**
+Files referenced by multiple features but NOT true infrastructure:
+- Utility helpers used by ≥2 features
+- Shared controllers with no single feature owner
+- Base classes / extensions used across features
+- Do NOT merge into Phase 0.5
 
-> **GitNexus MCP is not available.** Cannot auto-detect features.
->
-> Would you like to fallback to folder-based phasing?
-> - **Yes** → Split phases by folder structure
-> - **No** → Stop, user provides feature map manually
+**Everything else — assign by ownership:**
+- Feature-specific controllers → phase of their feature
+- Helpers used primarily by 1 feature → that feature's phase
+- If uncertain which feature owns a file → assign to Phase 0.6, not Phase 0.5
 
-If user chooses folder-based fallback:
-- `find <scope> -name "*.cs" -exec wc -l {} +`
-- Group files by top-level folder
-- Folder >5000 lines → split sub-phases (files >500 lines = 1 sub-phase each)
-- Folders <1000 lines → merge into combined phase
+**Phase size:**
+- If a phase exceeds ~20 files or ~5,000 lines → split into sub-phases
+- Sub-phase naming: 1a, 1b, 1c...
 
-**Step 2c: Create audit-plan.md**
+**2b: Fallback (no GitNexus)** — folder-based: group by top-level folder, split >5000 lines, merge <1000 lines.
 
-Regardless of detection method, create `audit-plan.md`:
+**2c: Create `audit-plan.md`**
+```markdown
+# Deep Audit Plan — 
 
-```
-# Deep Audit Plan — <Project Name>
+**Detection:** GitNexus / Folder-based | **Scope:**  — X lines | Y files
 
-**Detection:** GitNexus community / Folder-based fallback
-**Scope:** <path> — X lines | Y files
-
-## Phase Order
-
-| Phase | Feature        | Files | Lines | Status |
-|-------|----------------|-------|-------|--------|
-| 0.5   | Infrastructure | N     | N     | [ ]    |
-| 1     | <Feature A>    | N     | N     | [ ]    |
-| 2     | <Feature B>    | N     | N     | [ ]    |
-...
-
-## Phase Details
+| Phase | Feature | Files | Lines | Status |
+|-------|---------|-------|-------|--------|
+| 0.5 | Infrastructure | N | N | [ ] |
+| 0.6 | Shared/Utilities | N | N | [ ] |
+| 1 |  | N | N | [ ] |
 
 ### Phase 0.5: Infrastructure
 - [ ] APIManager.cs (1349 lines)
 - [ ] Data.cs (1123 lines)
-...
 
-### Phase 1: <Feature A>
+### Phase 0.6: Shared/Utilities
 - [ ] file1.cs (XXX lines)
 - [ ] file2.cs (XXX lines)
-...
+
+### Phase 1: 
+- [ ] file1.cs (XXX lines)
+- [ ] file2.cs (XXX lines)
 ```
 
-Present plan to user for approval before proceeding.
+Present plan to user for approval. **Store checkpoint** after approval.
 
 ### 3. Phase N: Audit + Fix per Feature
 
 Each phase = 1 complete feature. Within each phase:
 
-**Step 3a: Audit (1+ sessions)**
-- Read `audit-plan.md` to identify files for this phase.
-- For each file — repeat until all files done:
-  1. `view_file` the file — no exceptions
-  2. Apply ALL rules from PART A + PART B + PART C verification rules
-  3. Append findings of this file to `phase-N-findings.md` immediately
-  4. Mark file `[x]` in `audit-plan.md`
-- Never batch: do not read multiple files before writing findings
+**3a: Audit** — for each file:
+1. `view_file` the file — no exceptions
+2. Apply ALL rules from PART A + PART B + PART C
+3. Append findings to `phase-N-findings.md` immediately
+4. Mark file `[x]` in `audit-plan.md`
+5. **Store checkpoint** — key patterns for this file
+- Never batch: write findings after each file, not after reading multiple
 
-**Accuracy Check Rule:**
-- Read ENTIRE relevant method/class, not just the flagged line.
-- Check ALL code paths (success, error, cancellation) before writing description.
-- Check if the class provides separate public methods for resource cleanup (manual release pattern).
-- NEVER use absolute language ("NEVER", "NO", "ALL") unless verified ALL instances. Use precise language:
-  - ❌ "NEVER releases handle" → ✅ "No release on success path (error paths have release)"
-  - ❌ "ALL async methods lack CT" → ✅ "X/Y public async methods lack CancellationToken"
+**Accuracy Rules:**
+- Read ENTIRE method/class, not just the flagged line
+- Check ALL code paths (success, error, cancellation) before writing description
+- Check for manual release patterns (separate public cleanup methods)
+- Use precise language: ❌ "NEVER releases" → ✅ "No release on success path (error paths have release)"
 
-**Findings Format** — 1 row per location in `phase-N-findings.md`:
+**Cross-File Rule:** When finding involves factory/producer patterns:
+1. Use `mcp_gitnexus_context()` to find all callers
+2. Check if ≥1 caller disposes the returned resource
+3. Document: "Cross-file: N callers, M dispose properly"
+4. No caller disposes → escalate to 🔴 Critical
 
-Each row = 1 location. Issues with multiple locations = multiple rows sharing same #.
-Location format: `FileName:Line` (short — NO full path to keep table readable).
+**Severity Convention:**
+- 🔴 Critical — crash, memory leak, security, data corruption
+- 🟡 High — performance drain, logic bug, resource misuse
+- 🟡 Medium — code quality, maintainability, naming
+- 🟢 Low — style, minor cleanup, documentation
 
+**Location Link Rule:**
+- Use `file:///` absolute paths for ALL links in findings — ensures clickable links in artifact viewer
+- Format: `[FileName.cs:Line](file:///absolute/path/to/FileName.cs#LLine)`
+- Correct:   `[APIManager.cs:19](file:///Users/zasuo/Unity/SDU/Assets/_Game/Scripts/Common/APIManager.cs#L19)`
+- Incorrect: `[APIManager.cs:19](Assets/_Game/Scripts/Common/APIManager.cs#L19)` (not clickable)
+
+**Findings Template** (`phase-N-findings.md`):
 ```markdown
 # Phase N Findings — <Feature Name>
 
-**Files reviewed:** X | **Confirmed violations:** Y (Z unique issues)
+**Files đã review:** X | **Vi phạm xác nhận:** Y (Z vấn đề riêng biệt)
+
+| File | Lines | Lỗi |
+|------|-------|-----|
+| [APIManager.cs](file:///Users/zasuo/Unity/SDU/Assets/_Game/Scripts/Common/APIManager.cs) | 1350 | 14 |
+| [Data.cs](file:///Users/zasuo/Unity/SDU/Assets/_Game/Scripts/Data/Data.cs) | 1124 | 2 |
 
 ## 🔴 Critical
 
 | # | Location | Issue | Fix |
 |---|----------|-------|-----|
-| 1 | Motion:19 | DOTween without SetLink | `.SetLink(gameObject)` |
-| 1 | Motion:25 | | |
-| 1 | Motion:35 | | |
-| 2 | Manager:174 | `throw e` loses stack trace | `throw;` |
+| 1 | [Motion.cs:19](file:///Users/zasuo/Unity/SDU/Assets/Scripts/Motion.cs#L19) | DOTween không có SetLink | `.SetLink(gameObject)` |
+| 1 | [Motion.cs:25](file:///Users/zasuo/Unity/SDU/Assets/Scripts/Motion.cs#L25) | | |
+| 2 | [Manager.cs:174](file:///Users/zasuo/Unity/SDU/Assets/Scripts/Manager.cs#L174) | `throw e` mất stack trace | `throw;` |
 
 ## 🟡 High
 
 | # | Location | Issue | Fix |
 |---|----------|-------|-----|
-| 3 | APIManager:151 | UnityWebRequest not Disposed | Wrap in `using` |
+| 3 | [APIManager.cs:151](file:///Users/zasuo/Unity/SDU/Assets/_Game/Scripts/Common/APIManager.cs#L151) | UnityWebRequest không Dispose | Wrap trong `using` |
+
+## 🟡 Medium
+
+| # | Location | Issue | Fix |
+|---|----------|-------|-----|
 
 ## 🟢 Low
 
 | # | Location | Issue | Fix |
 |---|----------|-------|-----|
-| 4 | Data:3 | Unused import | Remove |
+| 4 | [Data.cs:3](file:///Users/zasuo/Unity/SDU/Assets/_Game/Scripts/Data/Data.cs#L3) | Import không cần thiết | Xoá |
 
 ---
 
-## Count Reconciliation
-- Unique issues: Z | Total locations: Y
-- Multi-location: #1 (3)
+## Thống kê
+- Vấn đề riêng biệt: Z | Tổng locations: Y
+- Multi-location: #1 (2)
 ```
 
-Rules:
-- First row of each # shows Issue + Fix. Subsequent rows of same # leave those columns empty
-- Severity levels: 🔴 Critical | 🟡 High | 🟡 Medium | 🟢 Low (from skill's Severity Classification Guide)
-- **No checkbox column** — user marks skip via comments
-- User adds `> skip #N — reason` below any table to skip issue #N
-- AI reads comments: if `> skip #N` found → skip all rows with that #
+**Findings rules:**
+- First row of each # shows Issue + Fix, subsequent rows leave those empty
+- User adds `> skip #N — reason` below table to skip. AI reads and respects these.
 
-**Triage example:**
-```markdown
-> skip #3 — test data for live event, remove after event ends
-> skip #15 — will refactor entire async layer later
-```
+**3b: User Review (REQUIRED)**
 
-**Count Reconciliation** — at end of findings file:
-- Total unique issues vs total locations
-- List multi-location issues: "#N (count)"
-
-- Update `audit-plan.md`: mark audited files `[x]`.
-
-**Step 3b: User Review (REQUIRED)**
-
-Before pausing, AI MUST update `audit-session.md`:
-
+Before pausing, write `audit-session.md`:
 ```markdown
 # Audit Session State
-
-## Current phase: N
-## Status: WAITING_USER_REVIEW
+## Current phase: N | Status: WAITING_USER_REVIEW
 
 ## Files read this session
 - [x] FileName.cs — X lines — fully read
 - [ ] FileName.cs — pending
-...
 
 ## Context notes
-- <FileName.cs>: <key finding summary per file>
-...
+- : 
 
 ## Pending user action
-Review `phase-N-findings.md` → add `> skip #N — reason` for issues to skip → reply `continue`
+Review `phase-N-findings.md` → add `> skip #N — reason` → reply `continue`
 ```
 
-After writing `audit-session.md`, present to user for triage:
+Then `notify_user` with `phase-N-findings.md` for review.
 
-```
-notify_user:
-  PathsToReview: [phase-N-findings.md]
-  Message: "Phase N audit complete. X violations found.
-            Review findings → add `> skip #N — reason` for issues to skip.
-            Say 'continue' when done."
-  BlockedOnUser: true
-```
+**3c: Fix (respect triage)**
 
-User adds comments below any table to skip or annotate:
-```markdown
-> skip #3 — test data for live event, remove after event ends
-> skip #15 — will refactor entire async layer later
-> #22 only fix L103 and L152, other lines deferred to next phase
-```
-
-**Step 3c: Fix (respect user triage)**
-
-On resume, AI MUST read in this order before proceeding:
-1. `audit-session.md` — restore context (files read, key findings)
-2. `phase-N-findings.md` — restore findings + user triage comments
-3. `audit-plan.md` — restore phase status
-
-Then proceed:
-- No comment on # → fix as suggested
+On resume, read in order: `audit-session.md` → `phase-N-findings.md` → `audit-plan.md`.
+**Store checkpoint** with triage summary before starting fixes.
+- No comment → fix as suggested
 - `> skip #N` → skip all rows with that #
-- `> #N partial note` → fix following user's instruction
-- Record fixes in `phase-N-fixes.md`.
+- `> #N partial note` → fix per user instruction
+- Record in `phase-N-fixes.md`
 
-**Step 3d: Verify**
-- Re-check fixed files — confirm no regressions.
-- Cross-reference with other phases if needed.
+**3d: Verify** — re-check fixed files, confirm no regressions.
 
-**Step 3e: Mark Done**
-- Update `audit-plan.md`: mark phase status `[x]`.
-- Update `audit-session.md`: mark phase COMPLETE.
+**3e: Mark Done**
+- Update `audit-plan.md`: Phase Order `[ ]` → `[x]`, Phase Details all files `[x]`
+- Re-read `audit-plan.md` to verify — if any file still `[ ]`, fix immediately
+- Update `audit-session.md`: mark phase COMPLETE
+- **Store checkpoint** — phase summary with recurring patterns
 - ✅ This feature is now COMPLETE.
 
-### 4. FINAL: Aggregate Report
+### 4. Final Report
 
-After all phases complete:
-- Read all phase findings + fixes.
-- Generate `deep-audit-report.md`:
-  - Summary per feature
-  - Total violations found vs fixed
-  - Remaining items (if any)
-  - Overall project health score
-
-### 5. Present to user
-
-Use `notify_user` to share the final report.
+After all phases: generate `deep-audit-report.md` with summary per feature, total violations found/fixed, remaining items, health score. Present to user via `notify_user`.
 
 ---
 
 ## Resuming Interrupted Sessions
 
-1. Read `audit-session.md` → restore context from last session.
-2. Read `audit-plan.md` → find phases/files still marked `[ ]`.
-3. Continue from the next unchecked phase.
-4. **Completed phases = completed features** — no need to redo.
-5. Previous findings/fixes files are preserved — no data loss.
+1. **Query OpenMemory** (or read `audit-context.md`) → restore semantic context FIRST
+2. Read `audit-session.md` → restore structured state
+3. Read `audit-plan.md` → find phases/files still `[ ]`
+4. Read latest `phase-N-findings.md` → restore current progress
+5. Continue from next unchecked file/phase
+6. Completed phases = done — no redo needed
