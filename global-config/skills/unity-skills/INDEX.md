@@ -2,7 +2,7 @@
 
 Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 
-**Total:** 9 skills across 6 categories
+**Total:** 10 skills across 6 categories
 
 ---
 
@@ -14,10 +14,11 @@ Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 
 ---
 
-## UI & UX (1 skill)
+## UI & UX (2 skills)
 
 | Skill | Description |
 |-------|-------------|
+| unity-ugui-layout | Responsive Rules, Canvas Scaler, Match value, RectTransform, anchors, TMP, sizes |
 | unity-ui-performance | Canvas rebuild, overdraw, raycast, state safety, responsive design, safe area |
 
 ---
@@ -60,6 +61,9 @@ Skills cho phát triển ứng dụng iOS/Android bằng Unity.
 
 ### Code quality
 - `unity-csharp-standards` → C# conventions + script review + performance
+
+### UI & Layout
+- `unity-ugui-layout` → Responsive Layouts, RectTransform, Anchors, TMP
 
 ### Safety & crash prevention
 - `unity-dotween-safety` → DOTween leak prevention

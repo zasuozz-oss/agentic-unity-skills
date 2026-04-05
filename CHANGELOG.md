@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [5.2.0] - 2026-04-05
+
+### Added
+- **unity-ugui-layout**: Rules for building responsive uGUI layouts, constraints, Canvas Scaler setup, RectTransform anchors, Content Size Fitter and TMP text.
+
+---
+
 ## [5.1.0] - 2026-03-20
 
 ### Changed — Phase 0.5 Evaluation Improvements

@@ -54,7 +54,7 @@ assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 
 # Count all SKILL.md files (flat — exactly 1 level deep)
 SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
-assert "Total skills installed ($SKILL_COUNT found, expect 13+)" "[ $SKILL_COUNT -ge 13 ]"
+assert "Total skills installed ($SKILL_COUNT found, expect 14+)" "[ $SKILL_COUNT -ge 14 ]"
 
 # Verify new audit skill exists (v5.0 redesign → v5.1 merge)
 assert "unity-code-audit exists (flat)" "[ -f '$TEST_PROJECT/.agents/skills/unity-code-audit/SKILL.md' ]"

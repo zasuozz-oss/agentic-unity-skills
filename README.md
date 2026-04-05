@@ -1,6 +1,6 @@
 # Antigravity Unity Skills
 
-13 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
+14 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
 
 > **📦 Public, read-only repository.** Install via npm or clone and run setup.
 
@@ -20,7 +20,7 @@ cd /path/to/your/unity-project
 npx ag-unity
 ```
 
-That's it. 13 skills installed.
+That's it. 14 skills installed.
 
 <details>
 <summary>Alternative: Clone + Run</summary>
@@ -59,7 +59,7 @@ Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` 
 
 ## 🎯 What Is This?
 
-A collection of **13 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
+A collection of **14 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
 
 Key features:
 - ✅ **One-command install** — `npx ag-unity` from any project
@@ -72,14 +72,14 @@ Key features:
 
 ## 📚 What's Inside
 
-**13 skills** across **2 groups**:
+**14 skills** across **2 groups**:
 
-### Unity Skills (9)
+### Unity Skills (10)
 
 | Category | Skills | Description |
 |----------|--------|-------------|
 | Architecture | 1 | Async/await, Coroutines, UniTask, lifecycle safety |
-| UI & UX | 1 | Canvas rebuild, overdraw, raycast, state safety, responsive |
+| UI & UX | 2 | Canvas rebuild, overdraw, raycast, state safety, responsive |
 | Performance | 1 | Addressables async loading, memory-safe release |
 | Safety | 1 | DOTween lifecycle, SetLink, kill patterns, leak prevention |
 | Tools & Standards | 2 | C# conventions, editor scripting |
@@ -118,7 +118,7 @@ antigravity-unity-skills/
 │   └── cli.mjs              # Cross-platform CLI (ESM)
 ├── global-config/
 │   ├── skills/              # Source skills (grouped)
-│   │   ├── unity-skills/    # 9 Unity skills
+│   │   ├── unity-skills/    # 10 Unity skills
 │   │   └── qa-skills/       # 4 QA skills
 │   └── workflow/            # Source workflows
 │       ├── build-ui-mcp.md
