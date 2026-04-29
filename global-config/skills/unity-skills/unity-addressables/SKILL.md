@@ -193,6 +193,5 @@ Rules for migrating from `Resources.Load` and managing asset memory across scene
 ---
 
 ## Related Skills
-- `@unity-csharp-standards` - Hot-path rules, GC reduction, object pooling
-- `@unity-crash-safety` - Memory leak prevention, static collection cleanup
+- `@unity-csharp-standards` - Hot-path rules, GC reduction, memory leak prevention
 - `@unity-event-safety` - Event subscription cleanup in OnDestroy

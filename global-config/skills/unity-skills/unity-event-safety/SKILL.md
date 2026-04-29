@@ -1,6 +1,6 @@
 ---
 name: unity-event-safety
-description: "Use when Unity C# code uses += / -= event subscriptions, ShowLoading/HideLoading pairing, CancellationTokenSource acquire/dispose, or risks ghost handlers from missing OnDisable unsubscribe. NOT for Button.onClick wiring — see unity-mcp-ignore."
+description: "Use when Unity C# code uses += / -= event subscriptions, ShowLoading/HideLoading pairing, boolean flags (_isLoading/_isFetching) that risk getting stuck, CancellationTokenSource acquire/dispose, or ghost handlers from missing OnDisable unsubscribe. NOT for Button.onClick — see unity-mcp-ignore."
 ---
 
 # Event Safety & Resource Pairing
@@ -106,6 +106,36 @@ finally
 
 ---
 
+## §3 — State Flag Safety
+
+Boolean flags (`_isLoading`, `_isFetching`) must be reset on ALL exit paths. A stuck flag permanently locks out functionality until app restart.
+
+- [ ] Every flag set `true` has a matching `false` in `finally`
+  - Grep: `grep -rn "_isLoading\|_isFetching\|_isProcessing" --include="*.cs"`
+  - Severity: 🔴 CRITICAL
+- [ ] No "Early Gatekeeper Bug": a caller must NOT set `_isFetching = true` before calling a method that also sets it — causes permanent lock-out
+- [ ] `forceRefresh` parameters bypass "Already Active" guards but respect cooldowns
+
+```csharp
+// ❌ BAD: flag stuck if exception
+_isFetching = true;
+var data = await LoadData(ct);
+_isFetching = false; // Never reached on exception!
+
+// ✅ GOOD: finally resets on ALL paths
+_isFetching = true;
+try
+{
+    var data = await LoadData(ct);
+    ProcessData(data);
+}
+catch (OperationCanceledException) { }
+catch (Exception e) { Debug.LogError($"Failed: {e.Message}"); }
+finally { _isFetching = false; }
+```
+
+---
+
 ## Verification Rules
 
 ### Event subscription symmetry
@@ -134,8 +164,7 @@ finally
 ---
 
 ## Related Skills
-- `@unity-state-safety` — State flag safety, race conditions, error handling
-- `@unity-crash-safety` — Null safety, lifecycle ordering, scene transitions
 - `@unity-async-patterns` — CancellationToken lifecycle, async guards
 - `@unity-dotween-safety` — DOTween kill and SetLink patterns
 - `@unity-ui-performance` — UI state safety and animation races
+- `@unity-csharp-standards` — Crash prevention, singleton guards, ANR prevention

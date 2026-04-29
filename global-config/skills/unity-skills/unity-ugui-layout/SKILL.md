@@ -279,3 +279,10 @@ Bottom-right fixed: anchorMin=(1,0)     anchorMax=(1,0)     pivot=(1,0)
 Full-stretch:       anchorMin=(0,0)     anchorMax=(1,1)     pivot=(0.5,0.5) sizeDelta=(0,0)
 Center-fixed:       anchorMin=(0.5,0.5) anchorMax=(0.5,0.5) pivot=(0.5,0.5)
 ```
+
+---
+
+## Related Skills
+- `@unity-ui-performance` — Canvas rebuild optimization, raycast target cleanup, scroll view recycling after layout is built
+- `@unity-mcp-ignore` — Button onClick persistent wiring, SerializeField assignment rules when modifying scenes/prefabs
+- `@unity-csharp-standards` — Naming conventions and coding rules for UI scripts
