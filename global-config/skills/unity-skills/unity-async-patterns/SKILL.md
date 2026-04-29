@@ -1,6 +1,6 @@
 ---
 name: unity-async-patterns
-description: "MANDATORY for ALL async code. Activate EVERY TIME you write, modify, generate, refactor, or review ANY code involving Coroutines, async/await, UniTask, CancellationToken, or asynchronous operations — no exceptions. This skill defines lifecycle safety, cancellation patterns, and threading rules that MUST be applied to every async implementation. Trigger keywords: 'async', 'await', 'coroutine', 'UniTask', 'CancellationToken', 'load async', 'parallel load', 'sequential operations', 'timeout pattern', 'async void', 'async Task', 'async UniTask', 'thread safety', 'background thread', 'Unity async'. If you are about to write or edit async code and have NOT loaded this skill, STOP and load it first."
+description: "Use when writing Unity async code: UniTask, CancellationToken, destroyCancellationToken, coroutine lifecycle, 'this == null' guard after await, async void prohibition, or CancellationTokenSource Cancel/Dispose/Recreate pattern."
 ---
 
 # Asynchronous Programming
@@ -260,23 +260,10 @@ public async void InitItem(ItemData itemData)
 ## Error Handling
 
 ### Try-Finally for UI Cleanup
-```csharp
-// ✅ Guaranteed cleanup on all paths
-public async UniTask Init(CancellationToken ct)
-{
-    loadingElement.ShowLoading();
-    try
-    {
-        var data = await LoadData().AttachExternalCancellation(ct);
-    }
-    catch (OperationCanceledException) { /* Silent */ }
-    catch (Exception e) { Debug.LogError($"Failed: {e.Message}"); }
-    finally
-    {
-        loadingElement.HideLoading();  // ALWAYS runs
-    }
-}
-```
+
+> Full ShowLoading/HideLoading pattern → see `@unity-event-safety` §2 Resource Pairing Principle.
+
+Key rule: `ShowLoading()` must ALWAYS have `HideLoading()` in a `finally` block — applies on success, failure, cancellation, and early return.
 
 ### Fire-and-Forget Safety
 ```csharp

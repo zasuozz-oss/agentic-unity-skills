@@ -1,6 +1,6 @@
 ---
 name: unity-qa-parser
-description: "QA feature analysis specialist. Use when the user parses feature documents, analyzes source code for testability, extracts test scenarios from existing codebase, or creates structured feature plans. Also trigger for: 'parse this feature', 'analyze code for QA', 'extract edge cases from code', 'create feature plan', or any request to convert documents or code into structured QA input."
+description: Use when turning QA documents, feature specs, acceptance criteria, screenshots, or Unity code into structured feature plans and testable requirements.
 ---
 
 # QA Document & Code Parser

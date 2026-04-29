@@ -1,72 +1,85 @@
 # Test Cases — Unity Skills
 
-Manual and automated test cases for verifying Unity skills setup.
+Test thủ công và tự động để xác minh cơ chế cài Unity project skills.
 
 ---
 
-## 🔵 Automated Tests
+## Automated Tests
 
-Run `bash tests/run-tests.sh` to execute the automated test suite.
+Chạy `bash tests/run-tests.sh` để thực thi test suite.
 
-### TC-01: Fresh Install — Flat Structure
-- Skills directory `.agents/skills/` created
-- Skills installed flat (no nested group folders)
-- 12+ skills installed (SKILL.md present)
+Suite sẽ build local CLI trước, tạo một skill test tạm dưới `global-config/skills`, sau đó kiểm tra hành vi `ag-unity init` thông qua `node dist/cli/index.js init` trong các project tạm.
+
+### TC-00: Build Surface
+- `dist/cli/index.js` được generate và có quyền executable
+- `package.json` expose `ag-unity` qua `dist/cli/index.js`
+- `setup.sh` tồn tại và pass shell syntax check
+- Lệnh `version` và `list` hoạt động
+- `list` tự phát hiện skill trong nhóm mới dưới `global-config`
+
+### TC-01: Fresh Project Init — Project Skill Targets
+- Tạo project skill directories:
+- `.agents/skills/` cho Antigravity/Codex
+- `.claude/skills/`
+- Skills được cài flat trong từng target
+- Số skill cài ra bằng số `SKILL.md` được tìm thấy dưới `global-config`
+- Không ghi global skills dưới `$HOME`
+- Không tạo `.codex/skills/`
 
 ### TC-02: YAML Frontmatter Validation
-- All skills have `name` + `description` in YAML frontmatter
-- No extra YAML fields
+- Mọi skill có `name` và `description` trong YAML frontmatter
+- Mọi `description` bắt đầu bằng `Use when` để agent detect đúng trigger
+- Không có extra YAML fields
 
 ### TC-03: Idempotent — No Duplication
-- Re-running install doesn't duplicate skills
-- Skill count unchanged after re-run
+- Chạy lại install không nhân bản skill
+- Skill count giữ nguyên sau khi chạy lại
 
 ### TC-04: Existing Project — No Side Effects
-- Existing GEMINI.md untouched
-- Skills installed alongside existing files
+- `GEMINI.md` có sẵn không bị sửa
+- Skills được cài bên cạnh file sẵn có
 
-### TC-05: All Skills Have SKILL.md
-- Every skill directory contains a SKILL.md file
+### TC-05: Manifest File
+- `.ag-unity-manifest.json` có package, version, installed_at, skills, groups
 
-### TC-06: Manifest File
-- `.ag-manifest.json` exists with version, installed_at, groups, workflows
+### TC-06: Legacy Migration
+- Old group folders (`unity-skills/`, `qa-skills/`, nhóm mới) bị xóa trong lúc install
+- Skills được migrate sang flat structure
+- Skill cũ từng do manifest quản lý nhưng không còn trong `global-config` bị xóa
 
-### TC-07: Legacy Migration
-- Old group folders (`unity-skills/`, `qa-skills/`) removed during install
-- Skills migrated to flat structure
-
-### TC-08: Workflow Installation
-- Workflows directory `.agents/workflows/` created
-- `build-ui-mcp.md`, `verify-assets.md`, `verify-code.md` installed
-- Workflow count unchanged after re-run
+### TC-07: init Argument Rejection
+- `ag-unity init <path>` exit non-zero
+- Error hướng dẫn user `cd` vào project rồi chạy `ag-unity init`
 
 ---
 
-## 🟢 Manual Skill Loading Tests
+## Manual Skill Loading Tests
 
 ### TC-09: Skills Auto-Load
-**Prompt:** Open Antigravity in a project after setup, ask "what Unity skills do you have?"
+**Prompt:** Mở Antigravity trong project sau setup, hỏi "what Unity skills do you have?"
+
 **Expected:**
-- Agent references INDEX.md
-- Agent can list Unity skill categories
+- Agent reference `INDEX.md`
+- Agent list được Unity skill categories
 
 ### TC-10: Skill Invocation
 **Prompt:** "I need help with DOTween safety in Unity"
+
 **Expected:**
-- Agent reads `dotween-safety/SKILL.md`
-- Response uses skill's patterns and recommendations
+- Agent đọc `unity-dotween-safety/SKILL.md`
+- Response dùng patterns và recommendations trong skill
 
 ---
 
 ## Verification Checklist
 
-- [ ] TC-01: Fresh setup works (automated)
+- [ ] TC-00: Build surface works (automated)
+- [ ] TC-01: Fresh project init works (automated)
 - [ ] TC-02: YAML frontmatter valid (automated)
 - [ ] TC-03: Idempotent re-run (automated)
 - [ ] TC-04: No side effects (automated)
-- [ ] TC-05: All skills have SKILL.md (automated)
-- [ ] TC-06: Manifest file valid (automated)
-- [ ] TC-07: Legacy migration works (automated)
-- [ ] TC-08: Workflow installation (automated)
+- [ ] TC-05: Manifest file valid (automated)
+- [ ] TC-06: Legacy migration works (automated)
+- [ ] TC-07: Path argument rejection works (automated)
 - [ ] TC-09: Skills auto-load in Antigravity
 - [ ] TC-10: Skill invocation works

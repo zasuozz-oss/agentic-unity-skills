@@ -1,6 +1,6 @@
 ---
 name: unity-addressables
-description: "MANDATORY for ALL Addressables usage. Activate EVERY TIME you write, modify, generate, refactor, or review ANY code involving Addressables, async asset loading, AssetReference, memory management, remote content, or asset bundles — no exceptions. This skill defines load/release patterns, lifecycle safety, and memory-safe patterns that MUST be applied to every Addressables implementation. Trigger keywords: 'Addressables', 'AssetReference', 'load async', 'release asset', 'download content', 'memory leak', 'asset bundle', 'runtime load', 'Resources.Load alternative', 'asset management'. If you are about to write or edit Addressables code and have NOT loaded this skill, STOP and load it first."
+description: "Use when loading Unity assets at runtime: Addressables.LoadAssetAsync, AssetReference, AsyncOperationHandle release, InstantiateAsync, preload by label, or migrating from Resources.Load."
 ---
 
 # Addressables Asset Management
@@ -177,5 +177,22 @@ public class LevelPreloader : MonoBehaviour
 }
 ```
 
+## Memory Management & Resources Migration
+
+Rules for migrating from `Resources.Load` and managing asset memory across scene transitions.
+
+- [ ] Do NOT use the `Resources` folder — migrate all assets to Addressables
+  - Grep: `grep -rn "Resources\.Load" --include="*.cs"`
+  - Severity: 🟡 HIGH
+- [ ] Call `Resources.UnloadUnusedAssets()` after scene transitions when still using Resources — aware it causes a hitch
+- [ ] Properly unload Addressables handles when leaving a scene — `Addressables.Release(handle)` in `OnDestroy`
+- [ ] Event cleanup in `OnDestroy` → see `@unity-event-safety` §1 Event Subscription Symmetry
+- [ ] Enable Incremental GC: Project Settings → Player → Other Settings → Use Incremental GC `[EDITOR-ONLY]`
+- [ ] Take Memory Profiler snapshots before and after scene transitions to detect unreleased handles `[EDITOR-ONLY]`
+
+---
+
 ## Related Skills
-- `@unity-csharp-standards` - Performance optimization and mobile asset loading strategies
+- `@unity-csharp-standards` - Hot-path rules, GC reduction, object pooling
+- `@unity-crash-safety` - Memory leak prevention, static collection cleanup
+- `@unity-event-safety` - Event subscription cleanup in OnDestroy

@@ -1,6 +1,6 @@
 ---
 name: unity-asset-audit
-description: "ASSET-LEVEL performance audit checklist. Activate when auditing Unity project assets — rendering settings, batching, materials, textures, models, audio, UI canvas setup, overdraw, memory budgets, and mobile-specific configurations. For C# CODE review, use unity-csharp-standards or unity-code-audit instead. Trigger keywords: 'asset audit', 'texture optimization', 'draw calls', 'rendering settings', 'batching', 'materials', 'models', 'audio settings', 'overdraw', 'memory budget', 'LOD', 'mesh optimization', 'import settings', 'SRP Batcher', 'build size'."
+description: "Use when auditing Unity asset import settings: texture compression (ASTC/PVRTC), audio format, mesh read/write, material shader selection, sprite atlas packing, or model import optimization."
 ---
 
 # Asset Verify Checklist — Unity Performance
@@ -453,5 +453,4 @@ Draw calls from UI: 89 (budget: < 50) — ⚠️ OVER BUDGET
 
 ## Related Skills
 - `@unity-ui-performance` — UI performance optimization and state safety
-- `@unity-code-audit` — C# code audit for scripts (performance + logic)
 - `@unity-addressables` — Asset loading and memory-safe release patterns

@@ -1,16 +1,24 @@
 {
   "name": "ag-unity",
   "version": "5.2.0",
-  "description": "Unity skills for Antigravity AI agent — Install 14 skills (10 Unity + 4 QA) into any project",
+  "description": "Unity project skills for Antigravity, Claude Code, and Codex",
   "type": "module",
   "bin": {
-    "ag-unity": "bin/cli.mjs"
+    "ag-unity": "dist/cli/index.js"
   },
   "files": [
-    "bin/",
+    "dist/",
+    "src/",
     "global-config/",
-    "scripts/"
+    "scripts/",
+    "setup.sh"
   ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "bash tests/run-tests.sh",
+    "prepare": "node scripts/build.js",
+    "prepack": "node scripts/build.js"
+  },
   "keywords": [
     "unity",
     "antigravity",

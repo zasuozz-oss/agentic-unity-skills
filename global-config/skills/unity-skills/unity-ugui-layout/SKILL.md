@@ -1,12 +1,6 @@
 ---
-name: ugui-layout
-description: >
-  Rules for building responsive uGUI layouts in Unity.
-  Triggers on: Canvas, RectTransform, anchor, Layout Group, Content Size Fitter,
-  VerticalLayoutGroup, HorizontalLayoutGroup, GridLayoutGroup, sizeDelta,
-  anchoredPosition, pivot, UGUI, UI element, responsive UI, screen size,
-  TextMeshPro, TMP, text, font size, label, heading.
-  Use this skill for EVERY uGUI component — especially TMP Text elements.
+name: unity-ugui-layout
+description: "Use when building Unity uGUI layout: Canvas Scaler reference resolution, RectTransform anchors/pivot, Layout Group child rules, ContentSizeFitter constraints, TMP font sizing, UILayoutSpec constants, or safe area initial setup."
 ---
 
 # uGUI Responsive Layout — Agent Rules

@@ -1,6 +1,6 @@
 ---
 name: unity-editor-tools
-description: "Unity Editor scripting specialist. Use this when the user creates custom Editor windows, PropertyDrawers, custom inspectors, SceneView tools, editor menus, or editor automation. Also trigger for: 'custom inspector', 'editor window', 'property drawer', 'context menu', 'editor tool', 'scene gizmos', or any question about extending the Unity Editor — even if they don't say 'editor scripting'."
+description: "Use ONLY when user explicitly requests Unity Editor tooling: EditorWindow, CustomEditor, PropertyDrawer, MenuItem, SceneView overlays, SerializedObject, or asset pipeline automation."
 ---
 
 # Custom Editor Scripting

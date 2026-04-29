@@ -1,160 +1,151 @@
 # Antigravity Unity Skills
 
-14 Unity-specific skills for game development with Google Antigravity. Install skills directly into any Unity project.
+Project skills for Unity game development with Antigravity, Claude Code, and Codex. Build the `ag-unity` CLI locally once, then install skills directly into each Unity project.
 
-> **📦 Public, read-only repository.** Install via npm or clone and run setup.
+> Local build/link workflow. This repo does not install global skills.
 
-🌐 [Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Full Skill List](global-config/skills/unity-skills/INDEX.md)
+[Quick Start](#-quick-start) · [What's Inside](#-whats-inside) · [Skill Index](global-config/skills/unity-skills/INDEX.md)
 
-## 📋 Requirements
+## Requirements
 
-- [Google Antigravity](https://antigravity.google) (macOS / Windows / Linux)
+- Google Antigravity, Claude Code, or Codex
 - Node.js 18+
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-```bash
-cd /path/to/your/unity-project
-npx ag-unity
-```
-
-That's it. 14 skills installed.
-
-<details>
-<summary>Alternative: Clone + Run</summary>
+Build and link the CLI from this repo:
 
 ```bash
 git clone https://github.com/zasuozz-oss/antigravity-unity-skills.git ~/AI-Tool/antigravity-unity-skills
-cd /path/to/your/unity-project
-node ~/AI-Tool/antigravity-unity-skills/bin/cli.mjs
+cd ~/AI-Tool/antigravity-unity-skills
+./setup.sh
 ```
 
-> ⚠️ Replace `/path/to/your/unity-project` with your actual Unity project path.
-
-</details>
-
-### What Happens After Setup
-
-```
-your-project/
-└── .agents/
-    ├── skills/                # All skills installed flat here
-    │   ├── unity-addressables/
-    │   ├── unity-code-audit/
-    │   ├── unity-csharp-standards/
-    │   ├── unity-qa-parser/
-    │   ├── ...
-    │   └── .ag-manifest.json  # Tracks group membership
-    └── workflows/             # Workflow files
-        ├── build-ui-mcp.md
-        ├── verify-assets.md
-        └── verify-code.md
-```
-
-Skills auto-trigger via YAML frontmatter `description` field — no `GEMINI.md` configuration needed.
-
----
-
-## 🎯 What Is This?
-
-A collection of **14 Unity-specific skills** organized by category, designed to extend Google Antigravity with deep Unity game development knowledge.
-
-Key features:
-- ✅ **One-command install** — `npx ag-unity` from any project
-- ✅ **Self-triggering** — skills activate via YAML frontmatter, no manual config
-- ✅ **Project-level install** — skills live in your project's `.agents/skills/`
-- ✅ **Cross-platform** — pure Node.js, no bash/powershell dependency
-- ✅ **Backup on update** — existing skills backed up before overwrite
-
----
-
-## 📚 What's Inside
-
-**14 skills** across **2 groups**:
-
-### Unity Skills (10)
-
-| Category | Skills | Description |
-|----------|--------|-------------|
-| Architecture | 1 | Async/await, Coroutines, UniTask, lifecycle safety |
-| UI & UX | 2 | Canvas rebuild, overdraw, raycast, state safety, responsive |
-| Performance | 1 | Addressables async loading, memory-safe release |
-| Safety | 1 | DOTween lifecycle, SetLink, kill patterns, leak prevention |
-| Tools & Standards | 2 | C# conventions, editor scripting |
-| Audit & Verification | 2 | Asset audit, comprehensive code audit (screen + deep modes) |
-
-### QA Skills (4)
-
-| Skill | Description |
-|-------|-------------|
-| unity-qa-parser | Parse QA documents |
-| unity-qa-generator | Generate test cases |
-| unity-qa-verifier | Verify test results |
-| unity-qa-scorer | Score test quality |
-
-👉 See [INDEX.md](global-config/skills/unity-skills/INDEX.md) for the complete Unity skill list with descriptions.
-
----
-
-## 🔄 Updating Skills
+Then run in the root of your Unity project:
 
 ```bash
 cd /path/to/your/unity-project
-npx ag-unity
+ag-unity init
 ```
 
-Re-running the command updates skills. Existing skills are automatically backed up.
+`ag-unity init` always uses the current working directory. This command does not accept a project path argument.
+
+### After Init
+
+```text
+your-project/
+├── .agents/
+│   └── skills/                 # Project skills for Antigravity and Codex
+│       ├── unity-addressables/
+│       ├── unity-code-audit/
+│       ├── unity-csharp-standards/
+│       ├── unity-qa-parser/
+│       ├── ...
+│       └── .ag-unity-manifest.json
+└── .claude/
+    └── skills/                 # Project skills for Claude Code
+        └── ...
+```
+
+Skills auto-activate via YAML frontmatter `description`. The installer does not create `GEMINI.md`, `.codex/skills`, nor write to `~/.codex`, `~/.claude`, or `~/.gemini`.
 
 ---
 
-## 📁 Repo Structure
+## What Is This?
 
+A set of **Unity project skills** organized by group under `global-config`, giving AI coding agents specialized context when working with Unity.
+
+Key features:
+
+- **Local build/link workflow**: build once, use `ag-unity` across all projects
+- **Project-level install**: skills live inside the current project's agent folders
+- **Multi-agent project skills**: installs to `.agents/skills/` for Antigravity/Codex and `.claude/skills/` for Claude Code
+- **Dynamic skill discovery**: copies every skill with a `SKILL.md` under `global-config` — no CLI changes needed when adding or splitting skill groups
+- **Self-triggering**: skills activate via YAML frontmatter, no manual config required
+- **Cross-platform**: pure Node.js, no bash/powershell dependency
+- **Idempotent update**: re-running `ag-unity init` replaces managed skills without duplication
+
+---
+
+## What's Inside
+
+The CLI automatically scans `global-config/**/SKILL.md` and installs them flat into the project. This means you can split groups or add new skills under `global-config/skills/<group>/<skill>/SKILL.md` without modifying the CLI.
+
+Current groups include `unity-skills` for Unity advisory skills and `qa-skills` for QA workflow skills. Run `ag-unity list` to see the current packaged skills. See [INDEX.md](global-config/skills/unity-skills/INDEX.md) for the Unity skills group.
+
+---
+
+## Updating Skills
+
+```bash
+cd ~/AI-Tool/antigravity-unity-skills
+git pull
+./setup.sh
+
+cd /path/to/your/unity-project
+ag-unity init
 ```
+
+Re-running `ag-unity init` updates managed skills without creating duplicates.
+
+---
+
+## CLI Commands
+
+```bash
+ag-unity init       # Install project skills into current project
+ag-unity list       # List packaged skills
+ag-unity version    # Show package version
+ag-unity help       # Show help
+```
+
+---
+
+## Repo Structure
+
+```text
 antigravity-unity-skills/
 ├── package.json             # npm package config
-├── bin/
-│   └── cli.mjs              # Cross-platform CLI (ESM)
+├── setup.sh                 # Autosetup: build + npm link ag-unity
+├── src/
+│   └── cli/
+│       └── index.js         # CLI source
+├── scripts/
+│   └── build.js             # Build dist/cli/index.js
+├── dist/
+│   └── cli/
+│       └── index.js         # Generated CLI used by ag-unity
 ├── global-config/
-│   ├── skills/              # Source skills (grouped)
-│   │   ├── unity-skills/    # 10 Unity skills
-│   │   └── qa-skills/       # 4 QA skills
-│   └── workflow/            # Source workflows
-│       ├── build-ui-mcp.md
-│       ├── verify-assets.md
-│       └── verify-code.md
+│   └── skills/              # Source skills by group
+│       ├── unity-skills/
+│       ├── qa-skills/
+│       └── ...              # New groups are auto-discovered by CLI
 ├── docs/                    # Source references
-│   ├── SOURCES.md           # Skill → source mapping
-│   ├── unity/               # Unity performance docs
-│   └── agent-qa/            # QA system design docs
 ├── tests/
-│   └── run-tests.sh         # Automated test suite (48 tests)
+│   └── run-tests.sh         # Automated test suite
 └── CHANGELOG.md
 ```
 
 ---
 
-## 🤝 Works With Superpowers
+## Works With Superpowers
 
-This extension is **independent** of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers), but they work great together.
+This extension is independent of [antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers), but works well alongside it.
 
 ---
 
-## 🔗 Links
+## Links
 
-- **npm:** [ag-unity](https://www.npmjs.com/package/ag-unity)
-- **Superpowers (core skills):** [zasuozz-oss/antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
-- **Google Antigravity:** [antigravity.google](https://antigravity.google)
+- npm: [ag-unity](https://www.npmjs.com/package/ag-unity)
+- Superpowers: [zasuozz-oss/antigravity-superpowers](https://github.com/zasuozz-oss/antigravity-superpowers)
+- Google Antigravity: [antigravity.google](https://antigravity.google)
 
-## 🙏 Credits
+## Credits
 
 Advisory skills adapted from [Besty0728/Unity-Skills](https://github.com/Besty0728/Unity-Skills) (MIT License).
 
-## 📝 License
+## License
 
 MIT
-
----
-
-**Last Updated:** 2026-03-20

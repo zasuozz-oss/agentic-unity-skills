@@ -1,6 +1,6 @@
 ---
 name: unity-dotween-safety
-description: "DOTween lifecycle and memory safety specialist. Use this when the user creates tweens, animates UI, reviews DOTween usage, or investigates tween leaks. Also trigger for: 'DOTween leak', 'tween not killed', 'SetLink', 'DOTween object leak warning', 'animation plays after destroy', 'tween fire-and-forget', 'DOTween.To leaking', or any question about DOTween cleanup — even if they don't say 'DOTween'."
+description: "Use when writing DOTween code: SetLink on every tween, Sequence SetTarget, DOKill before reset, looping tween cleanup, tween in OnDestroy prevention, or DOTween leak warnings."
 ---
 
 # DOTween Safety

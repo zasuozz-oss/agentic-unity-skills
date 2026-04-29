@@ -1,6 +1,6 @@
 ---
 name: unity-qa-scorer
-description: "QA test quality scoring specialist. Use when the user scores test case quality, generates QA score reports, evaluates test suite coverage, or produces sprint-end QA summaries. Also trigger for: 'score test cases', 'quality report', 'TC scoring', 'test coverage score', or any request to evaluate test quality with the 4-criteria scoring system."
+description: Use when scoring QA test quality, coverage, risk, ambiguity, or readiness before accepting a Unity feature test suite.
 ---
 
 # QA Test Scorer

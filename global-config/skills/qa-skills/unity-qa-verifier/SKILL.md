@@ -1,6 +1,6 @@
 ---
 name: unity-qa-verifier
-description: "QA test result classification specialist. Use when the user classifies test results from NUnit/PHPUnit logs, analyzes pass/fail status, identifies flaky tests, or processes test output for QA reports. Also trigger for: 'verify test results', 'classify test log', 'which tests passed', 'analyze test output', or any request to categorize test results into pass/fail/manual/skip/flaky."
+description: Use when classifying QA execution results, comparing expected versus actual behavior, or turning Unity test evidence into pass/fail/blocked findings.
 ---
 
 # QA Test Verifier

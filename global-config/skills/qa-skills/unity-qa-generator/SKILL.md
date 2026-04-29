@@ -1,6 +1,6 @@
 ---
 name: unity-qa-generator
-description: "QA test case generation specialist. Use when the user generates test cases from feature plans or source code, creates NUnit/PHPUnit test code, builds test suites for mobile game features, or converts feature specs into structured TCs. Also trigger for: 'generate test cases', 'create TCs', 'NUnit from spec', 'PHPUnit tests', 'TC-AUTH', or any request to produce test cases with scoring."
+description: Use when generating QA test cases, edge cases, regression checks, or Unity feature test matrices from a parsed feature plan or requirements.
 ---
 
 # QA Test Case Generator

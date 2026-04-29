@@ -1,15 +1,16 @@
 ---
 name: unity-csharp-standards
-description: "MANDATORY for ALL C# work in Unity. Real-time coding guidance covering three pillars: (1) C# naming/casing/formatting conventions, (2) script design review — responsibility, coupling, lifecycle safety, role assignment, and (3) mobile & general performance optimization — GC, hot-path, caching, battery, frame rate. For systematic script AUDIT with checklist, use unity-code-audit instead. Trigger for: 'create script', 'new MonoBehaviour', 'review this script', 'is this class too big', 'code smell', 'naming convention', 'how to optimize', 'game runs slow', 'frame drops', 'GC spikes', or any C# quality/performance question."
+description: "Use when writing Unity C# code: naming conventions (_camelCase, PascalCase), [SerializeField] usage, Allman brace style, hot-path allocation rules, object pooling, mobile frame budget, or CompareTag/sqrMagnitude patterns."
 ---
 
 # C# Quality Skill (Unity 6)
 
-Covers **three pillars** of C# quality for Unity mobile development:
+Covers **two pillars** of C# quality for Unity mobile development:
 
 1. **Conventions** — naming, casing, formatting, serialization
-2. **Design Review** — responsibility, coupling, lifecycle, testability, role assignment
-3. **Performance** — mobile budgets, hot-path rules, allocation reduction, platform specifics
+2. **Performance** — mobile budgets, hot-path rules, allocation reduction, platform specifics
+
+> For script **Design Review** (responsibility, coupling, role assignment, God class decomposition) → use `unity-script-design-review`.
 
 ---
 
@@ -154,62 +155,7 @@ private List<Item> _inventoryItems;
 
 ---
 
-## Part 2 — Script Design Review
-
-### Review Checklist
-
-#### 1. Responsibility
-- Does the script have one clear reason to change?
-- Is the class name accurate to what it actually does?
-- Could any method live in a different class?
-
-#### 2. Coupling
-- Are dependencies injected or hard-wired?
-- Does this script use `Find`, `GetComponent` in Update loops?
-- How many other scripts does this one know about?
-
-#### 3. Lifecycle Safety
-- Are event subscriptions symmetric (OnEnable/OnDisable)?
-- Are coroutines stopped in OnDisable/OnDestroy?
-- Are async operations guarded against destroyed objects?
-
-#### 4. Inspector UX
-- Are fields organized with `[Header]` and `[Tooltip]`?
-- Are tuning values constrained with `[Range]` or `[Min]`?
-- Will another developer understand this from Inspector alone?
-
-#### 5. Testability
-- Can core logic run without Unity APIs?
-- Can config be injected instead of hardcoded?
-- Is the script thin enough to not need tests itself?
-
-### Role Assignment Guide
-
-Before creating a batch of scripts, assign explicit roles so AI does not generate everything as MonoBehaviour.
-
-| Role | When to Use |
-|------|-------------|
-| **MonoBehaviour bridge** | Needs Transform, collisions, or Unity lifecycle |
-| **ScriptableObject config** | Authored data, shared between instances |
-| **Pure C# service** | Stateless logic, testable without Unity |
-| **Presenter / Controller** | Bridges domain logic to UI or visuals |
-| **State / FSM node** | Discrete state in a state machine |
-| **Installer / Bootstrap** | Scene setup, dependency wiring |
-
-### Guardrails
-- Do not make every class a MonoBehaviour
-- Do not force ScriptableObject onto runtime mutable state
-- Prefer the simplest role that satisfies the requirement
-
-### Output Format (Design Review)
-- Responsibility verdict
-- Top 3 concerns
-- Suggested changes (ranked by impact)
-- What's already good (reinforce)
-
----
-
-## Part 3 — Mobile & Performance Optimization
+## Part 2 — Mobile & Performance Optimization
 
 ### Mobile Performance Budget
 
@@ -253,10 +199,67 @@ Before creating a batch of scripts, assign explicit roles so AI does not generat
 - ✅ Use `StringBuilder` for string building in loops
 - ✅ Replace `foreach` with `for` on non-List collections
 - ✅ Cache delegates/lambdas as fields
+- ✅ Use non-allocating Physics APIs: `RaycastNonAlloc`, `OverlapSphereNonAlloc`
+- ✅ Use `CompareTag()` instead of `tag == "string"` (avoids string alloc)
+- ✅ Use generic collections (`List<T>`, `Dictionary<K,V>`) — never `ArrayList`/`Hashtable` (boxing)
+- ✅ Use `sqrMagnitude` instead of `Vector3.Distance` (avoids sqrt)
+- ❌ **NEVER** allocate new arrays/lists per-frame — pre-allocate buffers
+
+#### Update Loop Scale
+- Replace per-object `Update()` with a custom `UpdateManager` / `BatchUpdate` for 10+ entities
+- Use `CullingGroups` to pause subsystems for off-screen objects
+- Keep per-frame heap allocations under 32 bytes
 
 #### Event-Driven vs Polling
 - Replace `Update()` checks with C# Events or `UnityEvent` triggers
 - If polling is required, use timer throttling
+
+---
+
+### Object Pooling Rules
+
+Pooling prevents GC pressure from frequent `Instantiate`/`Destroy`. Apply when objects are spawned more than 5 times per minute.
+
+- [ ] Pre-warm pools during loading screens — never during gameplay
+  - Grep: `grep -rn "Instantiate(" --include="*.cs"` — flag calls outside loading context
+  - Severity: 🟡 HIGH
+- [ ] Set max pool size to prevent unbounded memory growth
+- [ ] Use `IPoolable` interface (`OnSpawn`/`OnDespawn`) to reset objects before reuse
+- [ ] Return to pool via `SetActive(false)` — never `Destroy()`
+  - Grep: `grep -rn "Destroy(" --include="*.cs" | grep -v "OnDestroy\|DontDestroy"`
+  - Severity: 🟡 HIGH
+- [ ] Always reset ALL state before reuse (position, scale, references, timers, flags)
+- [ ] Use Unity's built-in `ObjectPool<T>` for plain C# (non-MonoBehaviour) objects
+- [ ] Do NOT pool objects spawned fewer than 5 times/minute — overhead exceeds benefit
+
+```csharp
+// ✅ IPoolable pattern
+public interface IPoolable
+{
+    void OnSpawn();
+    void OnDespawn();
+}
+
+public class BulletPool : MonoBehaviour
+{
+    private readonly Queue<Bullet> _pool = new();
+
+    public Bullet Get()
+    {
+        var bullet = _pool.Count > 0 ? _pool.Dequeue() : Instantiate(_prefab);
+        bullet.gameObject.SetActive(true);
+        bullet.OnSpawn();
+        return bullet;
+    }
+
+    public void Return(Bullet bullet)
+    {
+        bullet.OnDespawn();
+        bullet.gameObject.SetActive(false);
+        _pool.Enqueue(bullet);
+    }
+}
+```
 
 ### Platform-Specific
 
@@ -313,70 +316,7 @@ public class HealthManager : MonoBehaviour
 }
 ```
 
-### Example 2: God Class Decomposition (Design Review)
-**User**: "Review this GameManager — it's 500 lines."
-
-**Agent**:
-```csharp
-// ❌ BEFORE: God class with 4+ responsibilities
-public class GameManager : MonoBehaviour
-{
-    // Manages score, spawns enemies, plays audio, handles UI, saves game
-    public void AddScore(int pts) { }
-    public void SpawnEnemy() { }
-    public void PlaySFX(AudioClip clip) { }
-    public void ShowGameOverUI() { }
-    public void SaveProgress() { }
-}
-
-// ✅ AFTER: Single responsibility per class
-public class ScoreManager : MonoBehaviour
-{
-    private int _score;
-    public event Action<int> OnScoreChanged;
-    public void AddScore(int pts)
-    {
-        _score += pts;
-        OnScoreChanged?.Invoke(_score);
-    }
-}
-
-// EnemySpawner, AudioManager, GameOverUI, SaveManager — each separate
-```
-
-### Example 3: Lifecycle Safety Violation (Design Review)
-**User**: "This script leaks events."
-
-**Agent**:
-```csharp
-// ❌ BEFORE: Asymmetric subscription — subscribe in Start, never unsubscribe
-public class HUDController : MonoBehaviour
-{
-    void Start()
-    {
-        PlayerHealth.OnDamaged += UpdateHealthBar;
-    }
-    // Missing OnDisable/OnDestroy — memory leak + ghost listener!
-}
-
-// ✅ AFTER: Symmetric subscribe/unsubscribe in OnEnable/OnDisable
-public class HUDController : MonoBehaviour
-{
-    private void OnEnable()
-    {
-        PlayerHealth.OnDamaged += UpdateHealthBar;
-    }
-
-    private void OnDisable()
-    {
-        PlayerHealth.OnDamaged -= UpdateHealthBar;
-    }
-
-    private void UpdateHealthBar(float health) { /* ... */ }
-}
-```
-
-### Example 4: Adaptive Quality System (Performance)
+### Example 2: Adaptive Quality System (Performance)
 **User**: "Auto-adjust quality based on device."
 
 **Agent**:
@@ -450,7 +390,7 @@ public class AdaptiveQuality : MonoBehaviour
 }
 ```
 
-### Example 5: Conditional Debug Logging (Performance)
+### Example 3: Conditional Debug Logging (Performance)
 **User**: "Remove Debug.Log from release builds."
 
 **Agent**:
@@ -486,8 +426,8 @@ public static class GameLog
 ---
 
 ## Related Skills
+- `@unity-script-design-review` - Script design review: responsibility, coupling, role assignment
 - `@unity-addressables` - Asset management and memory-safe release
-- `@unity-ui-performance` - UI rendering, state safety, responsive design
+- `@unity-ui-performance` - UI canvas performance and state safety
 - `@unity-dotween-safety` - DOTween lifecycle and memory patterns
 - `@unity-async-patterns` - Async/await lifecycle and cancellation
-- `@unity-code-audit` - Full C# audit checklist with verification rules

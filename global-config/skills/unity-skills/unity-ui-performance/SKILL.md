@@ -1,6 +1,6 @@
 ---
 name: unity-ui-performance
-description: "MANDATORY for ALL UI work. Activate EVERY TIME you create, modify, generate, refactor, or review ANY Unity UI code — no exceptions. Covers rendering performance (canvas rebuild, overdraw, raycast, batching), state safety (flicker, race conditions, resource pairing), AND responsive design (safe area, multi-device, Canvas Scaler). Trigger keywords: 'UI lag', 'canvas rebuild', 'raycast target', 'UI flicker', 'animation fighting', 'tab spam', 'panel stuck', 'scroll stutter', 'draw calls', 'loading spinner stuck', 'UI state', 'safe area', 'notch', 'responsive', 'screen size', 'aspect ratio', 'Canvas Scaler', 'multi-device'. If you are about to write UI code and have NOT loaded this skill, STOP and load it first."
+description: "Use when optimizing Unity UI runtime performance: Canvas rebuild spikes, draw call reduction, raycast target cleanup, scroll view recycling, tab/panel animation races, or Canvas split strategy."
 ---
 
 # UI Optimization
@@ -107,35 +107,9 @@ public class RaycastTargetOptimizer : MonoBehaviour
 ### Example 3: Resource Pairing (Loading Indicator)
 **User**: "Loading spinner never disappears when API fails."
 
-**Agent**:
-```csharp
-// ❌ BEFORE: HideLoading only on success path
-public async UniTask Init()
-{
-    loadingElement.ShowLoading();
-    var data = await LoadData();
-    loadingElement.HideLoading();  // Never reached if exception!
-}
+> Full ShowLoading/HideLoading patterns → see `@unity-event-safety` §2 Resource Pairing Principle
 
-// ✅ AFTER: finally guarantees cleanup on ALL paths
-public async UniTask Init(CancellationToken ct)
-{
-    loadingElement.ShowLoading();
-    try
-    {
-        var data = await LoadData().AttachExternalCancellation(ct);
-        ProcessData(data);
-    }
-    catch (OperationCanceledException) { }
-    catch (Exception e)
-    {
-        Debug.LogError($"[Init] Failed: {e.Message}");
-    }
-    finally
-    {
-        loadingElement.HideLoading();  // GUARANTEED on all paths
-    }
-}
+**Key rule**: `ShowLoading()` must ALWAYS have `HideLoading()` in a `finally` block — never rely on success path alone.
 ```
 
 ### Example 4: Tab Switching Spam Protection
@@ -198,11 +172,15 @@ void ClosePanel()
 }
 ```
 
-### Example 6: Safe Area Handler (Notch)
-**User**: "Handle notch on mobile."
+### Example 6: Safe Area Handler (Notch — Orientation Change Support)
+**User**: "Handle notch on mobile with orientation change support."
+
+> For static safe area (no orientation change): use `UILayoutSpec.ApplySafeArea(rt)` in `Start()` — see `@unity-ugui-layout`.
+> Use this MonoBehaviour pattern only when the app supports runtime orientation changes.
 
 **Agent**:
 ```csharp
+// Use only when orientation changes at runtime — polls Screen.safeArea in Update
 public class CanvasSafeArea : MonoBehaviour
 {
     [SerializeField] private RectTransform _safeAreaRect;
@@ -233,6 +211,31 @@ public class CanvasSafeArea : MonoBehaviour
     }
 }
 ```
+
+## UI Code Patterns (Script-level)
+
+Rules for C# code that interacts with the UI system at runtime.
+
+- [ ] Change material color via script (`material.color = ...`) instead of swapping sprites for color variations
+- [ ] Disable auto-layout components (`ContentSizeFitter`, `LayoutElement`, layout groups) on **static containers** once layout is finalized — they recalculate every frame unnecessarily
+  - Keep enabled on dynamic containers (scroll view Content, text that grows with input, runtime-populated lists)
+  - Disable on fixed-size containers that only lay out once at startup
+  - Grep: `grep -rn "ContentSizeFitter\|LayoutElement\|HorizontalLayoutGroup\|VerticalLayoutGroup\|GridLayoutGroup" --include="*.cs"`
+  - Severity: 🟡 HIGH
+- [ ] Avoid per-frame property changes on UI components (`RectTransform`, colors, sprites, text) — they trigger canvas rebuilds
+- [ ] Update `text` property only when value actually changes — compare old vs new before assigning `myText.text`
+- [ ] Flatten complex/deeply nested UI hierarchies — many layout components cascading is CPU-intensive
+- [ ] Unique materials break batching — even slight `_Color` variation on identical materials increases draw calls
+- [ ] `MaterialPropertyBlock` breaks SRP Batcher in URP/HDRP — use Material Variants or texture atlases instead
+  - Grep: `grep -rn "MaterialPropertyBlock" --include="*.cs"`
+  - Severity: 🟡 HIGH
+- [ ] Prefer `TextMeshProUGUI` — `UnityEngine.UI.Text` is forbidden
+  - Grep: `grep -rn "UnityEngine\.UI\.Text\|using UnityEngine.UI" --include="*.cs"`
+  - Severity: 🟡 HIGH
+- [ ] Consider `TextMeshPro` (non-UI variant) over `TextMeshProUGUI` when Canvas system is not needed — lighter CPU
+- [ ] Consider `SpriteRenderer` over `Image` for UI elements not requiring Canvas layout — tight mesh, less overdraw
+
+---
 
 ## Profiling Checklist
 - [ ] Check Canvas.BuildBatch in CPU Profiler
