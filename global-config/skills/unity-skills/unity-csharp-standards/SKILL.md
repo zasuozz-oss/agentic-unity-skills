@@ -1,6 +1,6 @@
 ---
 name: unity-csharp-standards
-description: "Use when writing Unity C# code: naming conventions (_camelCase, PascalCase), [SerializeField] usage, Allman brace style, hot-path allocation rules, object pooling, mobile frame budget, or CompareTag/sqrMagnitude patterns."
+description: "BASELINE — load whenever writing, generating, or reviewing ANY Unity C# script. Covers mandatory naming rules, field conventions, formatting, Update loop performance, GC allocation reduction, object pooling, and mobile frame budgets."
 ---
 
 # C# Quality Skill (Unity 6)
