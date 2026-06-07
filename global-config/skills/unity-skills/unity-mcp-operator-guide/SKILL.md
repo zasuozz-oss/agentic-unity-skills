@@ -7,6 +7,8 @@ description: "Use when operating Unity Editor through MCP tools: execute_menu_it
 
 This skill helps you effectively use the Unity Editor with MCP tools and resources.
 
+> **Run every MCP tool call here inside a subagent — see `@unity-mcp-delegation`. The main context never calls `mcpforunity__*` directly.**
+
 ## Template Notice
 
 Examples in `references/workflows.md` and `references/tools-reference.md` are reusable templates. They may be inaccurate across Unity versions, package setups (UGUI/TMP/Input System), and project-specific conventions. Please check console, compilation errors, or use screenshot after implementation.

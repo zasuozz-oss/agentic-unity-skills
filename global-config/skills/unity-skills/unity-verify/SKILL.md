@@ -1,100 +1,47 @@
 ---
 name: unity-verify
-description: Use when editing, writing, or reviewing Unity C# scripts and needing to verify correctness — covers compile-check with dotnet build and Unity Test Runner execution order, lock-file safety, and when to skip tests.
+description: Use when editing, writing, or reviewing Unity C# scripts and needing to verify correctness — compile-check via Unity MCP read_console and Unity Test Runner via MCP run_tests, the execution order, and when to skip tests.
 ---
 
 # Unity Verification Workflow
 
-Run these two steps **in order** after any Unity C# edit. Never invert them.
+Verify through **Unity MCP only.** Do NOT use `dotnet build`, `Unity -batchmode`, or launch a second Unity Editor instance. If Unity MCP is unavailable or not configured, **skip** verification and say so explicitly — there is no fallback path.
+
+**All MCP calls below run inside a subagent** — the main (Opus) context never calls `mcpforunity__*` directly. See `@unity-mcp-delegation` for the dispatch + model rules.
+
+Run the two steps **in order**. Never invert them.
 
 ---
 
-## Step 1 — Compile-Check with .NET (always, fast, lock-free)
+## Step 1 — Compile-check (always, after any C# edit)
 
-**Run this first, every time.** It reads source only and does NOT conflict with an open Unity Editor.
+`create_script` and `script_apply_edits` auto-trigger import + compilation — no `refresh_unity` needed.
 
-### One-time setup (no Windows/Mono needed)
+1. Poll `mcpforunity://editor/state` until `is_compiling == false` **and** `is_domain_reload_pending == false`.
+2. `read_console(types=["error"], count=20, include_stacktrace=True)`.
+3. No errors → compile clean. Errors → report `file:line` + message.
 
-Match `net<ver>` to `<TargetFrameworkVersion>` in the csproj (e.g. `v4.7.1` → `net471`):
+**Dispatch:** Haiku — the calls and expected output are fully specified.
 
-**macOS / Linux**
-```bash
-dotnet new classlib -o /tmp/refpack
-dotnet add /tmp/refpack package Microsoft.NETFramework.ReferenceAssemblies.net471
-```
+### Known safe-to-ignore
 
-**Windows (PowerShell)**
-```powershell
-dotnet new classlib -o $env:TEMP\refpack
-dotnet add $env:TEMP\refpack package Microsoft.NETFramework.ReferenceAssemblies.net471
-```
-
-### Build command
-
-**macOS / Linux**
-```bash
-REFDIR=$(find ~/.nuget/packages/microsoft.netframework.referenceassemblies.net471 \
-  -type d -name v4.7.1 | head -1)
-dotnet build Assembly-CSharp.csproj -nologo -v q \
-  -p:FrameworkPathOverride="$REFDIR"
-```
-
-**Windows (PowerShell)**
-```powershell
-$refDir = (Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.netframework.referenceassemblies.net471" `
-  -Recurse -Directory -Filter v4.7.1 | Select-Object -First 1).FullName
-dotnet build Assembly-CSharp.csproj -nologo -v q -p:FrameworkPathOverride="$refDir"
-```
-
-Build takes ~4–8 s. Exits non-zero on any compile error.
-
-### Known safe-to-ignore errors
-
-| Error | Cause | Action |
-|-------|-------|--------|
-| `MSB3644` | Missing `FrameworkPathOverride` | Fix: re-run setup above |
-| `CS0246` on 3rd-party plugin | csproj omits Firebase/etc. `<Reference>` — csproj-generation gap | Ignore — not your code |
-
-### Stale or missing .csproj
-
-If `.csproj`/`.sln` is missing or a file was added/renamed:
-- **Regenerate:** Unity → Preferences → External Tools → Generate .csproj files
-- **Or read** the Editor's auto-recompile result from `Editor.log`:
-  - macOS: `~/Library/Logs/Unity/Editor.log`
-  - Windows: `%LOCALAPPDATA%\Unity\Editor\Editor.log`
-  - Linux: `~/.config/unity3d/Editor.log`
+| Console error | Cause | Action |
+|---------------|-------|--------|
+| `CS0246` on a 3rd-party plugin only | Package/asmdef not referenced in that assembly | Ignore — not your code |
 
 ---
 
 ## Step 2 — Unity Test Runner (only when real logic exists)
 
-Run **only** if the task carries real logic (business rules, calculations, state machines, edge cases).
+Run **only** if the change carries real logic (business rules, calculations, state machines, edge cases).
 
 **Skip tests for:** getters/setters, UI wiring, glue code. Do NOT create tests just to have coverage.
 
-```bash
-Unity -batchmode -runTests \
-  -projectPath <project> \
-  -testPlatform EditMode \
-  -testResults results.xml \
-  -logFile -
-```
+1. `run_tests(mode="EditMode", test_names=[...])` → returns `job_id` (use `PlayMode` if the logic needs runtime).
+2. `get_test_job(job_id=job_id, wait_timeout=60, include_failed_tests=True)`.
+3. **Never wait indefinitely** — use a finite `wait_timeout`. If it is exceeded, report and stop (do not silently retry).
 
-Parse `results.xml` (JUnit/NUnit) for pass/fail. **Never wait indefinitely** — set a finite timeout.
-
----
-
-## Lock-File Safety Rule
-
-**Never launch a second Unity instance on a project already open in the Editor.**
-
-The project lock (`Temp/UnityLockfile`) blocks the second instance silently.
-
-| Situation | Correct action |
-|-----------|---------------|
-| Editor open + batchmode test needed | Run tests via the open Editor's Test Runner window |
-| Editor open + batchmode test needed (alt) | Ask the user to close the Editor first |
-| Blocked instance detected | Stop immediately — do NOT wait silently |
+**Dispatch:** Haiku if you pass explicit `test_names`; Sonnet if the subagent must select which tests apply.
 
 ---
 
@@ -109,8 +56,16 @@ The project lock (`Temp/UnityLockfile`) blocks the second instance silently.
 
 ---
 
+## No Second Instance
+
+Unity MCP talks to the **already-open** Editor. Never launch `Unity -batchmode` or a second Editor instance — the project lock (`Temp/UnityLockfile`) blocks it silently. If no Editor is open or MCP is not connected, **skip verification and say so** — do not fall back to batchmode or `dotnet build`.
+
+---
+
 ## Related Skills
 
+- `@unity-mcp-delegation` — run all MCP calls via subagent (mandatory) + model choice
+- `@unity-mcp-operator-guide` — `read_console`, `run_tests`, `editor/state` schemas
 - `@unity-csharp-standards` — Naming, field conventions, performance rules
 - `@unity-event-safety` — Event subscription symmetry
 - `@unity-async-patterns` — Async/await lifecycle and cancellation

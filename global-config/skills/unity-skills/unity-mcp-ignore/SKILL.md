@@ -7,6 +7,8 @@ description: "Use when applying mandatory guardrails before any Unity scene, pre
 
 **Load this skill before touching any scene, prefab, or Inspector data.**
 
+> **Execute every MCP call here inside a subagent — see `@unity-mcp-delegation`. The main context never calls `mcpforunity__*` directly.**
+
 ---
 
 ## Rule 1 — Button onClick: Persistent Wiring Only
