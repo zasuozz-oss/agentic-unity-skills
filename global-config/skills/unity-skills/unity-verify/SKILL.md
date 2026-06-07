@@ -21,7 +21,7 @@ Run the two steps **in order**. Never invert them.
 2. `read_console(types=["error"], count=20, include_stacktrace=True)`.
 3. No errors → compile clean. Errors → report `file:line` + message.
 
-**Dispatch:** Haiku — the calls and expected output are fully specified.
+**Dispatch:** Sonnet — the floor for all MCP execution (never Haiku).
 
 ### Known safe-to-ignore
 
@@ -41,7 +41,7 @@ Run **only** if the change carries real logic (business rules, calculations, sta
 2. `get_test_job(job_id=job_id, wait_timeout=60, include_failed_tests=True)`.
 3. **Never wait indefinitely** — use a finite `wait_timeout`. If it is exceeded, report and stop (do not silently retry).
 
-**Dispatch:** Haiku if you pass explicit `test_names`; Sonnet if the subagent must select which tests apply.
+**Dispatch:** Sonnet — whether you pass explicit `test_names` or the subagent must select which tests apply (never Haiku).
 
 ---
 

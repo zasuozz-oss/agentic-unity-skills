@@ -25,34 +25,29 @@ The main agent only *decides* the exact calls and *interprets* the distilled res
 
 If you catch yourself about to type an `mcpforunity__*` tool call in the main context, STOP and dispatch a subagent instead.
 
-## Choosing the Model — decide in this order
+## Choosing the Model — Sonnet executes, Opus plans
 
-Pick the **cheapest tier that can do the subtask**. Walk the questions top-down; the first "yes" picks the tier.
+**MCP execution always runs on Sonnet.** Do **not** use Haiku for Unity-MCP work — its output quality is too low: it misreads console dumps, mis-fills params, and silently returns wrong distillations, which costs more in rework than it saves. Sonnet is the floor for every MCP subagent, whether the calls are fully specified or the subagent must locate/adapt.
 
 ```dot
 digraph m {
-  "Needs to LOCATE or ADAPT? (find target, fix params, triage errors)" [shape=diamond];
-  "Sonnet" [shape=box];
-  "Every call and param fully specified, expected output known?" [shape=diamond];
-  "Haiku" [shape=box];
-  "Underspecified: specify it first, then re-decide" [shape=box];
+  "Running an mcpforunity__* call or reading its output?" [shape=diamond];
+  "Sonnet subagent (execute + read)" [shape=box];
+  "Opus / main agent (plan only, never MCP)" [shape=box];
 
-  "Needs to LOCATE or ADAPT? (find target, fix params, triage errors)" -> "Sonnet" [label=yes];
-  "Needs to LOCATE or ADAPT? (find target, fix params, triage errors)" -> "Every call and param fully specified, expected output known?" [label=no];
-  "Every call and param fully specified, expected output known?" -> "Haiku" [label=yes];
-  "Every call and param fully specified, expected output known?" -> "Underspecified: specify it first, then re-decide" [label=no];
+  "Running an mcpforunity__* call or reading its output?" -> "Sonnet subagent (execute + read)" [label=yes];
+  "Running an mcpforunity__* call or reading its output?" -> "Opus / main agent (plan only, never MCP)" [label=no];
 }
 ```
 
 | Tier | Use **exactly** when | Concrete examples |
 |------|----------------------|-------------------|
-| **Haiku** (`model: "haiku"`) | You handed it a fully-specified command list (tools + all params) and you know what success looks like. Pure execute / read / grep-for-known-pattern. | Run a given `batch_execute`; `read_console` → errors only; poll `editor/state` until `is_compiling==false`; parse `results.xml` for pass/fail; read latest compile result from `Editor.log` |
-| **Sonnet** (`model: "sonnet"`) | The subagent must make a small in-scope decision: find the correct GameObject/component, adapt a payload shape that varies by Unity version, or triage mixed/ambiguous console output. | `find_gameobjects` then pick the right instance and assign a SerializeField; describe a screenshot; decide which of several errors is the real one |
+| **Sonnet** (`model: "sonnet"`) | **Every** MCP execution and log/test read — both fully-specified command lists and tasks needing a small in-scope decision (locate a GameObject, adapt a payload, triage console output). | Run a given `batch_execute`; `read_console` → errors only; poll `editor/state` until `is_compiling==false`; parse `results.xml`; `find_gameobjects` then pick the right instance; describe a screenshot |
 | **Opus** = the **main** agent. **Never run MCP here.** | Architecture, cross-result root-cause reasoning, deciding *what* to build, writing the dispatch spec. | Designing scene/script structure; root-causing across multiple results |
 
-**Tie-breaker (Haiku vs Sonnet):** if *you* wrote every param → Haiku; if the subagent has to *go find* anything → Sonnet. Never reach for Opus to run MCP.
+**Never use Haiku for MCP**, and never reach for Opus to *run* MCP. Opus plans; Sonnet executes.
 
-> The Claude Code `Agent` tool exposes a `model` choice, not an `effort` knob — so "lower effort" = lower model tier (Haiku/Sonnet) **plus** a tight, fully-specified prompt.
+> The Claude Code `Agent` tool exposes a `model` choice, not an `effort` knob — so "lower effort" = a tight, fully-specified prompt on the Sonnet subagent, not a cheaper model tier.
 
 ## Dispatch Pattern
 
@@ -65,7 +60,7 @@ The subagent is cheaper and less capable — **give it a precise spec, not a goa
 ```
 Agent(
   subagent_type="general-purpose",     # or "Explore" for read-only
-  model="haiku",                       # "sonnet" if it needs to locate/adapt
+  model="sonnet",                      # always Sonnet for MCP — never Haiku
   description="Run Unity MCP ops",
   prompt="""
   Execute these Unity-MCP commands EXACTLY, in order. Follow
@@ -104,7 +99,8 @@ If the subagent hits something needing Opus-level judgment (architectural ambigu
 | Giving the subagent a vague goal ("set up the player") | Give exact tool calls + params; cheap models flail on open goals |
 | Asking it to "return everything" | Specify the distilled output explicitly; that IS the saving |
 | Pulling base64 screenshots into main | Have the subagent describe the image in text |
-| Using Opus for MCP execution because it "feels safer" | Plan on Opus, execute on Haiku/Sonnet; that is the whole point |
+| Using Opus for MCP execution because it "feels safer" | Plan on Opus, execute on Sonnet; that is the whole point |
+| Using Haiku to save tokens | Forbidden — Haiku's output quality is too low; Sonnet is the floor for MCP |
 | Subagent guessing on ambiguity | Instruct it to stop and report facts; Opus decides |
 
 ## Red Flags — STOP and dispatch instead
