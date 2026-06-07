@@ -10,8 +10,12 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..', '..');
 const PROJECT_DIR = process.cwd();
 const GLOBAL_CONFIG_DIR = path.join(ROOT, 'global-config');
+const INSTRUCTION_SOURCE = path.join(GLOBAL_CONFIG_DIR, 'instruction', 'unity_rule.md');
 const MANIFEST_NAME = '.ag-unity-manifest.json';
 const LEGACY_MANIFEST_NAME = '.ag-manifest.json';
+const UNITY_BLOCK_BEGIN = '<!-- AG-UNITY:BEGIN -->';
+const UNITY_BLOCK_END = '<!-- AG-UNITY:END -->';
+const PROJECT_INSTRUCTION_FILES = ['AGENTS.md', 'CLAUDE.md'];
 
 const pkg = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf-8'));
 
@@ -247,6 +251,40 @@ async function removeLegacyGroupFolders(skillsDir, manifest, groups) {
   }
 }
 
+function mergeManagedBlock(existingContent, managedBlock) {
+  const beginIndex = existingContent.indexOf(UNITY_BLOCK_BEGIN);
+  const endIndex = existingContent.indexOf(UNITY_BLOCK_END, beginIndex);
+
+  if (beginIndex !== -1 && endIndex !== -1) {
+    return [
+      existingContent.slice(0, beginIndex).trimEnd(),
+      managedBlock,
+      existingContent.slice(endIndex + UNITY_BLOCK_END.length).trimStart(),
+    ]
+      .filter((part) => part.length > 0)
+      .join('\n\n')
+      .concat('\n');
+  }
+
+  if (existingContent.trim().length === 0) {
+    return `${managedBlock}\n`;
+  }
+
+  return `${existingContent.trimEnd()}\n\n${managedBlock}\n`;
+}
+
+async function installProjectInstructionFiles() {
+  const managedBlock = (await fs.readFile(INSTRUCTION_SOURCE, 'utf-8')).trim();
+
+  for (const fileName of PROJECT_INSTRUCTION_FILES) {
+    const targetPath = path.join(PROJECT_DIR, fileName);
+    const existingContent = existsSync(targetPath) ? await fs.readFile(targetPath, 'utf-8') : '';
+    await fs.writeFile(targetPath, mergeManagedBlock(existingContent, managedBlock), 'utf-8');
+  }
+
+  return PROJECT_INSTRUCTION_FILES.length;
+}
+
 async function installTarget(target, groups) {
   await fs.mkdir(target.skillsDir, { recursive: true });
   const manifest = await readManifest(target.skillsDir);
@@ -286,6 +324,9 @@ async function initCommand(args) {
     const installed = await installTarget(target, groups);
     console.log(`+ ${target.name}: ${installed} skills -> ${path.relative(PROJECT_DIR, target.skillsDir)}`);
   }
+
+  const instructionCount = await installProjectInstructionFiles();
+  console.log(`+ Project instructions: ${instructionCount} files -> AGENTS.md, CLAUDE.md`);
 
   console.log('');
   console.log('Next steps: open this project in Antigravity, Codex, or Claude Code.');

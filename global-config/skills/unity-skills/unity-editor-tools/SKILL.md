@@ -1,6 +1,6 @@
 ---
 name: unity-editor-tools
-description: "Use ONLY when user explicitly requests Unity Editor tooling: EditorWindow, CustomEditor, PropertyDrawer, MenuItem, SceneView overlays, SerializedObject, or asset pipeline automation."
+description: "Use when the user explicitly requests Unity Editor tooling only: EditorWindow, CustomEditor, PropertyDrawer, MenuItem, SceneView overlays, SerializedObject, or asset pipeline automation."
 ---
 
 # Custom Editor Scripting

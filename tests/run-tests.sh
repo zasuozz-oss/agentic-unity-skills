@@ -87,6 +87,12 @@ done
 
 SKILL_COUNT=$(find "$TEST_PROJECT/.agents/skills" -maxdepth 2 -name "SKILL.md" -type f | wc -l | tr -d ' ')
 assert "Total project skills installed ($SKILL_COUNT found, expect $EXPECTED_SKILL_COUNT)" "[ '$SKILL_COUNT' = '$EXPECTED_SKILL_COUNT' ]"
+assert "AGENTS.md created" "[ -f '$TEST_PROJECT/AGENTS.md' ]"
+assert "AGENTS.md includes AG Unity block" "grep -q '<!-- AG-UNITY:BEGIN -->' '$TEST_PROJECT/AGENTS.md' && grep -q '<!-- AG-UNITY:END -->' '$TEST_PROJECT/AGENTS.md'"
+assert "AGENTS.md includes Unity MCP verification rule" "grep -q 'Use Unity MCP' '$TEST_PROJECT/AGENTS.md'"
+assert "CLAUDE.md created" "[ -f '$TEST_PROJECT/CLAUDE.md' ]"
+assert "CLAUDE.md includes AG Unity block" "grep -q '<!-- AG-UNITY:BEGIN -->' '$TEST_PROJECT/CLAUDE.md' && grep -q '<!-- AG-UNITY:END -->' '$TEST_PROJECT/CLAUDE.md'"
+assert "CLAUDE.md includes Unity MCP verification rule" "grep -q 'Use Unity MCP' '$TEST_PROJECT/CLAUDE.md'"
 assert "No GEMINI.md created" "[ ! -f '$TEST_PROJECT/GEMINI.md' ]"
 assert "No project .codex skills created" "[ ! -d '$TEST_PROJECT/.codex/skills' ]"
 assert "No global Codex skills written" "[ ! -d '$TEST_HOME/.codex/skills' ]"
@@ -116,6 +122,10 @@ INVALID_DESC=0
 for skill_dir in "$TEST_PROJECT/.agents/skills"/*/; do
     if [ -d "$skill_dir" ] && [ -f "$skill_dir/SKILL.md" ]; then
         desc=$(awk '/^description:/{sub(/^description:[[:space:]]*/, ""); print; exit}' "$skill_dir/SKILL.md")
+        desc=${desc#\"}
+        desc=${desc%\"}
+        desc=${desc#\'}
+        desc=${desc%\'}
         case "$desc" in
             "Use when"*) ;;
             *) INVALID_DESC=$((INVALID_DESC + 1)) ;;
@@ -148,17 +158,51 @@ assert "Skill count unchanged ($SKILL_COUNT_BEFORE -> $SKILL_COUNT_AFTER)" "[ '$
 for target in "${TARGETS[@]}"; do
     assert "$target still has no legacy group folders" "[ ! -d '$TEST_PROJECT/$target/skills/unity-skills' ] && [ ! -d '$TEST_PROJECT/$target/skills/qa-skills' ] && [ ! -d '$TEST_PROJECT/$target/skills/temp-dynamic-skills' ]"
 done
+AG_UNITY_BLOCK_COUNT=$(grep -c '<!-- AG-UNITY:BEGIN -->' "$TEST_PROJECT/AGENTS.md" 2>/dev/null || true)
+CLAUDE_AG_UNITY_BLOCK_COUNT=$(grep -c '<!-- AG-UNITY:BEGIN -->' "$TEST_PROJECT/CLAUDE.md" 2>/dev/null || true)
+assert "AGENTS.md AG Unity instruction block not duplicated" "[ '$AG_UNITY_BLOCK_COUNT' = '1' ]"
+assert "CLAUDE.md AG Unity instruction block not duplicated" "[ '$CLAUDE_AG_UNITY_BLOCK_COUNT' = '1' ]"
 echo ""
 
 # ─── TC-04: Existing Project — No Side Effects ───────────────
 echo -e "${YELLOW}TC-04: Existing Project — No Side Effects${NC}"
 TEST_PROJECT2=$(mktemp -d)
 printf '# My Project\n\nSome existing content here.\n' > "$TEST_PROJECT2/GEMINI.md"
+printf '%s\n' \
+    '# Existing Agent Rules' \
+    '' \
+    '<!-- OTHER-REPO:BEGIN -->' \
+    'Keep this unrelated repo instruction block.' \
+    '<!-- OTHER-REPO:END -->' \
+    '' \
+    '<!-- AG-UNITY:BEGIN -->' \
+    'old Unity rule that should be replaced' \
+    '<!-- AG-UNITY:END -->' \
+    '' \
+    'Trailing local note.' > "$TEST_PROJECT2/AGENTS.md"
+printf '%s\n' \
+    '# Existing Claude Rules' \
+    '' \
+    '<!-- CLAUDE-LOCAL:BEGIN -->' \
+    'Keep this Claude-specific instruction block.' \
+    '<!-- CLAUDE-LOCAL:END -->' \
+    '' \
+    '<!-- AG-UNITY:BEGIN -->' \
+    'old Claude Unity rule that should be replaced' \
+    '<!-- AG-UNITY:END -->' \
+    '' \
+    'Trailing Claude local note.' > "$TEST_PROJECT2/CLAUDE.md"
 
 cd "$TEST_PROJECT2"
 $CLI init > /dev/null 2>&1
 
 assert "Existing GEMINI.md untouched" "diff -q '$TEST_PROJECT2/GEMINI.md' <(printf '# My Project\n\nSome existing content here.\n')"
+assert "Existing AGENTS.md keeps unrelated instruction block" "grep -q 'Keep this unrelated repo instruction block.' '$TEST_PROJECT2/AGENTS.md'"
+assert "Existing AGENTS.md keeps trailing local content" "grep -q 'Trailing local note.' '$TEST_PROJECT2/AGENTS.md'"
+assert "Existing AGENTS.md replaces only AG Unity block" "grep -q 'Use Unity MCP' '$TEST_PROJECT2/AGENTS.md' && ! grep -q 'old Unity rule that should be replaced' '$TEST_PROJECT2/AGENTS.md'"
+assert "Existing CLAUDE.md keeps unrelated instruction block" "grep -q 'Keep this Claude-specific instruction block.' '$TEST_PROJECT2/CLAUDE.md'"
+assert "Existing CLAUDE.md keeps trailing local content" "grep -q 'Trailing Claude local note.' '$TEST_PROJECT2/CLAUDE.md'"
+assert "Existing CLAUDE.md replaces only AG Unity block" "grep -q 'Use Unity MCP' '$TEST_PROJECT2/CLAUDE.md' && ! grep -q 'old Claude Unity rule that should be replaced' '$TEST_PROJECT2/CLAUDE.md'"
 assert "Project skills installed alongside existing files" "[ -d '$TEST_PROJECT2/.agents/skills' ] && [ -d '$TEST_PROJECT2/.claude/skills' ] && [ ! -d '$TEST_PROJECT2/.codex/skills' ]"
 
 rm -rf "$TEST_PROJECT2"

@@ -36,6 +36,8 @@ ag-unity init
 
 ```text
 your-project/
+├── AGENTS.md                  # Project instruction file with the AG Unity managed block
+├── CLAUDE.md                  # Claude Code instruction file with the AG Unity managed block
 ├── .agents/
 │   └── skills/                 # Project skills for Antigravity and Codex
 │       ├── unity-addressables/
@@ -50,6 +52,8 @@ your-project/
 ```
 
 Skills auto-activate via YAML frontmatter `description`. The installer does not create `GEMINI.md`, `.codex/skills`, nor write to `~/.codex`, `~/.claude`, or `~/.gemini`.
+
+`ag-unity init` installs the Unity verification instruction into `AGENTS.md` and `CLAUDE.md` using the managed `<!-- AG-UNITY:BEGIN --> ... <!-- AG-UNITY:END -->` block. Re-running init replaces only that managed block and preserves unrelated local instructions.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: unity-csharp-standards
-description: "BASELINE — load whenever writing, generating, or reviewing ANY Unity C# script. Covers mandatory naming rules, field conventions, formatting, Update loop performance, GC allocation reduction, object pooling, and mobile frame budgets."
+description: "Use when writing, generating, or reviewing any Unity C# script as the baseline standard for naming rules, field conventions, formatting, Update loop performance, GC allocation reduction, object pooling, and mobile frame budgets."
 ---
 
 # C# Quality (Unity 6)

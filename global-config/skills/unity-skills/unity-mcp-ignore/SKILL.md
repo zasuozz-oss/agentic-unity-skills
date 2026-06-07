@@ -1,6 +1,6 @@
 ---
 name: unity-mcp-ignore
-description: "MANDATORY guardrails before any Unity scene, prefab, or Inspector modification. Enforces: persistent onClick wiring (never AddListener), SerializeField assignment completion, no unrequested editor scripts, scope confirmation for hierarchy changes."
+description: "Use when applying mandatory guardrails before any Unity scene, prefab, or Inspector modification: persistent onClick wiring (never AddListener), SerializeField assignment completion, no unrequested editor scripts, and scope confirmation for hierarchy changes."
 ---
 
 # MCP Behavioral Guardrails for Unity
