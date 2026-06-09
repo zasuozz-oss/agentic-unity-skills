@@ -225,11 +225,11 @@ echo ""
 echo -e "${YELLOW}TC-06: Legacy Migration — Removes Old Group Folders${NC}"
 TEST_PROJECT3=$(mktemp -d)
 
-mkdir -p "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety"
-printf '%s\n' '---' 'name: dotween-safety' 'description: old' '---' > "$TEST_PROJECT3/.agents/skills/unity-skills/dotween-safety/SKILL.md"
+mkdir -p "$TEST_PROJECT3/.agents/skills/unity-skills/unity-dotween-safety"
+printf '%s\n' '---' 'name: unity-dotween-safety' 'description: old' '---' > "$TEST_PROJECT3/.agents/skills/unity-skills/unity-dotween-safety/SKILL.md"
 mkdir -p "$TEST_PROJECT3/.agents/skills/removed-managed-skill"
 printf '%s\n' '---' 'name: removed-managed-skill' 'description: old managed skill' '---' > "$TEST_PROJECT3/.agents/skills/removed-managed-skill/SKILL.md"
-printf '%s\n' '{"groups":{"old-group":["removed-managed-skill"]},"skills":["removed-managed-skill"]}' > "$TEST_PROJECT3/.agents/skills/.ag-unity-manifest.json"
+printf '%s\n' '{"groups":{"unity-skills":["unity-dotween-safety"],"old-group":["removed-managed-skill"]},"skills":["removed-managed-skill","unity-dotween-safety"]}' > "$TEST_PROJECT3/.agents/skills/.ag-unity-manifest.json"
 
 cd "$TEST_PROJECT3"
 $CLI init > /dev/null 2>&1
@@ -239,6 +239,33 @@ assert "Skills installed flat after migration" "[ -f '$TEST_PROJECT3/.agents/ski
 assert "Old manifest-managed skill removed" "[ ! -d '$TEST_PROJECT3/.agents/skills/removed-managed-skill' ]"
 
 rm -rf "$TEST_PROJECT3"
+echo ""
+
+# ─── TC-06b: Other-Repo Skills Preserved ─────────────────────
+echo -e "${YELLOW}TC-06b: Other-Repo Skills Under Shared Group Folder Are Preserved${NC}"
+TEST_PROJECT3B=$(mktemp -d)
+
+# Legacy ag-unity skill nested under a group folder, recorded in the manifest.
+mkdir -p "$TEST_PROJECT3B/.claude/skills/unity-skills/unity-dotween-safety"
+printf '%s\n' '---' 'name: unity-dotween-safety' 'description: old' '---' > "$TEST_PROJECT3B/.claude/skills/unity-skills/unity-dotween-safety/SKILL.md"
+# Another package owns a skill under a folder that happens to share the group name.
+mkdir -p "$TEST_PROJECT3B/.claude/skills/unity-skills/foreign-repo-skill"
+printf '%s\n' '---' 'name: foreign-repo-skill' 'description: Use when verifying foreign skills survive ag-unity init.' '---' > "$TEST_PROJECT3B/.claude/skills/unity-skills/foreign-repo-skill/SKILL.md"
+# Another package's flat skill alongside ag-unity's flat skills.
+mkdir -p "$TEST_PROJECT3B/.claude/skills/foreign-flat-skill"
+printf '%s\n' '---' 'name: foreign-flat-skill' 'description: Use when verifying foreign flat skills survive ag-unity init.' '---' > "$TEST_PROJECT3B/.claude/skills/foreign-flat-skill/SKILL.md"
+printf '%s\n' '{"groups":{"unity-skills":["unity-dotween-safety"]},"skills":["unity-dotween-safety"]}' > "$TEST_PROJECT3B/.claude/skills/.ag-unity-manifest.json"
+
+cd "$TEST_PROJECT3B"
+$CLI init > /dev/null 2>&1
+
+assert "Foreign skill under shared group folder preserved" "[ -f '$TEST_PROJECT3B/.claude/skills/unity-skills/foreign-repo-skill/SKILL.md' ]"
+assert "Shared group folder kept because foreign skill remains" "[ -d '$TEST_PROJECT3B/.claude/skills/unity-skills' ]"
+assert "Legacy ag-unity nested skill migrated out of group folder" "[ ! -d '$TEST_PROJECT3B/.claude/skills/unity-skills/unity-dotween-safety' ]"
+assert "Foreign flat skill preserved" "[ -f '$TEST_PROJECT3B/.claude/skills/foreign-flat-skill/SKILL.md' ]"
+assert "ag-unity skill installed flat after migration" "[ -f '$TEST_PROJECT3B/.claude/skills/unity-dotween-safety/SKILL.md' ]"
+
+rm -rf "$TEST_PROJECT3B"
 echo ""
 
 # ─── TC-07: init Argument Rejection ──────────────────────────

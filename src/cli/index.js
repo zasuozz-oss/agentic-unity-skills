@@ -243,10 +243,41 @@ async function removeLegacyGroupFolders(skillsDir, manifest, groups) {
     ...groupNamesFromGroups(groups),
   ]);
   const newSkillNames = skillNamesFromGroups(groups);
+  const managedSkillNames = new Set([
+    ...managedSkillNamesFromManifest(manifest),
+    ...newSkillNames,
+  ]);
 
   for (const groupName of groupNames) {
-    if (!newSkillNames.has(groupName)) {
-      await removeIfExists(path.join(skillsDir, groupName));
+    // Skip names we install as flat skills; those are handled by cleanupManagedSkills.
+    if (newSkillNames.has(groupName)) {
+      continue;
+    }
+
+    const groupDir = path.join(skillsDir, groupName);
+    if (!existsSync(groupDir)) {
+      continue;
+    }
+
+    const groupStat = await fs.stat(groupDir);
+    if (!groupStat.isDirectory()) {
+      continue;
+    }
+
+    // Legacy ag-unity layout nested skills under group folders. Only remove the
+    // skill subfolders that ag-unity actually manages, so skills owned by another
+    // package that happens to share this folder name are preserved.
+    const entries = await fs.readdir(groupDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory() && managedSkillNames.has(entry.name)) {
+        await removeIfExists(path.join(groupDir, entry.name));
+      }
+    }
+
+    // Drop the group folder only when nothing else remains in it.
+    const remaining = await fs.readdir(groupDir);
+    if (remaining.length === 0) {
+      await removeIfExists(groupDir);
     }
   }
 }
