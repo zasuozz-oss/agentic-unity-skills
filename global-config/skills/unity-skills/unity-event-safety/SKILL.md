@@ -1,6 +1,6 @@
 ---
 name: unity-event-safety
-description: "Use when Unity C# code uses += / -= event subscriptions, ShowLoading/HideLoading pairing, boolean flags (_isLoading/_isFetching) that risk getting stuck, CancellationTokenSource acquire/dispose, or ghost handlers from missing OnDisable unsubscribe. NOT for Button.onClick — see unity-mcp-ignore."
+description: "Use when Unity C# code uses += / -= event subscriptions, ShowLoading/HideLoading pairing, boolean flags (_isLoading/_isFetching) that risk getting stuck, CancellationTokenSource acquire/dispose, or ghost handlers from missing OnDisable unsubscribe. NOT for Button.onClick (use persistent Inspector wiring)."
 ---
 
 # Event Safety & Resource Pairing
@@ -22,7 +22,7 @@ Prevents event memory leaks (ghost listeners) and stuck UI states (loading spinn
 Every `subscribe` MUST have a matching `unsubscribe` in the symmetric lifecycle method.
 
 > ⚠️ **Scope boundary**: This rule applies to **C# events** (`+=` / `-=`) and non-Button UnityEvents only.
-> `Button.onClick` must **never** use `AddListener` — persistent Inspector wiring is required instead. See `@unity-mcp-ignore`.
+> `Button.onClick` must **never** use `AddListener` — persistent Inspector wiring (Mode: `Runtime Only`) is required instead.
 
 - [ ] Every `OnEnable` subscribe → matching `OnDisable` unsubscribe
   - Grep: `grep -rn "OnEnable\|OnDisable" --include="*.cs"`
@@ -146,7 +146,7 @@ finally { _isFetching = false; }
   3. `Awake`/`Start` subscribe without `OnDestroy` unsubscribe? → **🔴 CRITICAL**
   4. Static event subscribe without unsubscribe? → **🔴 CRITICAL**
   5. Lambda subscribe `+=` without corresponding `-=`? → **🔴 CRITICAL**
-  6. `AddListener` / `RemoveListener` on `Button.onClick`? → **🔴 CRITICAL** — must use persistent Inspector wiring (see `@unity-mcp-ignore`)
+  6. `AddListener` / `RemoveListener` on `Button.onClick`? → **🔴 CRITICAL** — must use persistent Inspector wiring
 
 ### ShowLoading / HideLoading pairing
 - **Grep:** `grep -rn "ShowLoading\|HideLoading" --include="*.cs"`

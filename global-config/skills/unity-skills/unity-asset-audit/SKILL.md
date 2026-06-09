@@ -409,13 +409,13 @@ Summary: 47 checked / 15 passed / 32 violations
 Budget: ~103MB audio memory (limit: 30MB) — ⚠️ OVER BUDGET
 ```
 
-### Example 3: Canvas & UI Overdraw Audit (MCP Mode)
+### Example 3: Canvas & UI Overdraw Audit (utk Mode)
 **User**: "Audit UI canvas setup and overdraw in MainMenu scene."
 
 **Agent**:
 ```
-# Using MCP to inspect scene hierarchy...
-find_gameobjects(by_component, "Canvas")
+# Using utk exec to inspect scene hierarchy...
+utk exec 'return FindObjectsOfType<Canvas>().Select(c => c.name + ":" + c.GetComponentsInChildren<Transform>().Length).ToArray();'
 # Found 1 Canvas — "MainCanvas" with 847 children
 
 # Checking raycastTarget on non-interactive elements...

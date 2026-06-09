@@ -48,8 +48,8 @@ public event Action<float> OnHealthChanged;     // Action<T> preferred
 - No Hungarian notation
 
 ### Button.onClick — Code Prohibition
-- **NEVER** use `Button.onClick.AddListener()` — wire as persistent UnityEvent in Inspector
-- Full rules → see `@unity-mcp-ignore` Rule 1
+- **NEVER** use `Button.onClick.AddListener()` — wire as persistent UnityEvent in Inspector (Mode: `Runtime Only`, target the handler's GameObject)
+- Applies to all buttons, including dynamic/pooled — never fall back to `AddListener`
 
 ---
 
